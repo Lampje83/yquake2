@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{71e98a47-b07d-4c3a-999a-885b85fe60d6}</UniqueIdentifier>
+      <Extensions>frag;vert;geom;tcs;tes;comp</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_draw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_image.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_light.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_lightmap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_md2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_mesh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_misc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_model.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_sdl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_shaders.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_sp2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_surf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\gl3_warp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\glad\src\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\files\pcx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\files\stb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\client\refresh\files\wal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\common\shared\shared.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\common\md4.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backends\windows\shared\mem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\common\header\shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\ref_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\constants\anorms.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\constants\anormtab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\constants\warpsin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\files\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\glad\include\glad\glad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\glad\include\KHR\khrplatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\header\DG_dynarr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\header\HandmadeMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\header\local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\header\model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\client\refresh\gl3\shaders\2d.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\2Dcolor.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\2Dcolor.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\Common3D.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\Common3D.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3D.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dflow.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dlmflow.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3D.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dwater.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dsky.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dsprite.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3DspriteAlpha.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dwater.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\Alias.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\Alias.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\AliasColor.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\Particles.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\Particles.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\ParticlesSquare.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\src\client\refresh\gl3\shaders\2d.frag">
+      <Filter>Shader Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

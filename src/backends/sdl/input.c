@@ -1055,6 +1055,8 @@ Haptic_Feedback(char *name)
 	}
 	last_haptic_volume = joy_haptic_magnitude->value * 255;
 
+	// Com_Printf("Haptic: %s\n", name);
+
 	if (strstr(name, "misc/menu"))
 	{
 		effect_type = HAPTIC_EFFECT_MENY;

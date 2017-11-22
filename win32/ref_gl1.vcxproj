@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{A6861DEC-4E60-44A4-98A8-F03DEC75BE6B}</ProjectGuid>
-    <RootNamespace>ref_gl3</RootNamespace>
+    <ProjectGuid>{527DDA59-DBAA-4BBE-825A-1F3D5DD3FD92}</ProjectGuid>
+    <RootNamespace>ref_gl1</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -95,17 +95,6 @@
     <Link>
       <AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>
-      </Command>
-    </CustomBuildStep>
-    <CustomBuildStep />
-    <PostBuildEvent>
-      <Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying shaders</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -117,17 +106,6 @@
     <Link>
       <AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>
-      </Command>
-    </CustomBuildStep>
-    <CustomBuildStep />
-    <PostBuildEvent>
-      <Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying shaders</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -143,17 +121,6 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>
-      </Command>
-    </CustomBuildStep>
-    <CustomBuildStep />
-    <PostBuildEvent>
-      <Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying shaders</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -169,38 +136,27 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>
-      </Command>
-    </CustomBuildStep>
-    <CustomBuildStep />
-    <PostBuildEvent>
-      <Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying shaders</Message>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\backends\windows\shared\mem.c" />
     <ClCompile Include="..\src\client\refresh\files\pcx.c" />
     <ClCompile Include="..\src\client\refresh\files\stb.c" />
     <ClCompile Include="..\src\client\refresh\files\wal.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_draw.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_image.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_light.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_lightmap.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_main.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_md2.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_mesh.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_misc.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_model.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_sdl.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_shaders.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_sp2.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_surf.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_warp.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\glad\src\glad.c" />
+    <ClCompile Include="..\src\client\refresh\gl\qgl.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_draw.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_image.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_light.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_lightmap.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_main.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_md2.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_mesh.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_misc.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_model.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_scrap.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_sdl.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_sp2.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_surf.c" />
+    <ClCompile Include="..\src\client\refresh\gl\r_warp.c" />
     <ClCompile Include="..\src\common\md4.c" />
     <ClCompile Include="..\src\common\shared\shared.c" />
   </ItemGroup>
@@ -209,42 +165,11 @@
     <ClInclude Include="..\src\client\refresh\constants\anormtab.h" />
     <ClInclude Include="..\src\client\refresh\constants\warpsin.h" />
     <ClInclude Include="..\src\client\refresh\files\stb_image.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\glad\include\glad\glad.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\glad\include\KHR\khrplatform.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\header\DG_dynarr.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\header\HandmadeMath.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\header\local.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\header\model.h" />
+    <ClInclude Include="..\src\client\refresh\gl\header\local.h" />
+    <ClInclude Include="..\src\client\refresh\gl\header\model.h" />
+    <ClInclude Include="..\src\client\refresh\gl\header\qgl.h" />
     <ClInclude Include="..\src\client\refresh\ref_shared.h" />
     <ClInclude Include="..\src\common\header\shared.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\src\client\refresh\gl3\shaders\2d.frag">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <None Include="..\src\client\refresh\gl3\shaders\2d.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\2Dcolor.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\2Dcolor.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\3D.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\3D.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dflow.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dlmflow.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dsky.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dsprite.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\3DspriteAlpha.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dwater.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dwater.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\Alias.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\Alias.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\AliasColor.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\Common3D.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\Common3D.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\Particles.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\Particles.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\ParticlesSquare.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
