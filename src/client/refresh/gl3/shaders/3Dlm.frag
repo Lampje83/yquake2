@@ -33,15 +33,30 @@ flat in uint passLightFlags;
 void main()
 {
 	vec4 texel = texture(tex, passTexCoord);
+	vec4 lmTex;
 
 	// apply intensity
 	texel.rgb *= intensity;
 
 	// apply lightmap
-	vec4 lmTex = texture(lightmap0, passLMcoord) * lmScales[0];
-	lmTex     += texture(lightmap1, passLMcoord) * lmScales[1];
-	lmTex     += texture(lightmap2, passLMcoord) * lmScales[2];
-	lmTex     += texture(lightmap3, passLMcoord) * lmScales[3];
+	if (flags != 3u)
+	{
+		lmTex  = texture(lightmap0, passLMcoord) * lmScales[0];
+		lmTex += texture(lightmap1, passLMcoord) * lmScales[1];
+		lmTex += texture(lightmap2, passLMcoord) * lmScales[2];
+		lmTex += texture(lightmap3, passLMcoord) * lmScales[3];
+	}
+	else
+	{
+		// assume all lightmaps are the same size
+		ivec2 lmSize = textureSize (lightmap0, 0);
+		ivec2 LMcoord = ivec2(passLMcoord * lmSize);
+		
+		lmTex  = texelFetch(lightmap0, LMcoord, 0) * lmScales[0];
+		lmTex += texelFetch(lightmap1, LMcoord, 0) * lmScales[1];
+		lmTex += texelFetch(lightmap2, LMcoord, 0) * lmScales[2];
+		lmTex += texelFetch(lightmap3, LMcoord, 0) * lmScales[3];
+	}
 
 	if(passLightFlags != 0u)
 	{
@@ -68,7 +83,14 @@ void main()
 			lmTex.rgb += dynLights[i].lightColor.rgb * fact * (1.0/256.0);
 		}
 	}
-
+	if (flags == 1u)
+	{
+		lmTex.rgb = vec3(1.0);
+	}
+	else if (flags == 2u || flags == 3u)
+	{
+		texel.rgb = vec3(1.0);
+	}
 	lmTex.rgb *= overbrightbits;
 	outColor = lmTex*texel;
 	outColor.rgb = pow(outColor.rgb, vec3(gamma)); // apply gamma correction to result

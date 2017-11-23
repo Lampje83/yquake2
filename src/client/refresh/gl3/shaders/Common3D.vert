@@ -1,4 +1,4 @@
-#version 150
+#version 430
 
 in vec3 position;   // GL3_ATTRIB_POSITION
 in vec2 texCoord;   // GL3_ATTRIB_TEXCOORD
@@ -21,7 +21,7 @@ layout (std140) uniform uni3D
 	float alpha;
 	float overbrightbits;
 	float particleFadeFactor;
+	uint  flags;
 	float _pad_1; // AMDs legacy windows driver needs this, otherwise uni3D has wrong size
 	float _pad_2;
-	float _pad_3;
 };
