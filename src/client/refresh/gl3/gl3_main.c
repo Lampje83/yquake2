@@ -127,6 +127,12 @@ cvar_t *gl_shadows;
 cvar_t *gl_dynamic;
 
 cvar_t *gl_showtris;
+cvar_t *gl_skycube;		// render sky as cubemap, eliminating the need of calculating extents
+cvar_t *gl_reflection;
+cvar_t *gl_refraction;
+cvar_t *gl_multiarray;
+
+cvar_t *gl_cullpvs;
 
 cvar_t *gl3_debugcontext;
 
@@ -248,6 +254,11 @@ GL3_Register(void)
 	gl_dynamic = ri.Cvar_Get("gl_dynamic", "1", 0);
 
 	gl_showtris = ri.Cvar_Get( "gl_showtris", "0", 0 );
+	gl_skycube = ri.Cvar_Get ( "gl_skycube", "0", CVAR_ARCHIVE ); // TODO: not used right now
+	gl_reflection = ri.Cvar_Get ( "gl_reflection", "1", CVAR_ARCHIVE );
+	gl_refraction = ri.Cvar_Get ( "gl_refraction", "1", CVAR_ARCHIVE );
+	gl_multiarray = ri.Cvar_Get ( "gl_multiarray", "1", CVAR_ARCHIVE );
+	gl_cullpvs = ri.Cvar_Get ( "gl_cullpvs", "1", 0 );
 
 #if 0 // TODO!
 	//gl_lefthand = ri.Cvar_Get("hand", "0", CVAR_USERINFO | CVAR_ARCHIVE);
@@ -675,8 +686,8 @@ GL3_DrawBeam(entity_t *e)
 		VectorCopy(end_points[pointb], verts[4*i+3].pos);
 	}
 
-	GL3_BindVAO(gl3state.vao3D);
-	GL3_BindVBO(gl3state.vbo3D);
+	GL3_BindVAO(gl3state.vao3Dtrans);
+	GL3_BindVBO(gl3state.vbo3Dtrans);
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STREAM_DRAW);
 	glDrawArrays( GL_TRIANGLE_STRIP, 0, NUM_BEAM_SEGS*4 );
@@ -751,8 +762,8 @@ GL3_DrawSpriteModel(entity_t *e)
 	VectorMA( e->origin, -frame->origin_y, up, verts[3].pos );
 	VectorMA( verts[3].pos, frame->width - frame->origin_x, right, verts[3].pos );
 
-	GL3_BindVAO(gl3state.vao3D);
-	GL3_BindVBO(gl3state.vbo3D);
+	GL3_BindVAO(gl3state.vao3Dtrans);
+	GL3_BindVBO(gl3state.vbo3Dtrans);
 
 	glBufferData(GL_ARRAY_BUFFER, 4*sizeof(gl3_3D_vtx_t), verts, GL_STREAM_DRAW);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -1276,6 +1287,10 @@ SetupGL(void)
 
 	gl3state.uni3DData.time = gl3_newrefdef.time;
 
+	gl3state.uni3DData.viewPos.X = gl3_newrefdef.vieworg[ 0 ];
+	gl3state.uni3DData.viewPos.Y = gl3_newrefdef.vieworg[ 1 ];
+	gl3state.uni3DData.viewPos.Z = gl3_newrefdef.vieworg[ 2 ];
+
 	GL3_UpdateUBO3D();
 
 	/* set drawing parms */
@@ -1416,41 +1431,29 @@ GL3_RenderView(refdef_t *fd)
 
 	gl3_newrefdef = *fd;
 
-	if (!gl3_worldmodel && !(gl3_newrefdef.rdflags & RDF_NOWORLDMODEL))
-	{
+	if (!gl3_worldmodel && !(gl3_newrefdef.rdflags & RDF_NOWORLDMODEL)) {
 		ri.Sys_Error(ERR_DROP, "R_RenderView: NULL worldmodel");
 	}
 
-	if (gl_speeds->value)
-	{
+	if (gl_speeds->value) {
 		c_brush_polys = 0;
 		c_alias_polys = 0;
 	}
 
 	GL3_PushDlights();
 
-	if (gl_finish->value)
-	{
+	if (gl_finish->value) {
 		glFinish();
 	}
 
 	SetupFrame();
-
 	SetFrustum();
-
 	SetupGL();
 
 	GL3_MarkLeaves(); /* done here so we know if we're in water */
-
 	GL3_DrawWorld();
-
 	GL3_DrawEntitiesOnList();
-
-	// kick the silly gl_flashblend poly lights
-	// GL3_RenderDlights();
-
 	GL3_DrawParticles();
-
 	GL3_DrawAlphaSurfaces();
 
 	// Note: R_Flash() is now GL3_Draw_Flash() and called from GL3_RenderFrame()
@@ -1539,12 +1542,83 @@ GL3_SetLightLevel(void)
 	}
 }
 
+extern GLuint vao2D, vbo2D;
+
 static void
 GL3_RenderFrame(refdef_t *fd)
-{
+{	
+	gl3state.uni3DData.fluidPlane = HMM_Vec4 ( 0, 0, 0, 0 );
+	gl3state.modMatrix = gl3_identityMat4;
+
+	GL3_RenderView ( fd );
+	GL3_SetLightLevel ();
+/*
+	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
+	glViewport (0, 0, fd->width, fd->height );
+	glClear ( GL_DEPTH_BUFFER_BIT );
+
+	fd->viewangles[ 1 ] += 180;
+	fd->viewangles[ 0 ] = -fd->viewangles[ 0 ];
 	GL3_RenderView(fd);
-	GL3_SetLightLevel();
-	GL3_SetGL2D();
+	fd->viewangles[ 1 ] -= 180;
+	fd->viewangles[ 0 ] = -fd->viewangles[ 0 ];
+
+	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
+*/
+
+	if ( gl3state.numRefPlanes > 0 && gl_reflection->value ) {
+		hmm_mat4 oldViewMat = gl3state.uni3DData.transModelMat4;
+		hmm_vec4 plane = { gl3state.refPlanes[ 0 ]->normal[ 0 ],
+			gl3state.refPlanes[ 0 ]->normal[ 1 ],
+			gl3state.refPlanes[ 0 ]->normal[ 2 ],
+			-gl3state.refPlanes[ 0 ]->dist };
+		if ( !gl3state.planeback[ 0 ] ) {
+			plane.X = -plane.X;
+			plane.Y = -plane.Y;
+			plane.Z = -plane.Z;
+			plane.W = -plane.W;
+		}
+		gl3state.modMatrix = HMM_Householder ( plane, -1 );
+
+		gl3state.uni3DData.transModelMat4 = HMM_MultiplyMat4 ( gl3state.modMatrix, gl3state.uni3DData.transModelMat4  );
+		
+		// start drawing to reflection buffer
+		glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
+		glViewport ( 0, 0, fd->width, fd->height );
+		glClearColor ( 0, 0, 0, 0 );
+		glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
+
+		gl3state.uni3DData.fluidPlane = plane;
+		GL3_UpdateUBO3D ();
+		//GL3_RenderView (fd);
+
+		// Draw the world
+		//GL3_MarkLeaves (); /* done here so we know if we're in water */
+		glCullFace ( GL_BACK );
+
+		float oldcull = gl_cullpvs->value;
+		//gl_cullpvs->value = 0;
+		GL3_DrawWorld ();
+		GL3_DrawEntitiesOnList ();
+		GL3_DrawParticles ();
+		GL3_DrawAlphaSurfaces ();
+
+		// Restore normal framebuffer
+		gl_cullpvs->value = oldcull;
+		glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
+		gl3state.uni3DData.transModelMat4 = oldViewMat;
+		glCullFace ( GL_FRONT );
+//		memcpy ( frustum, oldfrustum, sizeof ( cplane_t ) * 4 );
+
+		GL3_SetGL2D ();
+
+		GL3_Bind ( gl3state.reflectTexture );
+		GL3_UseProgram ( gl3state.si2D.shaderProgram );
+		GL3_DrawTexture ( 0, gl3_newrefdef.height * 0.25, gl3_newrefdef.width * 0.25, -gl3_newrefdef.height * 0.25 );
+	}
+	else {
+		GL3_SetGL2D ();
+	}
 
 	if(v_blend[3] != 0.0f)
 	{
@@ -1552,6 +1626,11 @@ GL3_RenderFrame(refdef_t *fd)
 		int y = (vid.height - gl3_newrefdef.height)/2;
 
 		GL3_Draw_Flash(v_blend, x, y, gl3_newrefdef.width, gl3_newrefdef.height);
+	}
+
+	char str[ 30 ];
+	if ( gl3state.numRefPlanes > 0 ) {
+		R_Printf ( PRINT_DEVELOPER, "Reflection planes: %d\n", gl3state.numRefPlanes );
 	}
 }
 

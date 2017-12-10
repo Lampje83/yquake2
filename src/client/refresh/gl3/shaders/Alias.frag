@@ -3,10 +3,15 @@
 uniform sampler2D tex;
 
 in vec4 passColor;
+in vec3 passWorldCoord;
 
 void main()
 {
 	vec4 texel = texture(tex, passTexCoord);
+
+	float clipPos = dot (passWorldCoord, fluidPlane.xyz) + fluidPlane.w;
+	if (clipPos < 0 && (length(fluidPlane.xyz) > 0))
+		discard;
 
 	// apply gamma correction and intensity
 	texel.rgb *= intensity;

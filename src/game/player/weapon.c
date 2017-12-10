@@ -624,7 +624,7 @@ Weapon_Generic(edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 			ent->client->ps.gunframe++;
 		}
 
-		if (ent->client->ps.gunframe == FRAME_IDLE_FIRST + 1)
+		if (ent->client->ps.gunframe >= FRAME_IDLE_FIRST + 1)
 		{
 			ent->client->weaponstate = WEAPON_READY;
 		}

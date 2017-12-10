@@ -191,6 +191,9 @@
     <None Include="..\src\client\refresh\gl3\shaders\ParticlesSquare.frag">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Drefract.vert">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\src\client\refresh\gl3\shaders\2d.frag">

@@ -142,6 +142,8 @@ typedef struct
 	hmm_mat4 transProjMat4;
 	hmm_mat4 transViewMat4;
 	hmm_mat4 transModelMat4;
+	hmm_vec4 fluidPlane;
+	hmm_vec3 viewPos;
 
 	GLfloat scroll; // for SURF_FLOWING
 	GLfloat time; // for warping surfaces like water & possibly other things
@@ -149,7 +151,7 @@ typedef struct
 	GLfloat overbrightbits; // gl3_overbrightbits, applied to lightmaps (and elsewhere to models)
 	GLfloat particleFadeFactor; // gl3_particle_fade_factor, higher => less fading out towards edges
 	GLuint	flags;	// 1 = fullbright, 2 = lightmap, 3 = flat lightmap
-		GLfloat _padding[2]; // again, some padding to ensure this has right size
+		GLfloat _padding[3]; // again, some padding to ensure this has right size
 } gl3Uni3D_t;
 
 extern const hmm_mat4 gl3_identityMat4;
@@ -227,6 +229,7 @@ typedef struct
 	gl3ShaderInfo_t siParticle; // for particles. surprising, right?
 
 	GLuint vao3D, vbo3D; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
+	GLuint vao3Dtrans, vbo3Dtrans; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
 	GLuint vaoAlias, vboAlias, eboAlias; // for models, using 9 floats as (x,y,z, s,t, r,g,b,a)
 	GLuint vaoParticle, vboParticle; // for particles, using 9 floats (x,y,z, size,distance, r,g,b,a)
 
@@ -239,6 +242,19 @@ typedef struct
 	GLuint uni2DUBO;
 	GLuint uni3DUBO;
 	GLuint uniLightsUBO;
+
+	// ERIK: Renderbuffers
+	GLuint	reflectTexture, reflectTextureDepth;
+	GLuint	refractTexture, refractTextureDepth;
+	GLuint	cubeTextures[ 6 ];
+	GLuint	reflectFB;		// reflection framebuffer
+	GLuint	refractFB;		// refration framebuffer
+
+	cplane_t	*refPlanes[ 16 ];
+	qboolean	planeback[ 16 ];
+	int			numRefPlanes;
+	int			currentRefPlane;
+	hmm_mat4	modMatrix;
 
 } gl3state_t;
 
@@ -386,6 +402,7 @@ extern mleaf_t* GL3_Mod_PointInLeaf(vec3_t p, gl3model_t *model);
 // gl3_draw.c
 extern void GL3_Draw_InitLocal(void);
 extern void GL3_Draw_ShutdownLocal(void);
+extern void GL3_DrawTexture ( float x, float y, float w, float h );
 extern gl3image_t * GL3_Draw_FindPic(char *name);
 extern void GL3_Draw_GetPicSize(int *w, int *h, char *pic);
 extern int GL3_Draw_GetPalette(void);
@@ -517,6 +534,12 @@ extern cvar_t *gl_shadows;
 extern cvar_t *gl_dynamic;
 
 extern cvar_t *gl_showtris;
+extern cvar_t *gl_skycube;
+extern cvar_t *gl_reflection;
+extern cvar_t *gl_refraction;
+extern cvar_t *gl_multiarray;
+
+extern cvar_t *gl_cullpvs;
 
 extern cvar_t *gl3_debugcontext;
 

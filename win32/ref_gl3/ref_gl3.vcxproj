@@ -244,6 +244,7 @@
     <None Include="..\src\client\refresh\gl3\shaders\3Dlm.frag" />
     <None Include="..\src\client\refresh\gl3\shaders\3Dlm.vert" />
     <None Include="..\src\client\refresh\gl3\shaders\3Dlmflow.vert" />
+    <None Include="..\src\client\refresh\gl3\shaders\3Drefract.vert" />
     <None Include="..\src\client\refresh\gl3\shaders\3Dsky.frag" />
     <None Include="..\src\client\refresh\gl3\shaders\3Dsprite.frag" />
     <None Include="..\src\client\refresh\gl3\shaders\3DspriteAlpha.frag" />

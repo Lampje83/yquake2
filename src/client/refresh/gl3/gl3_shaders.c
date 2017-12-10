@@ -70,11 +70,9 @@ CompileShader(GLenum shaderType, const char* shaderSrc, const char* shaderSrc2)
 			case GL_VERTEX_SHADER:   shaderTypeStr = "Vertex"; break;
 			case GL_FRAGMENT_SHADER: shaderTypeStr = "Fragment"; break;
 			case GL_GEOMETRY_SHADER: shaderTypeStr = "Geometry"; break;
-			/* not supported in OpenGL3.2 and we're unlikely to need/use them anyway
 			case GL_COMPUTE_SHADER:  shaderTypeStr = "Compute"; break;
 			case GL_TESS_CONTROL_SHADER:    shaderTypeStr = "TessControl"; break;
 			case GL_TESS_EVALUATION_SHADER: shaderTypeStr = "TessEvaluation"; break;
-			*/
 		}
 		eprintf("ERROR: Compiling %s Shader failed: %s\n", shaderTypeStr, bufPtr);
 		glDeleteShader(shader);
@@ -435,6 +433,10 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		{
 			glUniform1i(lmLoc, i+1); // lightmap0 belongs to GL_TEXTURE1, lightmap1 to GL_TEXTURE2 etc
 		}
+	}
+	GLint reflLoc = glGetUniformLocation ( prog, "refl" );
+	if ( reflLoc != -1 ) {
+		glUniform1i ( reflLoc, 5 );
 	}
 
 	GLint lmScalesLoc = glGetUniformLocation(prog, "lmScales");

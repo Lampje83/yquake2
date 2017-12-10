@@ -26,7 +26,7 @@
  */
 
 #include "header/local.h"
-
+#if 0
 static void
 R_BoundPoly(int numverts, float *verts, vec3_t mins, vec3_t maxs)
 {
@@ -223,10 +223,15 @@ GL3_SubdivideSurface(msurface_t *fa, gl3model_t* loadmodel)
 
 	R_SubdividePolygon(numverts, verts[0], fa);
 }
+#endif
 
 /*
  * Does a water warp on the pre-fragmented glpoly_t chain
  */
+extern GLuint numelements, elementlist[];
+extern void GL_DrawElements ( void );
+extern GLuint numarrays, arraystart[], arraylength[];
+
 void
 GL3_EmitWaterPolys(msurface_t *fa)
 {
@@ -235,7 +240,7 @@ GL3_EmitWaterPolys(msurface_t *fa)
 
 	if (fa->texinfo->flags & SURF_FLOWING)
 	{
-		scroll = -64.0f * ((gl3_newrefdef.time * 0.5) - (int)(gl3_newrefdef.time * 0.5));
+		scroll = -64.0f * ((gl3_newrefdef.time / 40.0f) - (int)(gl3_newrefdef.time / 40.0f));
 		if (scroll == 0.0f) // this is done in GL3_DrawGLFlowingPoly() TODO: keep?
 		{
 			scroll = -64.0f;
@@ -255,9 +260,17 @@ GL3_EmitWaterPolys(msurface_t *fa)
 
 	for (bp = fa->polys; bp != NULL; bp = bp->next)
 	{
-		int numverts = bp->numverts;
-		glBufferData(GL_ARRAY_BUFFER, sizeof(gl3_3D_vtx_t)*numverts, bp->vertices, GL_STREAM_DRAW);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, numverts);
+		if ( gl_multiarray->value ) {
+			arraystart[ numarrays ] = bp->vertices - currentmodel->glverts;
+			arraylength[ numarrays++ ] = bp->numverts;
+		} else {
+			if ( numelements > 0 ) {
+				elementlist[ numelements++ ] = -1;	// add primitive restart to list
+			}
+			for ( short i = 0; i < bp->numverts; i++, numelements++ ) {
+				elementlist[ numelements ] = ( bp->vertices - gl3_worldmodel->glverts ) + i;
+			}
+		}
 	}
 }
 
@@ -696,8 +709,8 @@ GL3_DrawSkyBox(void)
 	GL3_UpdateUBO3D();
 
 	GL3_UseProgram(gl3state.si3Dsky.shaderProgram);
-	GL3_BindVAO(gl3state.vao3D);
-	GL3_BindVBO(gl3state.vbo3D);
+	GL3_BindVAO(gl3state.vao3Dtrans);
+	GL3_BindVBO(gl3state.vbo3Dtrans);
 
 	// TODO: this could all be done in one drawcall.. but.. whatever, it's <= 6 drawcalls/frame
 
@@ -764,6 +777,8 @@ GL3_DrawSkyBox(void)
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	}
 
+	GL3_BindVAO ( gl3state.vao3D );
+	GL3_BindVBO ( gl3state.vbo3D );
 
 	// glPopMatrix();
 	gl3state.uni3DData.transModelMat4 = origModelMat;

@@ -34,6 +34,10 @@ int c_visible_textures;
 static vec3_t modelorg; /* relative to viewpoint */
 static msurface_t *gl3_alpha_surfaces;
 
+#define MAX_INDICES	2048
+GLuint elementlist[ MAX_INDICES ], numelements = 0; // for glDrawElements
+GLuint arraystart[ MAX_INDICES ], arraylength[ MAX_INDICES ], numarrays = 0; // for glMultiDrawArrays
+
 gl3lightmapstate_t gl3_lms;
 
 #define BACKFACE_EPSILON 0.01
@@ -67,6 +71,27 @@ void GL3_SurfInit(void)
 	glEnableVertexAttribArray(GL3_ATTRIB_LIGHTFLAGS);
 	qglVertexAttribIPointer(GL3_ATTRIB_LIGHTFLAGS, 1, GL_UNSIGNED_INT, sizeof(gl3_3D_vtx_t), offsetof(gl3_3D_vtx_t, lightFlags));
 
+
+	glGenVertexArrays ( 1, &gl3state.vao3Dtrans );
+	GL3_BindVAO ( gl3state.vao3Dtrans );
+
+	glGenBuffers ( 1, &gl3state.vbo3Dtrans );
+	GL3_BindVBO ( gl3state.vbo3Dtrans );
+
+	glEnableVertexAttribArray ( GL3_ATTRIB_POSITION );
+	qglVertexAttribPointer ( GL3_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof ( gl3_3D_vtx_t ), 0 );
+
+	glEnableVertexAttribArray ( GL3_ATTRIB_TEXCOORD );
+	qglVertexAttribPointer ( GL3_ATTRIB_TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof ( gl3_3D_vtx_t ), offsetof ( gl3_3D_vtx_t, texCoord ) );
+
+	glEnableVertexAttribArray ( GL3_ATTRIB_LMTEXCOORD );
+	qglVertexAttribPointer ( GL3_ATTRIB_LMTEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof ( gl3_3D_vtx_t ), offsetof ( gl3_3D_vtx_t, lmTexCoord ) );
+
+	glEnableVertexAttribArray ( GL3_ATTRIB_NORMAL );
+	qglVertexAttribPointer ( GL3_ATTRIB_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof ( gl3_3D_vtx_t ), offsetof ( gl3_3D_vtx_t, normal ) );
+
+	glEnableVertexAttribArray ( GL3_ATTRIB_LIGHTFLAGS );
+	qglVertexAttribIPointer ( GL3_ATTRIB_LIGHTFLAGS, 1, GL_UNSIGNED_INT, sizeof ( gl3_3D_vtx_t ), offsetof ( gl3_3D_vtx_t, lightFlags ) );
 
 
 	// init VAO and VBO for model vertexdata: 9 floats
@@ -107,13 +132,79 @@ void GL3_SurfInit(void)
 
 	glEnableVertexAttribArray(GL3_ATTRIB_COLOR);
 	qglVertexAttribPointer(GL3_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 9*sizeof(GLfloat), 5*sizeof(GLfloat));
+
+	// init renderbuffers for reflection, refraction and shadow mapping
+	GLenum DrawBuffers[ 2 ] = { GL_COLOR_ATTACHMENT0,GL_DEPTH_ATTACHMENT };
+
+	// TODO: Clean these up at shutdown
+	glGenFramebuffers ( 1, &gl3state.reflectFB );
+	glGenFramebuffers ( 1, &gl3state.refractFB );
+	glGenTextures ( 1, &gl3state.reflectTexture );
+	glGenTextures ( 1, &gl3state.reflectTextureDepth );
+	glGenTextures ( 1, &gl3state.refractTexture );
+	glGenTextures ( 1, &gl3state.refractTextureDepth );
+
+	// Setup buffer textures
+	glBindTexture ( GL_TEXTURE_2D, gl3state.reflectTexture );
+	glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGBA, vid.width, vid.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+
+	glBindTexture ( GL_TEXTURE_2D, gl3state.reflectTextureDepth );
+	glTexImage2D ( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0 );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+
+	glBindTexture ( GL_TEXTURE_2D, gl3state.refractTexture );
+	glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGBA, vid.width, vid.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+
+	glBindTexture ( GL_TEXTURE_2D, gl3state.refractTextureDepth );
+	glTexImage2D ( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0 );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+
+	// Setup the frame buffers
+	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
+	glFramebufferTexture ( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gl3state.reflectTexture, 0 );
+	glFramebufferTexture ( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, gl3state.reflectTextureDepth, 0 );
+/*
+	GLuint depthrenderbuffer;
+	glGenRenderbuffers ( 1, &depthrenderbuffer );
+	glBindRenderbuffer ( GL_RENDERBUFFER, depthrenderbuffer );
+	glRenderbufferStorage ( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, vid.height, vid.width );
+	glFramebufferRenderbuffer ( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer );
+*/
+	glDrawBuffers ( 1, DrawBuffers );
+
+	if ( glCheckFramebufferStatus ( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE ) {
+		R_Printf ( PRINT_ALERT, "Failed to create reflection framebuffer\n" );
+	}
+
+	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.refractFB );
+	glFramebufferTexture ( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gl3state.refractTexture, 0 );
+	glFramebufferTexture ( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, gl3state.refractTextureDepth, 0 );
+	glDrawBuffers ( 1, DrawBuffers );
+
+	if ( glCheckFramebufferStatus ( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE ) {
+		R_Printf ( PRINT_ALERT, "Failed to create refraction framebuffer\n" );
+	}
+
+	// Set framebuffer target to default output
+	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
 }
 
 void GL3_SurfShutdown(void)
 {
-	glDeleteBuffers(1, &gl3state.vbo3D);
+	glDeleteBuffers ( 1, &gl3state.vbo3D );
 	gl3state.vbo3D = 0;
-	glDeleteVertexArrays(1, &gl3state.vao3D);
+	glDeleteVertexArrays ( 1, &gl3state.vao3D );
+	gl3state.vao3D = 0;
+
+	glDeleteBuffers ( 1, &gl3state.vbo3Dtrans );
+	gl3state.vbo3D = 0;
+	glDeleteVertexArrays ( 1, &gl3state.vao3Dtrans );
 	gl3state.vao3D = 0;
 
 	glDeleteBuffers(1, &gl3state.eboAlias);
@@ -124,6 +215,34 @@ void GL3_SurfShutdown(void)
 	gl3state.vaoAlias = 0;
 }
 
+void GL_MultiDrawArrays ( void ) {
+	if ( numarrays > MAX_INDICES ) {
+		ri.Sys_Error ( ERR_DROP, __FUNCTION__": Array list overrun: %d, max %d\n", numarrays, MAX_INDICES );
+	} else if ( numarrays ) {
+		GL3_BindVAO ( gl3state.vao3D );
+		GL3_BindVBO ( gl3state.vbo3D );
+		glMultiDrawArrays ( GL_TRIANGLE_FAN, arraystart, arraylength, numarrays );
+		numarrays = 0;
+	}
+}
+
+void GL_DrawElements ( void ) {
+	if ( gl_multiarray->value ) {
+		GL_MultiDrawArrays ();
+		return;
+	}
+
+	if ( numelements > MAX_INDICES ) {
+		ri.Sys_Error ( ERR_DROP, __FUNCTION__": Element list overrun: %d, max %d\n", numelements, MAX_INDICES );
+	} else if ( numelements ) {
+		GL3_BindVAO ( gl3state.vao3D );
+		GL3_BindVBO ( gl3state.vbo3D );
+		//glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*gl3_worldmodel->numglverts, gl3_worldmodel->glverts, GL_STREAM_DRAW );
+
+		glDrawElements ( GL_TRIANGLE_FAN, numelements, GL_UNSIGNED_INT, elementlist );
+		numelements = 0;
+	}
+}
 /*
  * Returns true if the box is completely outside the frustom
  */
@@ -137,9 +256,47 @@ CullBox(vec3_t mins, vec3_t maxs)
 		return false;
 	}
 
+	hmm_vec4 Vmins, Vmaxs;
+	vec3_t	tmins, tmaxs;
+	Vmins.X = mins[ 0 ];
+	Vmins.Y = mins[ 1 ];
+	Vmins.Z = mins[ 2 ];
+	Vmins.W = 1;
+	if ( memcmp(&gl3state.modMatrix, &gl3_identityMat4, sizeof(hmm_mat4)) ) {
+		Vmins = HMM_MultiplyMat4ByVec4 ( gl3state.modMatrix, Vmins );
+	}
+	tmins[ 0 ] = Vmins.X;
+	tmins[ 1 ] = Vmins.Y;
+	tmins[ 2 ] = Vmins.Z;
+
+	Vmaxs.X = maxs[ 0 ];
+	Vmaxs.Y = maxs[ 1 ];
+	Vmaxs.Z = maxs[ 2 ];
+	Vmaxs.W = 1;
+	if ( memcmp ( &gl3state.modMatrix, &gl3_identityMat4, sizeof ( hmm_mat4 ) ) ) {
+		Vmaxs = HMM_MultiplyMat4ByVec4 ( gl3state.modMatrix, Vmaxs );
+	}
+	tmaxs[ 0 ] = Vmaxs.X;
+	tmaxs[ 1 ] = Vmaxs.Y;
+	tmaxs[ 2 ] = Vmaxs.Z;
+
+	if ( memcmp ( &gl3state.modMatrix, &gl3_identityMat4, sizeof ( hmm_mat4 ) ) ) {
+		if ( Vmins.X > Vmaxs.X ) {
+			tmaxs[ 0 ] = Vmins.X;
+			tmins[ 0 ] = Vmaxs.X;
+		}
+		if ( Vmins.Y > Vmaxs.Y ) {
+			tmaxs[ 1 ] = Vmins.Y;
+			tmins[ 1 ] = Vmaxs.Y;
+		}
+		if ( Vmins.Z > Vmaxs.Z ) {
+			tmaxs[ 2 ] = Vmins.Z;
+			tmins[ 2 ] = Vmaxs.Z;
+		}
+	}
 	for (i = 0; i < 4; i++)
 	{
-		if (BOX_ON_PLANE_SIDE(mins, maxs, &frustum[i]) == 2)
+		if (BOX_ON_PLANE_SIDE(tmins, tmaxs, &frustum[i]) == 2)
 		{
 			return true;
 		}
@@ -206,20 +363,42 @@ SetAllLightFlags(msurface_t *surf)
 }
 
 void
-GL3_DrawGLPoly(msurface_t *fa)
-{
+GL3_DrawGLPoly ( msurface_t *fa ) {
 	glpoly_t *p = fa->polys;
 
 	if ( gl3state.uni3DData.scroll != 0.0f ) {
 		gl3state.uni3DData.scroll = 0.0f;
-		GL3_UpdateUBO3D();
+		GL3_UpdateUBO3D ();
+	}
+	/*
+	*/
+	if ( -3 == gl3_worldmodel ) { // HACK: somehow transparent bmodels aren't showing up in glDrawElements
+		GL3_BindVAO ( gl3state.vao3Dtrans );
+		GL3_BindVBO ( gl3state.vbo3Dtrans );
+		glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*p->numverts, p->vertices, GL_STREAM_DRAW );
+		if ( (( p->vertices - gl3_worldmodel->glverts ) > gl3_worldmodel->numglverts ) ||
+			( ( p->vertices - gl3_worldmodel->glverts ) < 0 ) ) {
+			R_Printf ( PRINT_HIGH, "glvert out of bounds: %d, max = %d\n", p->vertices - gl3_worldmodel->glverts, gl3_worldmodel->numglverts );
+		}
+		glDrawArrays ( GL_TRIANGLE_FAN, 0, p->numverts );
+		//glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t ) * currentmodel->numglverts, currentmodel->glverts, GL_STATIC_DRAW );
+		//glDrawArrays(GL_TRIANGLE_FAN, (p->vertices - currentmodel->glverts), p->numverts);
+		GL3_BindVAO ( gl3state.vao3D );
+		GL3_BindVBO ( gl3state.vbo3D );
+	} else {
+		if ( gl_multiarray->value ) {
+			arraystart[ numarrays ] = p->vertices - currentmodel->glverts;
+			arraylength[ numarrays++ ] = p->numverts;
+		} else {
+			if ( numelements > 0 ) {
+				elementlist[ numelements++ ] = -1;	// add primitive restart to list
+			}
+			for ( short i = 0; i < p->numverts; i++, numelements++ ) {
+				elementlist[ numelements ] = ( p->vertices - gl3_worldmodel->glverts ) + i;
+			}
+		}
 	}
 
-	GL3_BindVAO(gl3state.vao3D);
-	GL3_BindVBO(gl3state.vbo3D);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(gl3_3D_vtx_t)*p->numverts, p->vertices, GL_STREAM_DRAW);
-
-	glDrawArrays(GL_TRIANGLE_FAN, 0, p->numverts);
 }
 
 void
@@ -242,12 +421,38 @@ GL3_DrawGLFlowingPoly(msurface_t *fa)
 		gl3state.uni3DData.scroll = scroll;
 		GL3_UpdateUBO3D();
 	}
-
+/*
 	GL3_BindVAO(gl3state.vao3D);
 	GL3_BindVBO(gl3state.vbo3D);
-
 	glBufferData(GL_ARRAY_BUFFER, sizeof(gl3_3D_vtx_t)*p->numverts, p->vertices, GL_STREAM_DRAW);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, p->numverts);
+*/
+	if ( -3 == gl3_worldmodel ) {	// HACK: somehow transparent bmodels aren't showing up in glDrawElements
+		GL3_BindVAO ( gl3state.vao3Dtrans );
+		GL3_BindVBO ( gl3state.vbo3Dtrans );
+		glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*p->numverts, p->vertices, GL_STREAM_DRAW );
+		if ( ( ( p->vertices - gl3_worldmodel->glverts ) > gl3_worldmodel->numglverts ) ||
+			( ( p->vertices - gl3_worldmodel->glverts ) < 0 ) ) {
+			R_Printf ( PRINT_HIGH, "glvert out of bounds: %d, max = %d\n", p->vertices - gl3_worldmodel->glverts, gl3_worldmodel->numglverts );
+		}
+		glDrawArrays ( GL_TRIANGLE_FAN, 0, p->numverts );
+		//glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t ) * currentmodel->numglverts, currentmodel->glverts, GL_STATIC_DRAW );
+		//glDrawArrays(GL_TRIANGLE_FAN, (p->vertices - currentmodel->glverts), p->numverts);
+		GL3_BindVAO ( gl3state.vao3D );
+		GL3_BindVBO ( gl3state.vbo3D );
+	} else {
+		if ( gl_multiarray->value ) {
+			arraystart[ numarrays ] = p->vertices - currentmodel->glverts;
+			arraylength[ numarrays++ ] = p->numverts;
+		} else {
+			if ( numelements > 0 ) {
+				elementlist[ numelements++ ] = -1;	// add primitive restart to list
+			}
+			for ( short i = 0; i < p->numverts; i++, numelements++ ) {
+				elementlist[ numelements ] = ( p->vertices - gl3_worldmodel->glverts ) + i;
+			}
+		}
+	}
 }
 
 static void
@@ -274,6 +479,7 @@ UpdateLMscales(const hmm_vec4 lmScales[MAX_LIGHTMAPS_PER_SURFACE], gl3ShaderInfo
 
 	if(hasChanged)
 	{
+		GL_DrawElements (); // render display list as state is being changed
 		glUniform4fv(si->uniLmScales, MAX_LIGHTMAPS_PER_SURFACE, si->lmScales[0].Elements);
 	}
 }
@@ -342,6 +548,7 @@ GL3_DrawAlphaSurfaces(void)
 	msurface_t *s;
 
 	/* go back to the world matrix */
+	GL_DrawElements ();
 	gl3state.uni3DData.transModelMat4 = gl3_identityMat4;
 	GL3_UpdateUBO3D();
 
@@ -349,6 +556,15 @@ GL3_DrawAlphaSurfaces(void)
 
 	for (s = gl3_alpha_surfaces; s != NULL; s = s->texturechain)
 	{
+		GL3_SelectTMU ( GL_TEXTURE5 );
+
+		if ( s->plane == gl3state.refPlanes[ 0 ] && ( ( s->flags & SURF_PLANEBACK ) == ( gl3state.planeback[ 0 ] * SURF_PLANEBACK ) ) && (gl_reflection->value)) {
+			glBindTexture ( GL_TEXTURE_2D, gl3state.reflectTexture );
+		} else {
+			glBindTexture ( GL_TEXTURE_2D, 0);
+		}
+		GL3_SelectTMU ( GL_TEXTURE0 );
+
 		GL3_Bind(s->texinfo->image->texnum);
 		c_brush_polys++;
 		float alpha = 1.0f;
@@ -380,6 +596,7 @@ GL3_DrawAlphaSurfaces(void)
 			GL3_UseProgram(gl3state.si3Dtrans.shaderProgram);
 			GL3_DrawGLPoly(s);
 		}
+		GL_DrawElements ();
 	}
 
 	gl3state.uni3DData.alpha = 1.0f;
@@ -399,6 +616,9 @@ DrawTextureChains(void)
 
 	c_visible_textures = 0;
 
+	GL3_BindVAO ( gl3state.vao3D );
+	GL3_BindVBO ( gl3state.vbo3D );
+	
 	for (i = 0, image = gl3textures; i < numgl3textures; i++, image++)
 	{
 		if (!image->registration_sequence)
@@ -415,11 +635,13 @@ DrawTextureChains(void)
 
 		c_visible_textures++;
 
+
 		for ( ; s; s = s->texturechain)
 		{
 			SetLightFlags(s);
 			RenderBrushPoly(s);
 		}
+		GL_DrawElements ();
 	}
 
 	// TODO: maybe one loop for normal faces and one for SURF_DRAWTURB ???
@@ -482,8 +704,8 @@ DrawTriangleOutlines( void ) {
 
 	}
 
-	GL3_BindVAO( gl3state.vao3D );
-	GL3_BindVBO( gl3state.vbo3D );
+	GL3_BindVAO( gl3state.vao3Dtrans );
+	GL3_BindVBO( gl3state.vbo3Dtrans );
 
 	for ( s = gl3_alpha_surfaces; s != NULL; s = s->texturechain ) {
 		for ( p = s->polys; p != NULL; p = p->next ) {
@@ -492,6 +714,9 @@ DrawTriangleOutlines( void ) {
 			glDrawArrays( GL_TRIANGLE_FAN, 0, p->numverts );
 		}
 	}
+
+	GL3_BindVAO ( gl3state.vao3D );
+	GL3_BindVBO ( gl3state.vbo3D );
 
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	//glEnable( GL_TEXTURE_2D );
@@ -593,6 +818,7 @@ DrawInlineBModel(void)
 			{
 				RenderBrushPoly(psurf);
 			}
+			GL_DrawElements ();
 		}
 	}
 
@@ -669,6 +895,10 @@ GL3_DrawBrushModel(entity_t *e)
 	e->angles[0] = -e->angles[0];
 	e->angles[2] = -e->angles[2];
 
+	GL3_BindVAO ( gl3state.vao3D );
+	GL3_BindVBO ( gl3state.vbo3D );
+	//glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*gl3_worldmodel->numglverts, gl3_worldmodel->glverts, GL_STREAM_DRAW );
+
 	DrawInlineBModel();
 
 	// glPopMatrix();
@@ -701,7 +931,7 @@ RecursiveWorldNode(mnode_t *node)
 		return;
 	}
 
-	if (CullBox(node->minmaxs, node->minmaxs + 3))
+	if (CullBox(node->minmaxs, node->minmaxs + 3) && gl_cullpvs->value)
 	{
 		return;
 	}
@@ -785,7 +1015,7 @@ RecursiveWorldNode(mnode_t *node)
 			continue; /* wrong side */
 		}
 
-		if (surf->texinfo->flags & SURF_SKY)
+		if ((surf->texinfo->flags & SURF_SKY) && (!gl_skycube->value))
 		{
 			/* just adds to visible sky bounds */
 			GL3_AddSkySurface(surf);
@@ -796,6 +1026,20 @@ RecursiveWorldNode(mnode_t *node)
 			surf->texturechain = gl3_alpha_surfaces;
 			gl3_alpha_surfaces = surf;
 			gl3_alpha_surfaces->texinfo->image = TextureAnimation(surf->texinfo);
+
+			qboolean addPlane = true;
+			for ( int r = 0; r < gl3state.numRefPlanes; r++ ) {
+				if ( gl3state.refPlanes[ r ] == surf->plane ) {
+					// plane already in list
+					addPlane = false;
+					break;
+				}
+			}
+			if ( addPlane ) {
+				gl3state.refPlanes[ gl3state.numRefPlanes ] = surf->plane;
+				gl3state.planeback[ gl3state.numRefPlanes ] = (surf->flags & SURF_PLANEBACK) != 0;
+				gl3state.numRefPlanes++;
+			}
 		}
 		else
 		{
@@ -822,11 +1066,12 @@ RecursiveWorldNode(mnode_t *node)
 	RecursiveWorldNode(node->children[!side]);
 }
 
-void
-GL3_DrawWorld(void)
+int chainviewcluster = -2;
+
+void GL3_DrawWorld(void)
 {
 	entity_t ent;
-
+	
 	if (!gl_drawworld->value)
 	{
 		return;
@@ -836,6 +1081,8 @@ GL3_DrawWorld(void)
 	{
 		return;
 	}
+	numelements = 0;
+	numarrays = 0;
 
 	currentmodel = gl3_worldmodel;
 
@@ -847,10 +1094,14 @@ GL3_DrawWorld(void)
 	currententity = &ent;
 
 	gl3state.currenttexture = -1;
+	glEnable ( GL_PRIMITIVE_RESTART_FIXED_INDEX );
 
-	GL3_ClearSkyBox();
-	ClearTextureChains();
-	RecursiveWorldNode(gl3_worldmodel->nodes);
+	GL3_ClearSkyBox();	
+	ClearTextureChains ();
+
+	gl3state.numRefPlanes = 0;
+
+	RecursiveWorldNode ( gl3_worldmodel->nodes );
 	DrawTextureChains();
 	GL3_DrawSkyBox();
 	DrawTriangleOutlines();

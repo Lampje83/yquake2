@@ -2,7 +2,7 @@
 
 in vec2 passTexCoord;
 
-out vec4 outColor;
+layout (location = 0) out vec4 outColor;
 
 // for UBO shared between all shaders (incl. 2D)
 layout (std140) uniform uniCommon
@@ -20,6 +20,8 @@ layout (std140) uniform uni3D
 	mat4 transProj;
 	mat4 transView;
 	mat4 transModel;
+	vec4 fluidPlane;
+	vec3 viewPos;
 
 	float scroll; // for SURF_FLOWING
 	float time;
@@ -29,4 +31,5 @@ layout (std140) uniform uni3D
 	uint  flags;
 	float _pad_1; // AMDs legacy windows driver needs this, otherwise uni3D has wrong size
 	float _pad_2;
+	float _pad_3;
 };

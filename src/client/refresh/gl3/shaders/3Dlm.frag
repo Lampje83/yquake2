@@ -35,6 +35,10 @@ void main()
 	vec4 texel = texture(tex, passTexCoord);
 	vec4 lmTex;
 
+	float clipPos = dot (passWorldCoord, fluidPlane.xyz) + fluidPlane.w;
+	if (clipPos < 0 && (length(fluidPlane.xyz) > 0))
+		discard;
+
 	// apply intensity
 	texel.rgb *= intensity;
 
