@@ -235,20 +235,34 @@
       <FileType>Document</FileType>
     </CustomBuild>
     <None Include="..\src\client\refresh\gl3\shaders\2d.vert" />
+    <None Include="..\src\client\refresh\gl3\shaders\2darray.frag" />
     <None Include="..\src\client\refresh\gl3\shaders\2Dcolor.frag" />
     <None Include="..\src\client\refresh\gl3\shaders\2Dcolor.vert" />
     <None Include="..\src\client\refresh\gl3\shaders\3D.frag" />
     <None Include="..\src\client\refresh\gl3\shaders\3D.vert" />
     <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dflow.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.frag" />
+    <None Include="..\src\client\refresh\gl3\shaders\3Dflow.vert">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.frag">
+      <FileType>Document</FileType>
+    </None>
     <None Include="..\src\client\refresh\gl3\shaders\3Dlm.vert" />
     <None Include="..\src\client\refresh\gl3\shaders\3Dlmflow.vert" />
     <None Include="..\src\client\refresh\gl3\shaders\3Drefract.vert" />
     <None Include="..\src\client\refresh\gl3\shaders\3Dsky.frag" />
     <None Include="..\src\client\refresh\gl3\shaders\3Dsprite.frag" />
     <None Include="..\src\client\refresh\gl3\shaders\3DspriteAlpha.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dwater.frag" />
+    <ClCompile Include="..\src\client\refresh\gl3\shaders\3Dwater.frag">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <None Include="..\src\client\refresh\gl3\shaders\3Dwater.vert" />
     <None Include="..\src\client\refresh\gl3\shaders\Alias.frag" />
     <None Include="..\src\client\refresh\gl3\shaders\Alias.vert" />

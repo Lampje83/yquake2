@@ -280,13 +280,14 @@ err_cleanup:
 static qboolean
 initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* fragFilename)
 {
-	GLuint shaders3D[2] = {0};
+	GLuint shaders3D[3] = {0};
 	GLuint prog = 0;
 	int i=0;
 
 	char*	vertSrc;
 	char*	fragSrc;
-	char*	vertCommon, *fragCommon;
+	char*	geomSrc;
+	char*	vertCommon, *fragCommon, *geomCommon;
 	int		fileSize = 0;
 
 	// load shader files
@@ -295,14 +296,12 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		R_Printf( PRINT_ALL, __FUNCTION__": Failed to load 3D common fragment shader!\n" );
 		return false;
 	}
-	//fragCommon[fileSize] = 0;
 
 	if ( !( fileSize = ri.FS_LoadFile( "shaders/Common3D.vert", (void **) &vertCommon ) ) ) {
 		R_Printf( PRINT_ALL, __FUNCTION__": Failed to load 3D common vertex shader!\n" );
 		ri.FS_FreeFile( fragCommon );
 		return false;
 	}
-	//vertCommon[fileSize] = 0;
 
 	if ( !( fileSize = ri.FS_LoadFile( fragFilename, (void **) &fragSrc ) ) ) {
 		R_Printf( PRINT_ALL, __FUNCTION__": Failed to load 3D fragment shader!\n" );
@@ -310,7 +309,6 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		ri.FS_FreeFile( vertCommon );
 		return false;
 	}
-	//fragSrc[fileSize] = 0;
 
 	if ( !( fileSize = ri.FS_LoadFile( vertFilename, (void **) &vertSrc ) ) ) {
 		R_Printf( PRINT_ALL, __FUNCTION__": Failed to load 3D vertex shader!\n" );
@@ -319,7 +317,6 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		ri.FS_FreeFile( fragSrc );
 		return false;
 	}
-	//vertSrc[fileSize] = 0;
 
 	if ( shaderInfo->shaderProgram != 0 ) {
 		R_Printf( PRINT_ALL, "WARNING: calling initShader3D for gl3ShaderInfo_t that already has a shaderProgram!\n" );
@@ -516,6 +513,11 @@ static qboolean createShaders(void)
 {
 	if(!initShader2D(&gl3state.si2D, "shaders/2d.vert", "shaders/2d.frag")) {
 		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for textured 2D rendering!\n");
+		return false;
+	}
+
+	if ( !initShader2D ( &gl3state.si2Darray, "shaders/2d.vert", "shaders/2darray.frag" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for array-textured 2D rendering!\n" );
 		return false;
 	}
 

@@ -16,4 +16,13 @@ void main()
 	passLightFlags = lightFlags;
 
 	gl_Position = transProj * transView * worldCoord;
+
+	if (length(fluidPlane.xyz) > 0)
+	{
+		gl_ClipDistance[0] = dot (worldCoord.xyz, fluidPlane.xyz) + fluidPlane.w;
+	}
+	else
+	{
+		gl_ClipDistance[0] = 0;
+	}
 }

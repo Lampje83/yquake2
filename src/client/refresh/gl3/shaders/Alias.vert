@@ -11,4 +11,13 @@ void main()
 	passColor = vertColor*overbrightbits;
 	passTexCoord = texCoord;
 	gl_Position = transProj * transView * transModel * vec4(position, 1.0);
+
+	if (length(fluidPlane.xyz) > 0)
+	{
+		gl_ClipDistance[0] = dot (tmp.xyz, fluidPlane.xyz) + fluidPlane.w;
+	}
+	else
+	{
+		gl_ClipDistance[0] = 0;
+	}
 }

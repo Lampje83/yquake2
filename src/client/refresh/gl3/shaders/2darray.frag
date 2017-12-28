@@ -12,13 +12,17 @@ layout (std140) uniform uniCommon
 	vec4 color;
 };
 
-uniform sampler2D tex;
+uniform sampler2DArray tex;
 
 out vec4 outColor;
 
 void main()
 {
-	vec4 texel = texture(tex, passTexCoord);
+	vec3 coord;
+	coord.xy = passTexCoord.xy;
+	coord.z = 0;
+
+	vec4 texel = texture(tex, coord);
 
 	// the gl1 renderer used glAlphaFunc(GL_GREATER, 0.666);
 	// and glEnable(GL_ALPHA_TEST); for 2D rendering

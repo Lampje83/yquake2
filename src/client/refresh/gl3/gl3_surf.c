@@ -134,7 +134,7 @@ void GL3_SurfInit(void)
 	qglVertexAttribPointer(GL3_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 9*sizeof(GLfloat), 5*sizeof(GLfloat));
 
 	// init renderbuffers for reflection, refraction and shadow mapping
-	GLenum DrawBuffers[ 2 ] = { GL_COLOR_ATTACHMENT0,GL_DEPTH_ATTACHMENT };
+	GLenum DrawBuffers[ 2 ] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT };
 
 	// TODO: Clean these up at shutdown
 	glGenFramebuffers ( 1, &gl3state.reflectFB );
@@ -145,16 +145,16 @@ void GL3_SurfInit(void)
 	glGenTextures ( 1, &gl3state.refractTextureDepth );
 
 	// Setup buffer textures
-	glBindTexture ( GL_TEXTURE_2D, gl3state.reflectTexture );
-	glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGBA, vid.width, vid.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
-	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
+	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, vid.width, vid.height, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
-	glBindTexture ( GL_TEXTURE_2D, gl3state.reflectTextureDepth );
-	glTexImage2D ( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0 );
-	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-
+	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTextureDepth );
+	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 32, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0 );
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+/*
 	glBindTexture ( GL_TEXTURE_2D, gl3state.refractTexture );
 	glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGBA, vid.width, vid.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
 	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
@@ -164,7 +164,7 @@ void GL3_SurfInit(void)
 	glTexImage2D ( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0 );
 	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-
+*/
 	// Setup the frame buffers
 	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
 	glFramebufferTexture ( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gl3state.reflectTexture, 0 );
@@ -179,9 +179,9 @@ void GL3_SurfInit(void)
 	glDrawBuffers ( 1, DrawBuffers );
 
 	if ( glCheckFramebufferStatus ( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE ) {
-		R_Printf ( PRINT_ALERT, "Failed to create reflection framebuffer\n" );
+		R_Printf ( PRINT_ALERT, "Failed to create reflection framebuffers\n" );
 	}
-
+/*
 	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.refractFB );
 	glFramebufferTexture ( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gl3state.refractTexture, 0 );
 	glFramebufferTexture ( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, gl3state.refractTextureDepth, 0 );
@@ -190,7 +190,7 @@ void GL3_SurfInit(void)
 	if ( glCheckFramebufferStatus ( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE ) {
 		R_Printf ( PRINT_ALERT, "Failed to create refraction framebuffer\n" );
 	}
-
+*/
 	// Set framebuffer target to default output
 	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
 }
@@ -365,42 +365,37 @@ SetAllLightFlags(msurface_t *surf)
 void
 GL3_DrawGLPoly ( msurface_t *fa ) {
 	glpoly_t *p = fa->polys;
+	float scroll;
 
-	if ( gl3state.uni3DData.scroll != 0.0f ) {
-		gl3state.uni3DData.scroll = 0.0f;
+	if ( fa->flags & SURF_FLOWING ) {
+		scroll = -64.0f * ( ( gl3_newrefdef.time / 40.0f ) - (int) ( gl3_newrefdef.time / 40.0f ) );
+
+		if ( scroll == 0.0f ) {
+			scroll = -64.0f;
+		}
+	} else {
+		scroll = 0.0f;
+	}
+
+	if ( gl3state.uni3DData.scroll != scroll ) {
+		gl3state.uni3DData.scroll = scroll;
 		GL3_UpdateUBO3D ();
 	}
-	/*
-	*/
-	if ( -3 == gl3_worldmodel ) { // HACK: somehow transparent bmodels aren't showing up in glDrawElements
-		GL3_BindVAO ( gl3state.vao3Dtrans );
-		GL3_BindVBO ( gl3state.vbo3Dtrans );
-		glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*p->numverts, p->vertices, GL_STREAM_DRAW );
-		if ( (( p->vertices - gl3_worldmodel->glverts ) > gl3_worldmodel->numglverts ) ||
-			( ( p->vertices - gl3_worldmodel->glverts ) < 0 ) ) {
-			R_Printf ( PRINT_HIGH, "glvert out of bounds: %d, max = %d\n", p->vertices - gl3_worldmodel->glverts, gl3_worldmodel->numglverts );
-		}
-		glDrawArrays ( GL_TRIANGLE_FAN, 0, p->numverts );
-		//glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t ) * currentmodel->numglverts, currentmodel->glverts, GL_STATIC_DRAW );
-		//glDrawArrays(GL_TRIANGLE_FAN, (p->vertices - currentmodel->glverts), p->numverts);
-		GL3_BindVAO ( gl3state.vao3D );
-		GL3_BindVBO ( gl3state.vbo3D );
+
+	if ( gl_multiarray->value ) {
+		arraystart[ numarrays ] = p->vertices - currentmodel->glverts;
+		arraylength[ numarrays++ ] = p->numverts;
 	} else {
-		if ( gl_multiarray->value ) {
-			arraystart[ numarrays ] = p->vertices - currentmodel->glverts;
-			arraylength[ numarrays++ ] = p->numverts;
-		} else {
-			if ( numelements > 0 ) {
-				elementlist[ numelements++ ] = -1;	// add primitive restart to list
-			}
-			for ( short i = 0; i < p->numverts; i++, numelements++ ) {
-				elementlist[ numelements ] = ( p->vertices - gl3_worldmodel->glverts ) + i;
-			}
+		if ( numelements > 0 ) {
+			elementlist[ numelements++ ] = -1;	// add primitive restart to list
+		}
+		for ( short i = 0; i < p->numverts; i++, numelements++ ) {
+			elementlist[ numelements ] = ( p->vertices - gl3_worldmodel->glverts ) + i;
 		}
 	}
 
 }
-
+#if 0
 void
 GL3_DrawGLFlowingPoly(msurface_t *fa)
 {
@@ -454,6 +449,7 @@ GL3_DrawGLFlowingPoly(msurface_t *fa)
 		}
 	}
 }
+#endif
 
 static void
 UpdateLMscales(const hmm_vec4 lmScales[MAX_LIGHTMAPS_PER_SURFACE], gl3ShaderInfo_t* si)
@@ -525,7 +521,7 @@ RenderBrushPoly(msurface_t *fa)
 	{
 		GL3_UseProgram(gl3state.si3DlmFlow.shaderProgram);
 		UpdateLMscales(lmScales, &gl3state.si3DlmFlow);
-		GL3_DrawGLFlowingPoly(fa);
+		GL3_DrawGLPoly(fa);
 	}
 	else
 	{
@@ -559,9 +555,9 @@ GL3_DrawAlphaSurfaces(void)
 		GL3_SelectTMU ( GL_TEXTURE5 );
 
 		if ( s->plane == gl3state.refPlanes[ 0 ] && ( ( s->flags & SURF_PLANEBACK ) == ( gl3state.planeback[ 0 ] * SURF_PLANEBACK ) ) && (gl_reflection->value)) {
-			glBindTexture ( GL_TEXTURE_2D, gl3state.reflectTexture );
+			glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
 		} else {
-			glBindTexture ( GL_TEXTURE_2D, 0);
+			glBindTexture ( GL_TEXTURE_2D_ARRAY, 0);
 		}
 		GL3_SelectTMU ( GL_TEXTURE0 );
 
@@ -589,7 +585,7 @@ GL3_DrawAlphaSurfaces(void)
 		else if (s->texinfo->flags & SURF_FLOWING)
 		{
 			GL3_UseProgram(gl3state.si3DtransFlow.shaderProgram);
-			GL3_DrawGLFlowingPoly(s);
+			GL3_DrawGLPoly(s);
 		}
 		else
 		{
@@ -604,7 +600,7 @@ GL3_DrawAlphaSurfaces(void)
 
 	glDisable(GL_BLEND);
 
-	gl3_alpha_surfaces = NULL;
+	//gl3_alpha_surfaces = NULL;
 }
 
 static void
@@ -666,6 +662,8 @@ ClearTextureChains( void ) {
 
 		image->texturechain = NULL;
 	}
+
+	gl3_alpha_surfaces = NULL;
 }
 
 static void
@@ -703,6 +701,7 @@ DrawTriangleOutlines( void ) {
 		}
 
 	}
+	GL_DrawElements ();
 
 	GL3_BindVAO( gl3state.vao3Dtrans );
 	GL3_BindVBO( gl3state.vbo3Dtrans );
@@ -753,14 +752,13 @@ RenderLightmappedPoly(msurface_t *surf)
 	{
 		GL3_UseProgram(gl3state.si3DlmFlow.shaderProgram);
 		UpdateLMscales(lmScales, &gl3state.si3DlmFlow);
-		GL3_DrawGLFlowingPoly(surf);
 	}
 	else
 	{
 		GL3_UseProgram(gl3state.si3Dlm.shaderProgram);
 		UpdateLMscales(lmScales, &gl3state.si3Dlm);
-		GL3_DrawGLPoly(surf);
 	}
+	GL3_DrawGLPoly ( surf );
 }
 
 static void

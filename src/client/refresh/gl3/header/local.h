@@ -210,6 +210,7 @@ typedef struct
 
 	// NOTE: make sure si2D is always the first shaderInfo (or adapt GL3_ShutdownShaders())
 	gl3ShaderInfo_t si2D;      // shader for rendering 2D with textures
+	gl3ShaderInfo_t si2Darray;      // shader for rendering 2D with array textures
 	gl3ShaderInfo_t si2Dcolor; // shader for rendering 2D with flat colors
 	gl3ShaderInfo_t si3Dlm;        // a regular opaque face (e.g. from brush) with lightmap
 	// TODO: lm-only variants for gl_lightmap 1
@@ -470,7 +471,7 @@ extern void GL3_AddSkySurface(msurface_t *fa);
 extern void GL3_SurfInit(void);
 extern void GL3_SurfShutdown(void);
 extern void GL3_DrawGLPoly(msurface_t *fa);
-extern void GL3_DrawGLFlowingPoly(msurface_t *fa);
+//extern void GL3_DrawGLFlowingPoly(msurface_t *fa);
 extern void GL3_DrawTriangleOutlines(void);
 extern void GL3_DrawAlphaSurfaces(void);
 extern void GL3_DrawBrushModel(entity_t *e);

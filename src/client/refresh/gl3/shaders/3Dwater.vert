@@ -7,15 +7,21 @@ out vec3 passNormal;
 void main()
 {
 	vec2 tc = texCoord;
-	//tc.s += sin( texCoord.t*0.125 + time ) * 4;
 	tc.s += scroll;
-	//tc.t += sin( texCoord.s*0.125 + time ) * 4;
-	// tc *= 1.0/64.0; // do this last
+
 	passTexCoord = tc;
 	passWorldCoord = position.xyz;
 	vec4 worldNormal = transModel * vec4(normal, 0.0f);
 	passNormal = normalize(worldNormal.xyz);
 
-	mvpVertex = transProj * transView * transModel * vec4(position, 1.0);
 	gl_Position = transProj * transView * transModel * vec4(position, 1.0);
+
+	if (length(fluidPlane.xyz) > 0)
+	{
+		gl_ClipDistance[0] = dot (position.xyz, fluidPlane.xyz) + fluidPlane.w;
+	}
+	else
+	{
+		gl_ClipDistance[0] = 0;
+	}
 }

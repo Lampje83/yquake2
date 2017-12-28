@@ -1454,6 +1454,7 @@ GL3_RenderView(refdef_t *fd)
 	GL3_DrawWorld();
 	GL3_DrawEntitiesOnList();
 	GL3_DrawParticles();
+
 	GL3_DrawAlphaSurfaces();
 
 	// Note: R_Flash() is now GL3_Draw_Flash() and called from GL3_RenderFrame()
@@ -1552,19 +1553,6 @@ GL3_RenderFrame(refdef_t *fd)
 
 	GL3_RenderView ( fd );
 	GL3_SetLightLevel ();
-/*
-	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
-	glViewport (0, 0, fd->width, fd->height );
-	glClear ( GL_DEPTH_BUFFER_BIT );
-
-	fd->viewangles[ 1 ] += 180;
-	fd->viewangles[ 0 ] = -fd->viewangles[ 0 ];
-	GL3_RenderView(fd);
-	fd->viewangles[ 1 ] -= 180;
-	fd->viewangles[ 0 ] = -fd->viewangles[ 0 ];
-
-	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
-*/
 
 	if ( gl3state.numRefPlanes > 0 && gl_reflection->value ) {
 		hmm_mat4 oldViewMat = gl3state.uni3DData.transModelMat4;
@@ -1580,13 +1568,14 @@ GL3_RenderFrame(refdef_t *fd)
 		}
 		gl3state.modMatrix = HMM_Householder ( plane, -1 );
 
-		gl3state.uni3DData.transModelMat4 = HMM_MultiplyMat4 ( gl3state.modMatrix, gl3state.uni3DData.transModelMat4  );
-		
+		gl3state.uni3DData.transModelMat4 = HMM_MultiplyMat4 ( gl3state.modMatrix, gl3state.uni3DData.transModelMat4 );
+
 		// start drawing to reflection buffer
 		glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
 		glViewport ( 0, 0, fd->width, fd->height );
 		glClearColor ( 0, 0, 0, 0 );
 		glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
+		glEnable ( GL_CLIP_DISTANCE0 );
 
 		gl3state.uni3DData.fluidPlane = plane;
 		GL3_UpdateUBO3D ();
@@ -1608,16 +1597,32 @@ GL3_RenderFrame(refdef_t *fd)
 		glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
 		gl3state.uni3DData.transModelMat4 = oldViewMat;
 		glCullFace ( GL_FRONT );
-//		memcpy ( frustum, oldfrustum, sizeof ( cplane_t ) * 4 );
+		glDisable ( GL_CLIP_DISTANCE0 );
 
-		GL3_SetGL2D ();
-
-		GL3_Bind ( gl3state.reflectTexture );
-		GL3_UseProgram ( gl3state.si2D.shaderProgram );
-		GL3_DrawTexture ( 0, gl3_newrefdef.height * 0.25, gl3_newrefdef.width * 0.25, -gl3_newrefdef.height * 0.25 );
+		//		memcpy ( frustum, oldfrustum, sizeof ( cplane_t ) * 4 );
 	}
-	else {
-		GL3_SetGL2D ();
+
+/*
+	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
+	glViewport (0, 0, fd->width, fd->height );
+	glClear ( GL_DEPTH_BUFFER_BIT );
+
+	fd->viewangles[ 1 ] += 180;
+	fd->viewangles[ 0 ] = -fd->viewangles[ 0 ];
+	GL3_RenderView(fd);
+	fd->viewangles[ 1 ] -= 180;
+	fd->viewangles[ 0 ] = -fd->viewangles[ 0 ];
+
+	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
+*/
+	GL3_SetGL2D ();
+
+	if ( gl3state.numRefPlanes > 0 && gl_reflection->value ) {
+		GL3_Bind ( gl3state.reflectTexture );
+		glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
+
+		GL3_UseProgram ( gl3state.si2Darray.shaderProgram );
+		GL3_DrawTexture ( 0, gl3_newrefdef.height * 0.25, gl3_newrefdef.width * 0.25, -gl3_newrefdef.height * 0.25 );
 	}
 
 	if(v_blend[3] != 0.0f)

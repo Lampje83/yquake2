@@ -82,6 +82,9 @@
     <ClCompile Include="..\src\backends\windows\shared\mem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\shaders\3Dwater.frag">
+      <Filter>Shader Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\common\header\shared.h">
@@ -152,12 +155,6 @@
     <None Include="..\src\client\refresh\gl3\shaders\3D.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dwater.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.frag">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.frag">
       <Filter>Shader Files</Filter>
     </None>
@@ -192,6 +189,12 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="..\src\client\refresh\gl3\shaders\3Drefract.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\2darray.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.frag">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
