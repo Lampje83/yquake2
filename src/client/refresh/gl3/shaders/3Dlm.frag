@@ -25,6 +25,7 @@ uniform sampler2D lightmap3;
 
 uniform vec4 lmScales[4];
 
+in vec2 passTexCoord;
 in vec2 passLMcoord;
 in vec3 passWorldCoord;
 in vec3 passNormal;

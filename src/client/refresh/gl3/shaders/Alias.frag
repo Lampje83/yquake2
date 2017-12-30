@@ -2,6 +2,7 @@
 
 uniform sampler2D tex;
 
+in vec2 passTexCoord;
 in vec4 passColor;
 in vec3 passWorldCoord;
 
