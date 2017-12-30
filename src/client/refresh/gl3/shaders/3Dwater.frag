@@ -5,7 +5,6 @@ uniform sampler2D tex;
 uniform	sampler2DArray refl;
 // uniform sampler2D refr;
 
-in vec2 passTexCoord;
 in vec3 passWorldCoord;
 in vec3 passNormal;
 

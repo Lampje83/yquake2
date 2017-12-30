@@ -1,17 +1,15 @@
 // it gets attributes and uniforms from Common3D.vert
 
-out VS_OUT {
-	vec2 TexCoord;
-	vec3 WorldCoord;
-	vec3 Normal;
-} vs;
+out vec2 passTexCoord;
+out vec3 passWorldCoord;
+out vec3 passNormal;
 
 void main()
 {
-	vs.TexCoord = texCoord + vec2(scroll, 0);
-	vs.WorldCoord = position.xyz;
+	passTexCoord = texCoord + vec2(scroll, 0);
+	passWorldCoord = position.xyz;
 	vec4 worldNormal = transModel * vec4(normal, 0.0f);
-	vs.Normal = normalize(worldNormal.xyz);
+	passNormal = normalize(worldNormal.xyz);
 
 	gl_Position = transProj * transView * transModel * vec4(position, 1.0);
 

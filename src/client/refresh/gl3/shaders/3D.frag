@@ -3,15 +3,12 @@
 uniform sampler2D tex;
 uniform	sampler2DArray refl;
 
-in VS_OUT {
-	vec2 TexCoord;
-	vec3 WorldCoord;
-	vec3 Normal;
-} fs_in;
+in vec3 passWorldCoord;
+in vec3 passNormal;
 
 void main()
 {
-	vec4 texel = texture(tex, fs_in.TexCoord);
+	vec4 texel = texture(tex, passTexCoord);
 
 	// apply intensity and gamma
 	texel.rgb *= intensity;
@@ -19,8 +16,8 @@ void main()
 	float newalpha = alpha;
 	if (alpha < 1)
 	{
-		vec3 viewang = normalize(viewPos - fs_in.WorldCoord.xyz);
-		float dp = dot(fs_in.Normal, viewang);
+		vec3 viewang = normalize(viewPos - passWorldCoord.xyz);
+		float dp = dot(passNormal, viewang);
 
 		newalpha += (1.0 - alpha) * pow (1 - dp, 3);
 
