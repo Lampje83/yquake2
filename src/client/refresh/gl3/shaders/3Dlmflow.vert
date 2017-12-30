@@ -1,5 +1,6 @@
 // it gets attributes and uniforms from vertexCommon3D
 
+out vec2 passTexCoord;
 out vec2 passLMcoord;
 out vec3 passWorldCoord;
 out vec3 passNormal;

@@ -252,6 +252,7 @@ typedef struct
 	GLuint	refractFB;		// refration framebuffer
 
 	cplane_t	*refPlanes[ 16 ];
+	int			refVisframe[ 16 ];
 	qboolean	planeback[ 16 ];
 	int			numRefPlanes;
 	int			currentRefPlane;
@@ -476,7 +477,7 @@ extern void GL3_DrawTriangleOutlines(void);
 extern void GL3_DrawAlphaSurfaces(void);
 extern void GL3_DrawBrushModel(entity_t *e);
 extern void GL3_DrawWorld(void);
-extern void GL3_MarkLeaves(void);
+extern void GL3_MarkLeafs(void);
 
 // gl3_mesh.c
 extern void GL3_DrawAliasModel(entity_t *e);

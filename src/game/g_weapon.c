@@ -420,7 +420,7 @@ blaster_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 		else
 		{
 			T_Damage(other, self, self->owner, self->velocity, self->s.origin,
-					vec3_origin, self->dmg, 20, DAMAGE_ENERGY, mod);
+					vec3_origin, self->dmg, 200, DAMAGE_ENERGY, mod); // knockback was 20
 		}
 	}
 	else

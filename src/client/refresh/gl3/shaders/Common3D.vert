@@ -1,4 +1,4 @@
-#version 430
+#version 430 core
 
 in vec3 position;   // GL3_ATTRIB_POSITION
 in vec2 texCoord;   // GL3_ATTRIB_TEXCOORD
@@ -6,8 +6,6 @@ in vec2 lmTexCoord; // GL3_ATTRIB_LMTEXCOORD
 in vec4 vertColor;  // GL3_ATTRIB_COLOR
 in vec3 normal;     // GL3_ATTRIB_NORMAL
 in uint lightFlags; // GL3_ATTRIB_LIGHTFLAGS
-
-out vec2 passTexCoord;
 
 // for UBO shared between all 3D shaders
 layout (std140) uniform uni3D

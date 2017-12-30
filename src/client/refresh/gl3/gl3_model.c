@@ -308,6 +308,14 @@ Mod_LoadEdges(lump_t *l)
 		out->v[1] = (unsigned short)LittleShort(in->v[1]);
 	}
 }
+typedef struct texsizes_s {
+	unsigned int	width;
+	unsigned int	height;
+	unsigned int    count;
+} texsizes_t;
+
+texsizes_t		texsizes[128];
+unsigned int	texsizescount;
 
 static void
 Mod_LoadTexinfo(lump_t *l)
@@ -331,6 +339,8 @@ Mod_LoadTexinfo(lump_t *l)
 
 	loadmodel->texinfo = out;
 	loadmodel->numtexinfo = count;
+
+	texsizescount = 0;
 
 	for (i = 0; i < count; i++, in++, out++)
 	{
@@ -369,10 +379,29 @@ Mod_LoadTexinfo(lump_t *l)
 		out = &loadmodel->texinfo[i];
 		out->numframes = 1;
 
+		// scan texture sizes
+		qboolean foundsize = false;
+		for ( int size = 0; size < texsizescount && foundsize == false; size++ ) 			{
+			if ( texsizes[ size ].width == out->image->width && texsizes[ size ].height == out->image->height ) {
+				foundsize = true;
+				texsizes[ size ].count++;
+			}
+		}
+		if ( !foundsize ) {
+			texsizes[ texsizescount ].width = out->image->width;
+			texsizes[ texsizescount ].height = out->image->height;
+			texsizes[ texsizescount ].count = 1;
+			texsizescount++;
+		}
+
 		for (step = out->next; step && step != out; step = step->next)
 		{
 			out->numframes++;
 		}
+	}
+
+	for ( i = 0; i < texsizescount; i++ ) {
+		R_Printf ( PRINT_ALL, "%ix%i: %i textures\n", texsizes[ i ].width, texsizes[ i ].height, texsizes[ i ].count );
 	}
 }
 

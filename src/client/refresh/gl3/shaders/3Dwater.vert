@@ -1,6 +1,6 @@
 // it gets attributes and uniforms from Common3D.vert
 
-out	vec4 mvpVertex;
+out vec2 passTexCoord;
 out vec3 passWorldCoord;
 out vec3 passNormal;
 
@@ -10,7 +10,7 @@ void main()
 	tc.s += scroll;
 
 	passTexCoord = tc;
-	passWorldCoord = position.xyz;
+	passWorldCoord = (transModel * vec4(position, 1.0)).xyz;
 	vec4 worldNormal = transModel * vec4(normal, 0.0f);
 	passNormal = normalize(worldNormal.xyz);
 
@@ -18,7 +18,7 @@ void main()
 
 	if (length(fluidPlane.xyz) > 0)
 	{
-		gl_ClipDistance[0] = dot (position.xyz, fluidPlane.xyz) + fluidPlane.w;
+		gl_ClipDistance[0] = dot (passWorldCoord, fluidPlane.xyz) + fluidPlane.w;
 	}
 	else
 	{

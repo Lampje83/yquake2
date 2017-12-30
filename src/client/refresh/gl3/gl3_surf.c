@@ -138,11 +138,11 @@ void GL3_SurfInit(void)
 
 	// TODO: Clean these up at shutdown
 	glGenFramebuffers ( 1, &gl3state.reflectFB );
-	glGenFramebuffers ( 1, &gl3state.refractFB );
+	//glGenFramebuffers ( 1, &gl3state.refractFB );
 	glGenTextures ( 1, &gl3state.reflectTexture );
 	glGenTextures ( 1, &gl3state.reflectTextureDepth );
-	glGenTextures ( 1, &gl3state.refractTexture );
-	glGenTextures ( 1, &gl3state.refractTextureDepth );
+	//glGenTextures ( 1, &gl3state.refractTexture );
+	//glGenTextures ( 1, &gl3state.refractTextureDepth );
 
 	// Setup buffer textures
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
@@ -213,6 +213,12 @@ void GL3_SurfShutdown(void)
 	gl3state.vboAlias = 0;
 	glDeleteVertexArrays(1, &gl3state.vaoAlias);
 	gl3state.vaoAlias = 0;
+
+	glDeleteFramebuffers ( 1, &gl3state.reflectFB );
+	//glDeleteFramebuffers ( 1, &gl3state.refractFB );
+	glDeleteTextures ( 1, &gl3state.reflectTexture );
+	glDeleteTextures ( 1, &gl3state.reflectTextureDepth );
+
 }
 
 void GL_MultiDrawArrays ( void ) {
@@ -538,6 +544,9 @@ RenderBrushPoly(msurface_t *fa)
  * The BSP tree is waled front to back, so unwinding the chain
  * of alpha_surfaces will draw back to front, giving proper ordering.
  */
+extern void GL3_DrawEntitiesOnList ( void );
+extern void GL3_DrawParticles ( void );
+
 void
 GL3_DrawAlphaSurfaces(void)
 {
@@ -556,11 +565,71 @@ GL3_DrawAlphaSurfaces(void)
 
 		if ( s->plane == gl3state.refPlanes[ 0 ] && ( ( s->flags & SURF_PLANEBACK ) == ( gl3state.planeback[ 0 ] * SURF_PLANEBACK ) ) && (gl_reflection->value)) {
 			glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
+
+			if ( gl3state.numRefPlanes > 0 && gl_reflection->value && gl3state.refVisframe[ 0 ] != gl3_framecount) {
+				gl3state.refVisframe[ 0 ] = gl3_framecount;
+
+				hmm_mat4 oldViewMat = gl3state.uni3DData.transModelMat4;
+				hmm_vec4 plane = { gl3state.refPlanes[ 0 ]->normal[ 0 ],
+					gl3state.refPlanes[ 0 ]->normal[ 1 ],
+					gl3state.refPlanes[ 0 ]->normal[ 2 ],
+					-gl3state.refPlanes[ 0 ]->dist };
+				if ( !gl3state.planeback[ 0 ] ) {
+					plane.X = -plane.X;
+					plane.Y = -plane.Y;
+					plane.Z = -plane.Z;
+					plane.W = -plane.W;
+				}
+				gl3state.modMatrix = HMM_Householder ( plane, -1 );
+
+				gl3state.uni3DData.transModelMat4 = HMM_MultiplyMat4 ( gl3state.modMatrix, gl3state.uni3DData.transModelMat4 );
+
+				// start drawing to reflection buffer
+				glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
+				glViewport ( 0, 0, gl3_newrefdef.width, gl3_newrefdef.height );
+				glClearColor ( 0, 0, 0, 0 );
+				glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
+				//glEnable ( GL_CLIP_DISTANCE0 );
+
+				gl3state.uni3DData.fluidPlane = plane;
+				GL3_UpdateUBO3D ();
+				//GL3_RenderView (fd);
+
+				// Draw the world
+				//GL3_MarkLeafs (); /* done here so we know if we're in water */
+				glCullFace ( GL_BACK );
+
+				float oldcull = gl_cullpvs->value;
+				//gl_cullpvs->value = 0;
+				GL3_DrawWorld ();
+				GL3_DrawEntitiesOnList ();
+				GL3_DrawParticles ();
+				GL3_DrawAlphaSurfaces ();
+				
+				// Restore normal framebuffer
+				gl_cullpvs->value = oldcull;
+				glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
+				gl3state.uni3DData.transModelMat4 = oldViewMat;
+				gl3state.uni3DData.fluidPlane = (hmm_vec4){ 0, 0, 0, 0 };
+				glCullFace ( GL_FRONT );
+				//glDisable ( GL_CLIP_DISTANCE0 );
+
+				glEnable ( GL_BLEND );
+				//		memcpy ( frustum, oldfrustum, sizeof ( cplane_t ) * 4 );
+			}
+
 		} else {
 			glBindTexture ( GL_TEXTURE_2D_ARRAY, 0);
 		}
 		GL3_SelectTMU ( GL_TEXTURE0 );
-
+/*
+		if ( s->plane->normal[ 0 ] == gl3state.uni3DData.fluidPlane.X &&
+			 s->plane->normal[ 1 ] == gl3state.uni3DData.fluidPlane.Y && 
+			 s->plane->normal[ 2 ] == gl3state.uni3DData.fluidPlane.Z &&
+			 s->plane->dist == gl3state.uni3DData.fluidPlane.W) {
+			continue;
+		}
+*/
 		GL3_Bind(s->texinfo->image->texnum);
 		c_brush_polys++;
 		float alpha = 1.0f;
@@ -1108,11 +1177,11 @@ void GL3_DrawWorld(void)
 }
 
 /*
- * Mark the leaves and nodes that are
+ * Mark the leafs and nodes that are
  * in the PVS for the current cluster
  */
 void
-GL3_MarkLeaves(void)
+GL3_MarkLeafs(void)
 {
 	byte *vis;
 	byte fatvis[MAX_MAP_LEAFS / 8];

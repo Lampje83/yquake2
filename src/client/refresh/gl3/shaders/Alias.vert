@@ -1,5 +1,6 @@
 // it gets attributes and uniforms from Common3D.vert
 
+out vec2 passTexCoord;
 out vec4 passColor;
 out vec3 passWorldCoord;
 

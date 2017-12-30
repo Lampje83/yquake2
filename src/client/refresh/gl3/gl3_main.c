@@ -825,7 +825,7 @@ GL3_DrawNullModel(void)
 	GL3_UpdateUBO3D();
 }
 
-static void
+void
 GL3_DrawParticles(void)
 {
 	// TODO: stereo
@@ -892,7 +892,7 @@ GL3_DrawParticles(void)
 	}
 }
 
-static void
+void
 GL3_DrawEntitiesOnList(void)
 {
 	int i;
@@ -1450,7 +1450,7 @@ GL3_RenderView(refdef_t *fd)
 	SetFrustum();
 	SetupGL();
 
-	GL3_MarkLeaves(); /* done here so we know if we're in water */
+	GL3_MarkLeafs(); /* done here so we know if we're in water */
 	GL3_DrawWorld();
 	GL3_DrawEntitiesOnList();
 	GL3_DrawParticles();
@@ -1553,54 +1553,6 @@ GL3_RenderFrame(refdef_t *fd)
 
 	GL3_RenderView ( fd );
 	GL3_SetLightLevel ();
-
-	if ( gl3state.numRefPlanes > 0 && gl_reflection->value ) {
-		hmm_mat4 oldViewMat = gl3state.uni3DData.transModelMat4;
-		hmm_vec4 plane = { gl3state.refPlanes[ 0 ]->normal[ 0 ],
-			gl3state.refPlanes[ 0 ]->normal[ 1 ],
-			gl3state.refPlanes[ 0 ]->normal[ 2 ],
-			-gl3state.refPlanes[ 0 ]->dist };
-		if ( !gl3state.planeback[ 0 ] ) {
-			plane.X = -plane.X;
-			plane.Y = -plane.Y;
-			plane.Z = -plane.Z;
-			plane.W = -plane.W;
-		}
-		gl3state.modMatrix = HMM_Householder ( plane, -1 );
-
-		gl3state.uni3DData.transModelMat4 = HMM_MultiplyMat4 ( gl3state.modMatrix, gl3state.uni3DData.transModelMat4 );
-
-		// start drawing to reflection buffer
-		glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
-		glViewport ( 0, 0, fd->width, fd->height );
-		glClearColor ( 0, 0, 0, 0 );
-		glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
-		glEnable ( GL_CLIP_DISTANCE0 );
-
-		gl3state.uni3DData.fluidPlane = plane;
-		GL3_UpdateUBO3D ();
-		//GL3_RenderView (fd);
-
-		// Draw the world
-		//GL3_MarkLeaves (); /* done here so we know if we're in water */
-		glCullFace ( GL_BACK );
-
-		float oldcull = gl_cullpvs->value;
-		//gl_cullpvs->value = 0;
-		GL3_DrawWorld ();
-		GL3_DrawEntitiesOnList ();
-		GL3_DrawParticles ();
-		GL3_DrawAlphaSurfaces ();
-
-		// Restore normal framebuffer
-		gl_cullpvs->value = oldcull;
-		glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
-		gl3state.uni3DData.transModelMat4 = oldViewMat;
-		glCullFace ( GL_FRONT );
-		glDisable ( GL_CLIP_DISTANCE0 );
-
-		//		memcpy ( frustum, oldfrustum, sizeof ( cplane_t ) * 4 );
-	}
 
 /*
 	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );

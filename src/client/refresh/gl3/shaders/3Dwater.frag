@@ -20,17 +20,16 @@ void main()
 	texw.t = (passTexCoord.t + sin( passTexCoord.s * 4 + time ) * 0.0625) ;
 	vec4 texel = texture(tex, texw);
 
-	texel.rgb *= intensity * 2.0;
+	texel.rgb *= intensity * 1.0;
 	texel.rgb = pow(texel.rgb, vec3(gamma));
 
 	float newalpha = alpha;
 	if (alpha < 1)
 	{
-		newalpha = pow(alpha, 1.0);
 		vec3 viewang = normalize(viewPos - passWorldCoord.xyz);
 		float dp = dot(passNormal, viewang);
 
-		newalpha += (1.0 - newalpha) * pow (1 - dp, 5);
+		newalpha += (1.0 - alpha) * pow (1 - dp, 3);
 
 		vec3 bufSize = 1.0 / textureSize(refl, 0);
 
@@ -51,10 +50,10 @@ void main()
 
 		projCoord.xy += df;
 		projCoord = clamp(projCoord, 0.0, 1.0);	
-		vec4 refltex = texture(refl, projCoord.xyz);
+		vec4 refltex = texture(refl, projCoord.xyz) * newalpha;
 		texel.rgb *= vec3(1 - newalpha);
 
-		texel.rgb += refltex.rgb * newalpha; // * (1.0 - (texel.a * newalpha));
+		texel.rgb += refltex.rgb; // * (1.0 - (texel.a * newalpha));
 	}
 	outColor.rgb = texel.rgb;
 	// apply intensity and gamma
