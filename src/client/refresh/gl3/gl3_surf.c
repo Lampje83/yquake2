@@ -875,6 +875,20 @@ DrawInlineBModel(void)
 				/* add to the translucent chain */
 				psurf->texturechain = gl3_alpha_surfaces;
 				gl3_alpha_surfaces = psurf;
+
+				qboolean addPlane = true;
+				for ( int r = 0; r < gl3state.numRefPlanes; r++ ) {
+					if ( gl3state.refPlanes[ r ] == psurf->plane ) {
+						// plane already in list
+						addPlane = false;
+						break;
+					}
+				}
+				if ( addPlane ) {
+					gl3state.refPlanes[ gl3state.numRefPlanes ] = psurf->plane;
+					gl3state.planeback[ gl3state.numRefPlanes ] = ( psurf->flags & SURF_PLANEBACK ) != 0;
+					gl3state.numRefPlanes++;
+				}
 			}
 			else if(!(psurf->flags & SURF_DRAWTURB))
 			{

@@ -1,7 +1,5 @@
 #version 430
 
-in vec2 passTexCoord;
-
 layout (location = 0) out vec4 outColor;
 
 // for UBO shared between all shaders (incl. 2D)
