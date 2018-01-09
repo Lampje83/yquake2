@@ -103,12 +103,14 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 
 	// make sure all shaders use the same attribute locations for common attributes
 	// (so the same VAO can easily be used with different shaders)
-	glBindAttribLocation(shaderProgram, GL3_ATTRIB_POSITION, "position");
-	glBindAttribLocation(shaderProgram, GL3_ATTRIB_TEXCOORD, "texCoord");
-	glBindAttribLocation(shaderProgram, GL3_ATTRIB_LMTEXCOORD, "lmTexCoord");
-	glBindAttribLocation(shaderProgram, GL3_ATTRIB_COLOR, "vertColor");
-	glBindAttribLocation(shaderProgram, GL3_ATTRIB_NORMAL, "normal");
-	glBindAttribLocation(shaderProgram, GL3_ATTRIB_LIGHTFLAGS, "lightFlags");
+	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_POSITION, "position" );
+	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_TEXCOORD, "texCoord" );
+	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_LMTEXCOORD, "lmTexCoord" );
+	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_COLOR, "vertColor" );
+	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_NORMAL, "normal" );
+	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_LIGHTFLAGS, "lightFlags" );
+	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_SURFFLAGS, "surfFlags" );
+	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_REFMATRIX, "refMatrix" );
 
 	// the following line is not necessary/implicit (as there's only one output)
 	// glBindFragDataLocation(shaderProgram, 0, "outColor"); XXX would this even be here?
@@ -161,7 +163,8 @@ enum {
 	GL3_BINDINGPOINT_UNICOMMON,
 	GL3_BINDINGPOINT_UNI2D,
 	GL3_BINDINGPOINT_UNI3D,
-	GL3_BINDINGPOINT_UNILIGHTS
+	GL3_BINDINGPOINT_UNILIGHTS,
+	GL3_BINDINGPOINT_REFDATA
 };
 
 static qboolean
@@ -277,8 +280,9 @@ err_cleanup:
 	return false;
 }
 
+// geometry shader is optional
 static qboolean
-initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* fragFilename)
+initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* fragFilename, const char* geomFilename)
 {
 	GLuint shaders3D[3] = {0};
 	GLuint prog = 0;
@@ -287,7 +291,7 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	char*	vertSrc;
 	char*	fragSrc;
 	char*	geomSrc;
-	char*	vertCommon, *fragCommon, *geomCommon;
+	char*	vertCommon, *fragCommon;
 	int		fileSize = 0;
 
 	// load shader files
@@ -345,7 +349,28 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		return false;
 	}
 
-	prog = CreateShaderProgram(2, shaders3D);
+	// Geometry shader is optional
+	if ( geomFilename != NULL ) {
+		if ( strlen ( geomFilename ) > 0 ) {
+			if ( !( fileSize = ri.FS_LoadFile ( geomFilename, (void **) &geomSrc ) ) ) {
+				R_Printf ( PRINT_ALL, __FUNCTION__": Failed to load 3D geometry shader!\n" );
+				ri.FS_FreeFile ( geomSrc );
+			} else {
+				shaders3D[ 2 ] = shaders3D[ 1 ];
+				shaders3D[ 1 ] = CompileShader ( GL_GEOMETRY_SHADER, geomSrc, NULL );
+			} 
+		}
+	}
+
+	if ( shaders3D[ 1 ] == 0 ) {
+		// Couldn't create geometry shader, so try without
+		R_Printf ( PRINT_ALL, __FUNCTION__": Failed to compile 3D geometry shader!\n" );
+		shaders3D[ 1 ] = shaders3D[ 2 ];
+		shaders3D[ 2 ] = 0;
+		prog = CreateShaderProgram ( 2, shaders3D );
+	} else {
+		prog = CreateShaderProgram ( 3, shaders3D );
+	}
 
 	if(prog == 0)
 	{
@@ -413,6 +438,20 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	}
 	// else: as uniLights is only used in the LM shaders, it's ok if it's missing
 
+	blockIndex = glGetUniformBlockIndex ( prog, "refData" );
+	if ( blockIndex != GL_INVALID_INDEX ) {
+		GLint blockSize;
+		glGetActiveUniformBlockiv ( prog, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize );
+		if ( blockSize != sizeof ( gl3state.refPlanes ) ) {
+			R_Printf ( PRINT_ALL, "WARNING: OpenGL driver disagrees with us about UBO size of 'refData'\n" );
+			R_Printf ( PRINT_ALL, "         OpenGL says %d, we say %d\n", blockSize, ( int )sizeof ( gl3state.uniLightsData ) );
+
+			goto err_cleanup;
+		}
+
+		glUniformBlockBinding ( prog, blockIndex, GL3_BINDINGPOINT_REFDATA );
+	}
+
 	// make sure texture is GL_TEXTURE0
 	GLint texLoc = glGetUniformLocation(prog, "tex");
 	if(texLoc != -1)
@@ -450,17 +489,18 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	shaderInfo->shaderProgram = prog;
 
 	// I think the shaders aren't needed anymore once they're linked into the program
-	glDeleteShader(shaders3D[0]);
-	glDeleteShader(shaders3D[1]);
-
+	glDeleteShader ( shaders3D[ 0 ] );
+	glDeleteShader ( shaders3D[ 1 ] );
+	glDeleteShader ( shaders3D[ 2 ] );
 	return true;
 
 err_cleanup:
 
-	if(shaders3D[0] != 0)  glDeleteShader(shaders3D[0]);
-	if(shaders3D[1] != 0)  glDeleteShader(shaders3D[1]);
+	if ( shaders3D[ 0 ] != 0 )  glDeleteShader ( shaders3D[ 0 ] );
+	if ( shaders3D[ 1 ] != 0 )  glDeleteShader ( shaders3D[ 1 ] );
+	if ( shaders3D[ 2 ] != 0 )	glDeleteShader ( shaders3D[ 2 ] );
 
-	if(prog != 0)  glDeleteProgram(prog);
+	if ( prog != 0 )  glDeleteProgram ( prog );
 
 	return false;
 }
@@ -506,99 +546,85 @@ static void initUBOs(void)
 	glBindBufferBase(GL_UNIFORM_BUFFER, GL3_BINDINGPOINT_UNILIGHTS, gl3state.uniLightsUBO);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(gl3state.uniLightsData), &gl3state.uniLightsData, GL_DYNAMIC_DRAW);
 
-	gl3state.currentUBO = gl3state.uniLightsUBO;
+	glGenBuffers ( 1, &gl3state.uniRefDataUBO );
+	glBindBuffer ( GL_UNIFORM_BUFFER, gl3state.uniRefDataUBO );
+	glBindBufferBase ( GL_UNIFORM_BUFFER, GL3_BINDINGPOINT_REFDATA, gl3state.uniRefDataUBO );
+	glBufferData ( GL_UNIFORM_BUFFER, sizeof ( gl3state.uniRefData ), &gl3state.uniRefData, GL_DYNAMIC_DRAW );
+
+	gl3state.currentUBO = gl3state.uniRefData;
 }
 
-static qboolean createShaders(void)
-{
-	if(!initShader2D(&gl3state.si2D, "shaders/2d.vert", "shaders/2d.frag")) {
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for textured 2D rendering!\n");
+static qboolean createShaders ( void ) {
+	if ( !initShader2D ( &gl3state.si2D, "shaders/2d.vert", "shaders/2d.frag" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for textured 2D rendering!\n" );
 		return false;
 	}
-
 	if ( !initShader2D ( &gl3state.si2Darray, "shaders/2d.vert", "shaders/2darray.frag" ) ) {
 		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for array-textured 2D rendering!\n" );
 		return false;
 	}
-
-	if(!initShader2D(&gl3state.si2Dcolor, "shaders/2Dcolor.vert", "shaders/2Dcolor.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for color-only 2D rendering!\n");
+	if ( !initShader2D ( &gl3state.si2Dcolor, "shaders/2Dcolor.vert", "shaders/2Dcolor.frag" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for color-only 2D rendering!\n" );
 		return false;
 	}
-
-	if(!initShader3D(&gl3state.si3Dlm, "shaders/3Dlm.vert", "shaders/3Dlm.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for textured 3D rendering with lightmap!\n");
+	if ( !initShader3D ( &gl3state.si3Dlm, "shaders/3Dlmflow.vert", "shaders/3Dlm.frag", "shaders/3Dlm.geom" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for textured 3D rendering with lightmap!\n" );
 		return false;
 	}
-	if(!initShader3D(&gl3state.si3Dtrans, "shaders/3D.vert", "shaders/3D.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for rendering translucent 3D things!\n");
+	if ( !initShader3D ( &gl3state.si3Dtrans, "shaders/3D.vert", "shaders/3D.frag", "shaders/3D.geom" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for rendering translucent 3D things!\n" );
 		return false;
 	}
-	if(!initShader3D(&gl3state.si3DcolorOnly, "shaders/3D.vert", "shaders/3Dcolor.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for flat-colored 3D rendering!\n");
+	if ( !initShader3D ( &gl3state.si3DcolorOnly, "shaders/3D.vert", "shaders/3Dcolor.frag", "shaders/3D.geom" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for flat-colored 3D rendering!\n" );
 		return false;
 	}
 	/*
-	if(!initShader3D(&gl3state.si3Dlm, vertexSrc3Dlm, fragmentSrc3D))
-	{
+	if(!initShader3D(&gl3state.si3Dlm, vertexSrc3Dlm, fragmentSrc3D)) {
 		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for blending 3D lightmaps rendering!\n");
 		return false;
 	}
 	*/
-	if(!initShader3D(&gl3state.si3Dturb, "shaders/3Dwater.vert", "shaders/3Dwater.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for water rendering!\n");
+	if ( !initShader3D ( &gl3state.si3Dturb, "shaders/3D.vert", "shaders/3Dwater.frag", "shaders/3D.geom" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for water rendering!\n" );
 		return false;
 	}
-	if(!initShader3D(&gl3state.si3DlmFlow, "shaders/3DlmFlow.vert", "shaders/3Dlm.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for scrolling textured 3D rendering with lightmap!\n");
+	if ( !initShader3D ( &gl3state.si3DlmFlow, "shaders/3DlmFlow.vert", "shaders/3Dlm.frag", "shaders/3Dlm.geom" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for scrolling textured 3D rendering with lightmap!\n" );
 		return false;
 	}
-	if(!initShader3D(&gl3state.si3DtransFlow, "shaders/3Dflow.vert", "shaders/3D.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for scrolling textured translucent 3D rendering!\n");
+	if ( !initShader3D ( &gl3state.si3DtransFlow, "shaders/3D.vert", "shaders/3D.frag", "shaders/3d.geom" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for scrolling textured translucent 3D rendering!\n" );
 		return false;
 	}
-	if(!initShader3D(&gl3state.si3Dsky, "shaders/3D.vert", "shaders/3Dsky.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for sky rendering!\n");
+	if ( !initShader3D ( &gl3state.si3Dsky, "shaders/3D.vert", "shaders/3Dsky.frag", "shaders/3d.geom" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for sky rendering!\n" );
 		return false;
 	}
-	if(!initShader3D(&gl3state.si3Dsprite, "shaders/3D.vert", "shaders/3Dsprite.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for sprite rendering!\n");
+	if ( !initShader3D ( &gl3state.si3Dsprite, "shaders/3D.vert", "shaders/3Dsprite.frag", "shaders/3d.geom" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for sprite rendering!\n" );
 		return false;
 	}
-	if(!initShader3D(&gl3state.si3DspriteAlpha, "shaders/3D.vert", "shaders/3DspriteAlpha.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for alpha-tested sprite rendering!\n");
+	if ( !initShader3D ( &gl3state.si3DspriteAlpha, "shaders/3D.vert", "shaders/3DspriteAlpha.frag", "shaders/3d.geom" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for alpha-tested sprite rendering!\n" );
 		return false;
 	}
-	if(!initShader3D(&gl3state.si3Dalias, "shaders/Alias.vert", "shaders/Alias.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for rendering textured models!\n");
+	if ( !initShader3D ( &gl3state.si3Dalias, "shaders/Alias.vert", "shaders/Alias.frag", "shaders/Alias.geom" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for rendering textured models!\n" );
 		return false;
 	}
-	if(!initShader3D(&gl3state.si3DaliasColor, "shaders/Alias.vert", "shaders/AliasColor.frag"))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for rendering flat-colored models!\n");
+	if ( !initShader3D ( &gl3state.si3DaliasColor, "shaders/Alias.vert", "shaders/AliasColor.frag", "shaders/Alias.geom" ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for rendering flat-colored models!\n" );
 		return false;
 	}
 
 	const char* particleFrag = "shaders/Particles.frag";
-	if(gl3_particle_square->value != 0.0f)
-	{
+	if ( gl3_particle_square->value != 0.0f ) {
 		particleFrag = "shaders/ParticlesSquare.frag";
 	}
 
-	if(!initShader3D(&gl3state.siParticle, "shaders/Particles.vert", particleFrag))
-	{
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for rendering particles!\n");
+	if ( !initShader3D ( &gl3state.siParticle, "shaders/Particles.vert", particleFrag, NULL ) ) {
+		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for rendering particles!\n" );
 		return false;
 	}
 

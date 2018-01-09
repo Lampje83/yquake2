@@ -7,7 +7,9 @@ out vec3 passNormal;
 void main()
 {
 	vec2 tc = texCoord;
-	tc.s += scroll;
+	if ((surfFlags & SURF_FLOWING) != 0) {
+		tc.s -= time / 48.0 * 32.0;
+	}
 
 	passTexCoord = tc;
 	passWorldCoord = (transModel * vec4(position, 1.0)).xyz;

@@ -24,14 +24,19 @@ void main()
 
 	vec4 texel = texture(tex, coord);
 
+	//coord.z = 1;
+	//vec4 texel2 = texture(tex, coord);
+
 	// the gl1 renderer used glAlphaFunc(GL_GREATER, 0.666);
 	// and glEnable(GL_ALPHA_TEST); for 2D rendering
 	// this should do the same
-	if(texel.a <= 0.666)
+	//texel += texel2;
+
+	if(texel.a <= 0.0)
 		discard;
 
 	// apply gamma correction and intensity
-	texel.rgb *= intensity2D;
-	outColor.rgb = pow(texel.rgb, vec3(gamma));
-	outColor.a = texel.a; // I think alpha shouldn't be modified by gamma and intensity
+	//texel.rgb *= intensity2D;
+	outColor.rgb = texel.rgb;
+	outColor.a = 1; //texel.a; // I think alpha shouldn't be modified by gamma and intensity
 }

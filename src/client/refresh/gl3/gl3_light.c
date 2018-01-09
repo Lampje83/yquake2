@@ -285,7 +285,6 @@ void GL3_PushDlights(void)
 	{
 		memset(&gl3state.uniLightsData.dynLights[i], 0, (MAX_DLIGHTS-i)*sizeof(gl3state.uniLightsData.dynLights[0]));
 	}
-
 	// GL3_RenderShadows();
 
 	GL3_UpdateUBOLights();

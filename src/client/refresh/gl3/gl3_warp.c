@@ -237,7 +237,7 @@ GL3_EmitWaterPolys(msurface_t *fa)
 {
 	glpoly_t *bp;
 	float scroll = 0.0f;
-
+/*
 	if (fa->texinfo->flags & SURF_FLOWING)
 	{
 		scroll = -64.0f * ((gl3_newrefdef.time / 40.0f) - (int)(gl3_newrefdef.time / 40.0f));
@@ -246,7 +246,7 @@ GL3_EmitWaterPolys(msurface_t *fa)
 			scroll = -64.0f;
 		}
 	}
-
+*/
 	if(gl3state.uni3DData.scroll != scroll)
 	{
 		gl3state.uni3DData.scroll = scroll;
@@ -261,7 +261,7 @@ GL3_EmitWaterPolys(msurface_t *fa)
 	for (bp = fa->polys; bp != NULL; bp = bp->next)
 	{
 		if ( gl_multiarray->value ) {
-			arraystart[ numarrays ] = bp->vertices - currentmodel->glverts;
+			arraystart[ numarrays ] = bp->vertices - gl3_worldmodel->glverts;
 			arraylength[ numarrays++ ] = bp->numverts;
 		} else {
 			if ( numelements > 0 ) {

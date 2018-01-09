@@ -6,6 +6,11 @@ in vec2 lmTexCoord; // GL3_ATTRIB_LMTEXCOORD
 in vec4 vertColor;  // GL3_ATTRIB_COLOR
 in vec3 normal;     // GL3_ATTRIB_NORMAL
 in uint lightFlags; // GL3_ATTRIB_LIGHTFLAGS
+in uint surfFlags;	// GL3_ATTRIB_SURFFLAGS
+in mat4 refMatrix;  // GL3_ATTRIB_REFMATRIX
+
+#define SURF_FLOWING	0x40
+#define SURF_WARP		0x08
 
 // for UBO shared between all 3D shaders
 layout (std140) uniform uni3D
@@ -14,6 +19,7 @@ layout (std140) uniform uni3D
 	mat4 transView;
 	mat4 transModel;
 	vec4 fluidPlane;
+	vec4 cullDistances;
 	vec3 viewPos;
 
 	float scroll; // for SURF_FLOWING
@@ -26,3 +32,12 @@ layout (std140) uniform uni3D
 	float _pad_2;
 	float _pad_3;
 };
+/*
+layout ( std140 ) uniform refData_s {
+	bool	active;
+	bool	planeback;
+	vec4	plane;
+	vec4	cullDistances;
+	mat4	modMatrix;
+} refData[];
+*/

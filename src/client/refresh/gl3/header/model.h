@@ -44,11 +44,12 @@ enum {
 // used for vertex array elements when drawing brushes, sprites, sky and more
 // (ok, it has the layout used for rendering brushes, but is not used there)
 typedef struct gl3_3D_vtx_s {
-	vec3_t pos;
-	float texCoord[2];
-	float lmTexCoord[2]; // lightmap texture coordinate (sometimes unused)
-	vec3_t normal;
-	GLuint lightFlags; // bit i set means: dynlight i affects surface
+	vec3_t	pos;
+	float	texCoord[2];
+	float	lmTexCoord[2]; // lightmap texture coordinate (sometimes unused)
+	vec3_t	normal;
+	GLuint	lightFlags; // bit i set means: dynlight i affects surface
+	GLuint	surfFlags;
 } gl3_3D_vtx_t;
 
 // used for vertex array elements when drawing models

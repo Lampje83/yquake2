@@ -25,22 +25,19 @@ uniform sampler2D lightmap3;
 
 uniform vec4 lmScales[4];
 
-in vec2 passTexCoord;
-in vec2 passLMcoord;
-in vec3 passWorldCoord;
-in vec3 passNormal;
-flat in uint passLightFlags;
+in VS_OUT {
+	vec2		TexCoord;
+	vec2		LMcoord;
+	vec3		WorldCoord;
+	vec3		Normal;
+	flat uint	LightFlags;
+	flat mat4	refMatrix;
+} fs_in;
 
 void main()
 {
-	vec4 texel = texture(tex, passTexCoord);
+	vec4 texel = texture(tex, fs_in.TexCoord);
 	vec4 lmTex;
-
-	/*
-	float clipPos = dot (passWorldCoord, fluidPlane.xyz) + fluidPlane.w;
-	if (clipPos < 0 && (length(fluidPlane.xyz) > 0))
-		discard;
-	*/
 
 	// apply intensity
 	texel.rgb *= intensity;
@@ -48,16 +45,16 @@ void main()
 	// apply lightmap
 	if (flags != 3u)
 	{
-		lmTex  = texture(lightmap0, passLMcoord) * lmScales[0];
-		lmTex += texture(lightmap1, passLMcoord) * lmScales[1];
-		lmTex += texture(lightmap2, passLMcoord) * lmScales[2];
-		lmTex += texture(lightmap3, passLMcoord) * lmScales[3];
+		lmTex  = texture(lightmap0, fs_in.LMcoord) * lmScales[0];
+		lmTex += texture(lightmap1, fs_in.LMcoord) * lmScales[1];
+		lmTex += texture(lightmap2, fs_in.LMcoord) * lmScales[2];
+		lmTex += texture(lightmap3, fs_in.LMcoord) * lmScales[3];
 	}
 	else
 	{
 		// assume all lightmaps are the same size
 		ivec2 lmSize = textureSize (lightmap0, 0);
-		ivec2 LMcoord = ivec2(passLMcoord * lmSize);
+		ivec2 LMcoord = ivec2(fs_in.LMcoord * lmSize);
 		
 		lmTex  = texelFetch(lightmap0, LMcoord, 0) * lmScales[0];
 		lmTex += texelFetch(lightmap1, LMcoord, 0) * lmScales[1];
@@ -65,7 +62,7 @@ void main()
 		lmTex += texelFetch(lightmap3, LMcoord, 0) * lmScales[3];
 	}
 
-	if(passLightFlags != 0u)
+	if(fs_in.LightFlags != 0u)
 	{
 		// TODO: or is hardcoding 32 better?
 		for(uint i=0u; i<numDynLights; ++i)
@@ -75,16 +72,16 @@ void main()
 			// and, if it is, sets intensity according to distance between light and pixel on surface
 
 			// dyn light number i does not affect this plane, just skip it
-			if((passLightFlags & (1u << i)) == 0u)  continue;
+			if((fs_in.LightFlags & (1u << i)) == 0u)  continue;
 
 			float intens = dynLights[i].lightColor.a;
 
-			vec3 lightToPos = dynLights[i].lightOrigin - passWorldCoord;
+			vec3 lightToPos = dynLights[i].lightOrigin - fs_in.WorldCoord;
 			float distLightToPos = length(lightToPos);
 			float fact = max(0, intens - distLightToPos - 52);
 
 			// also factor in angle between light and point on surface
-			fact *= max(0, dot(passNormal, lightToPos/distLightToPos));
+			fact *= max(0, dot(fs_in.Normal, lightToPos/distLightToPos));
 
 
 			lmTex.rgb += dynLights[i].lightColor.rgb * fact * (1.0/256.0);

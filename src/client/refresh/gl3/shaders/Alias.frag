@@ -2,13 +2,16 @@
 
 uniform sampler2D tex;
 
-in vec2 passTexCoord;
-in vec4 passColor;
-in vec3 passWorldCoord;
+in VS_OUT {
+	vec2		TexCoord;
+	vec4		Color;
+	vec3		WorldCoord;
+	flat mat4	refMatrix;
+} fs_in;
 
 void main()
 {
-	vec4 texel = texture(tex, passTexCoord);
+	vec4 texel = texture(tex, fs_in.TexCoord);
 /*
 	float clipPos = dot (passWorldCoord, fluidPlane.xyz) + fluidPlane.w;
 	if (clipPos < 0 && (length(fluidPlane.xyz) > 0))
@@ -17,7 +20,7 @@ void main()
 	// apply gamma correction and intensity
 	texel.rgb *= intensity;
 	texel.a *= alpha; // is alpha even used here?
-	texel *= min(vec4(3.0), passColor);
+	texel *= min(vec4(3.0), fs_in.Color);
 
 	outColor.rgb = pow(texel.rgb, vec3(gamma));
 	outColor.a = texel.a; // I think alpha shouldn't be modified by gamma and intensity

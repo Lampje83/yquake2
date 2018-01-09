@@ -1,4 +1,7 @@
-#version 430
+#version 430 core
+
+#define SURF_FLOWING	0x40
+#define SURF_WARP		0x08
 
 layout (location = 0) out vec4 outColor;
 
@@ -19,6 +22,7 @@ layout (std140) uniform uni3D
 	mat4 transView;
 	mat4 transModel;
 	vec4 fluidPlane;
+	vec4 cullDistances;
 	vec3 viewPos;
 
 	float scroll; // for SURF_FLOWING

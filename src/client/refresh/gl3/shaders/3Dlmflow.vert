@@ -1,29 +1,38 @@
 // it gets attributes and uniforms from vertexCommon3D
 
-out vec2 passTexCoord;
-out vec2 passLMcoord;
-out vec3 passWorldCoord;
-out vec3 passNormal;
-flat out uint passLightFlags;
+out VS_OUT {
+	vec2		TexCoord;
+	vec2		LMcoord;
+	vec3		WorldCoord;
+	vec3		Normal;
+	flat uint	LightFlags;
+	flat mat4	refMatrix;
+} vs;
 
 void main()
 {
-	passTexCoord = texCoord + vec2(scroll, 0);
-	passLMcoord = lmTexCoord;
+	vs.TexCoord = texCoord;// + vec2(scroll, 0);
+	if ((surfFlags & SURF_FLOWING) != 0) {
+		vs.TexCoord += vec2(time / 128.0, 0);
+	}
+	vs.LMcoord = lmTexCoord;
 	vec4 worldCoord = transModel * vec4(position, 1.0);
-	passWorldCoord = worldCoord.xyz;
+	vs.WorldCoord = worldCoord.xyz;
 	vec4 worldNormal = transModel * vec4(normal, 0.0f);
-	passNormal = normalize(worldNormal.xyz);
-	passLightFlags = lightFlags;
+	vs.Normal = normalize(worldNormal.xyz);
+	vs.LightFlags = lightFlags;
+	vs.refMatrix = refMatrix;
 
 	gl_Position = transProj * transView * worldCoord;
 
-	if (length(fluidPlane.xyz) > 0)
-	{
-		gl_ClipDistance[0] = dot (worldCoord.xyz, fluidPlane.xyz) + fluidPlane.w;
-	}
-	else
-	{
-		gl_ClipDistance[0] = 0;
+	if ( length ( fluidPlane.xyz ) > 0 ) {
+		//worldCoord = refMatrix * worldCoord;
+		//vs.WorldCoord = worldCoord.xyz;
+		gl_Position = transProj * transView * worldCoord;
+		gl_ClipDistance[ 0 ] = dot ( worldCoord.xyz, fluidPlane.xyz ) + fluidPlane.w;
+
+	} else {
+		gl_Position = transProj * transView * worldCoord;
+		gl_ClipDistance[ 0 ] = dot ( worldCoord.xyz, fluidPlane.xyz ) + fluidPlane.w;
 	}
 }

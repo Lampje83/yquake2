@@ -28,7 +28,7 @@ void main()
 
 		vec4 projCoord = gl_FragCoord;
 		projCoord.xy *= bufSize.xy;
-		projCoord.z = 0;
+		projCoord.z = 1;
 
 		vec4 refltex = texture(refl, projCoord.xyz) * newalpha;
 		texel.rgb *= vec3(1 - newalpha);

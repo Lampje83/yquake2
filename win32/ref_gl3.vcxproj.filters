@@ -82,9 +82,6 @@
     <ClCompile Include="..\src\backends\windows\shared\mem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\client\refresh\gl3\shaders\3Dwater.frag">
-      <Filter>Shader Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\common\header\shared.h">
@@ -123,84 +120,88 @@
     <ClInclude Include="..\src\client\refresh\gl3\header\model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\2darray.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\2Dcolor.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\2Dcolor.vert">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3D.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3D.vert">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dcolor.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.geom">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlmflow.vert">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Drefract.vert">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dsky.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dsprite.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3DspriteAlpha.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dwater.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\Alias.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\Alias.vert">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\AliasColor.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\Common3D.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\Common3D.vert">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\Particles.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\Particles.vert">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\ParticlesSquare.frag">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\glsl.h">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\2d.vert">
+      <Filter>Shader Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\client\refresh\gl3\shaders\2d.vert">
+    <None Include="..\src\client\refresh\gl3\shaders\2d.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="..\src\client\refresh\gl3\shaders\2Dcolor.vert">
+    <None Include="..\src\client\refresh\gl3\shaders\3D.geom">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="..\src\client\refresh\gl3\shaders\2Dcolor.frag">
+    <None Include="..\src\client\refresh\gl3\shaders\Alias.geom">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="..\src\client\refresh\gl3\shaders\Common3D.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\Common3D.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3D.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dflow.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dlmflow.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3D.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dsky.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dsprite.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3DspriteAlpha.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dwater.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\Alias.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\Alias.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\AliasColor.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\Particles.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\Particles.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\ParticlesSquare.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Drefract.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\2darray.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\src\client\refresh\gl3\shaders\2d.frag">
-      <Filter>Shader Files</Filter>
-    </CustomBuild>
   </ItemGroup>
 </Project>

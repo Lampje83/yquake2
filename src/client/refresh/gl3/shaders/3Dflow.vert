@@ -8,20 +8,26 @@ out VS_OUT {
 
 void main()
 {
-	vs.TexCoord = texCoord + vec2(scroll, 0);
-	vs.WorldCoord = position.xyz;
-	vec4 worldNormal = transModel * vec4(normal, 0.0f);
-	vs.Normal = normalize(worldNormal.xyz);
-
-	gl_Position = transProj * transView * transModel * vec4(position, 1.0);
-
-	if (length(fluidPlane.xyz) > 0)
-	{
-		gl_ClipDistance[0] = dot (position.xyz, fluidPlane.xyz) + fluidPlane.w;
+	vs.TexCoord = texCoord;
+	if ((surfFlags & SURF_FLOWING) != 0) {
+		//vs.TexCoord += vec2(time / 256.0, 0);
 	}
-	else
-	{
-		gl_ClipDistance[0] = 0;
+
+	vec4 worldCoord = transModel * vec4 ( position, 1.0 );
+
+	vs.WorldCoord = worldCoord.xyz;
+	vec4 worldNormal = transModel * vec4 ( normal, 0.0f );
+	vs.Normal = normalize ( worldNormal.xyz );
+
+	if ( length ( fluidPlane.xyz ) > 0 ) {
+		worldCoord = refMatrix * worldCoord;
+		vs.WorldCoord = worldCoord.xyz;
+		gl_Position = transProj * transView * worldCoord;
+		gl_ClipDistance[ 0 ] = dot ( worldCoord.xyz, fluidPlane.xyz ) + fluidPlane.w;
+
+	} else {
+		gl_Position = transProj * transView * worldCoord;
+		gl_ClipDistance[ 0 ] = -dot ( worldCoord.xyz, fluidPlane.xyz ) - fluidPlane.w;
 	}
 
 }

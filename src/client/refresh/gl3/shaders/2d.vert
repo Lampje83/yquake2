@@ -1,3 +1,6 @@
+#ifdef __INTELLISENSE__
+#include "glsl.h"
+#endif
 #version 150
 
 in vec2 position; // GL3_ATTRIB_POSITION

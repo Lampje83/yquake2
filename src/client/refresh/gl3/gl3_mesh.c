@@ -607,11 +607,11 @@ CullAliasModel(vec3_t bbox[8], entity_t *e)
 		bbox[i][2] = DotProduct(vectors[2], tmp);
 
 		VectorAdd(e->origin, bbox[i], bbox[i]);
-		if ( memcmp ( &gl3state.modMatrix, &gl3_identityMat4, sizeof ( hmm_mat4 ) ) ) {
+		if ( memcmp ( &gl3state.refPlanes[ 0 ].modMatrix, &gl3_identityMat4, sizeof ( hmm_mat4 ) ) ) {
 			hmm_vec4 tmp;
 			memcpy ( &tmp, bbox[ i ], sizeof ( vec3_t ) );
 			tmp.W = 1;
-			tmp = HMM_MultiplyMat4ByVec4 ( gl3state.modMatrix, tmp );
+			tmp = HMM_MultiplyMat4ByVec4 ( gl3state.refPlanes[ 0 ].modMatrix, tmp );
 			memcpy ( bbox[ i ], &tmp, sizeof ( vec3_t ) );
 		}
 	}

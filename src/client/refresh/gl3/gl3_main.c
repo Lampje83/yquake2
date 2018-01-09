@@ -1549,8 +1549,24 @@ static void
 GL3_RenderFrame(refdef_t *fd)
 {	
 	gl3state.uni3DData.fluidPlane = HMM_Vec4 ( 0, 0, 0, 0 );
-	gl3state.modMatrix = gl3_identityMat4;
+	gl3state.refPlanes[ 0 ].modMatrix = gl3_identityMat4;
 
+	gl3state.uni3DData.cullDistances = HMM_Vec4 ( 1, 1, 1, 1 );
+	glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vboRefMats );
+	for ( int index = 0; index < 4; index++ ) {
+		glDisableVertexAttribArray ( GL3_ATTRIB_REFMATRIX + index );
+		glVertexAttrib4fv ( GL3_ATTRIB_REFMATRIX + index, gl3_identityMat4.Elements[ index ] );
+	}
+	glBufferData ( GL_ARRAY_BUFFER, sizeof ( refplanedata_t ) * MAX_REF_PLANES, &gl3state.refPlanes[ 0 ], GL_DYNAMIC_DRAW );
+	GL3_UpdateUBO3D ();
+
+	//glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
+	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
+	//glViewport ( 0, 0, fd->width, fd->height );
+	//glClearDepthf ( 10000 );
+
+	//glClearColor ( 0.0f, 0.0f, 0.0f, 0.0f );
+	glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
 	GL3_RenderView ( fd );
 	GL3_SetLightLevel ();
 
@@ -1565,17 +1581,19 @@ GL3_RenderFrame(refdef_t *fd)
 	fd->viewangles[ 1 ] -= 180;
 	fd->viewangles[ 0 ] = -fd->viewangles[ 0 ];
 
-	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
 */
+	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
 	GL3_SetGL2D ();
+	//glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
 
-	if ( gl3state.numRefPlanes > 0 && gl_reflection->value ) {
+	//if ( gl3state.numRefPlanes > 0 && gl_reflection->value ) {
+		GL3_SelectTMU ( GL_TEXTURE0 );
 		GL3_Bind ( gl3state.reflectTexture );
 		glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
 
 		GL3_UseProgram ( gl3state.si2Darray.shaderProgram );
-		GL3_DrawTexture ( 0, gl3_newrefdef.height * 0.25, gl3_newrefdef.width * 0.25, -gl3_newrefdef.height * 0.25 );
-	}
+		GL3_DrawTexture ( 0, gl3_newrefdef.height, gl3_newrefdef.width, -gl3_newrefdef.height );
+	//}
 
 	if(v_blend[3] != 0.0f)
 	{
@@ -1585,7 +1603,6 @@ GL3_RenderFrame(refdef_t *fd)
 		GL3_Draw_Flash(v_blend, x, y, gl3_newrefdef.width, gl3_newrefdef.height);
 	}
 
-	char str[ 30 ];
 	if ( gl3state.numRefPlanes > 0 ) {
 		R_Printf ( PRINT_DEVELOPER, "Reflection planes: %d\n", gl3state.numRefPlanes );
 	}

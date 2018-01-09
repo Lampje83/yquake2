@@ -78,7 +78,10 @@ enum {
 	GL3_ATTRIB_LMTEXCOORD = 2, // for lightmap
 	GL3_ATTRIB_COLOR      = 3, // per-vertex color
 	GL3_ATTRIB_NORMAL     = 4, // vertex normal
-	GL3_ATTRIB_LIGHTFLAGS = 5  // uint, each set bit means "dyn light i affects this surface"
+	GL3_ATTRIB_LIGHTFLAGS = 5,  // uint, each set bit means "dyn light i affects this surface"
+	GL3_ATTRIB_SURFFLAGS  = 6, // surface flags, currently for SURF_WARP and SURF_FLOWING
+	GL3_ATTRIB_REFMATRIX  = 7, // reflection matrix, for draw instancing
+	GL3_ATTRIB_REFPLANE   = 8
 };
 
 // TODO: do we need the following configurable?
@@ -137,12 +140,15 @@ typedef struct
 	hmm_mat4 transMat4;
 } gl3Uni2D_t;
 
+#define MAX_REF_PLANES 16
+
 typedef struct
 {
 	hmm_mat4 transProjMat4;
 	hmm_mat4 transViewMat4;
 	hmm_mat4 transModelMat4;
 	hmm_vec4 fluidPlane;
+	hmm_vec4 cullDistances;
 	hmm_vec3 viewPos;
 
 	GLfloat scroll; // for SURF_FLOWING
@@ -180,6 +186,24 @@ enum {
 	MAX_LIGHTMAPS = 4,
 	MAX_LIGHTMAPS_PER_SURFACE = MAXLIGHTMAPS // 4
 };
+
+typedef struct 	{
+	GLboolean	active;
+	GLuint		id;
+	cplane_t	*plane;		// The actual reflection plane
+	int			frameCount;	// Last seen frame index
+	qboolean	planeback;		// is surface on back side of plane
+	hmm_mat4	modMatrix;		// World reflection modification matrix
+	hmm_vec4	cullDistances;	// offsets of visibility in view frame
+} refplanedata_t;
+
+typedef struct gl3UniRefdata_s {
+	GLboolean	active;
+	GLboolean	planeback;
+	hmm_vec4	plane;
+	hmm_vec4	cullDistances;
+	hmm_mat4	modMatrix;
+} gl3UniRefData_t;
 
 typedef struct
 {
@@ -230,6 +254,7 @@ typedef struct
 	gl3ShaderInfo_t siParticle; // for particles. surprising, right?
 
 	GLuint vao3D, vbo3D; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
+	GLuint vboRefMats;					// for reflection matrices
 	GLuint vao3Dtrans, vbo3Dtrans; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
 	GLuint vaoAlias, vboAlias, eboAlias; // for models, using 9 floats as (x,y,z, s,t, r,g,b,a)
 	GLuint vaoParticle, vboParticle; // for particles, using 9 floats (x,y,z, size,distance, r,g,b,a)
@@ -239,10 +264,13 @@ typedef struct
 	gl3Uni2D_t uni2DData;
 	gl3Uni3D_t uni3DData;
 	gl3UniLights_t uniLightsData;
+	gl3UniRefData_t uniRefData[ MAX_REF_PLANES ];
+
 	GLuint uniCommonUBO;
 	GLuint uni2DUBO;
 	GLuint uni3DUBO;
 	GLuint uniLightsUBO;
+	GLuint uniRefDataUBO;
 
 	// ERIK: Renderbuffers
 	GLuint	reflectTexture, reflectTextureDepth;
@@ -251,12 +279,9 @@ typedef struct
 	GLuint	reflectFB;		// reflection framebuffer
 	GLuint	refractFB;		// refration framebuffer
 
-	cplane_t	*refPlanes[ 16 ];
-	int			refVisframe[ 16 ];
-	qboolean	planeback[ 16 ];
-	int			numRefPlanes;
-	int			currentRefPlane;
-	hmm_mat4	modMatrix;
+	refplanedata_t	refPlanes[ MAX_REF_PLANES + 1 ]; // Contains the currently found reflection planes. 1 extra for neutral data
+	int				numRefPlanes;					// Total number of refplanes found
+	int				currentRefPlane;				// Current reflection plane. Still needed?
 
 } gl3state_t;
 

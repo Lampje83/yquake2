@@ -208,6 +208,10 @@ GL3_LM_BuildPolygonFromSurface(msurface_t *fa)
 
 		VectorCopy(normal, vert->normal);
 		vert->lightFlags = 0;
+		vert->surfFlags = fa->flags;
+		if ( fa->texinfo->flags & SURF_FLOWING ) {
+			vert->surfFlags |= SURF_FLOWING;
+		}
 	}
 
 	poly->numverts = lnumverts;

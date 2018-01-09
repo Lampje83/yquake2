@@ -5,9 +5,11 @@ uniform sampler2D tex;
 uniform	sampler2DArray refl;
 // uniform sampler2D refr;
 
-in vec2 passTexCoord;
-in vec3 passWorldCoord;
-in vec3 passNormal;
+in VS_OUT {
+	vec2 TexCoord;
+	vec3 WorldCoord;
+	vec3 Normal;
+} fs_in;
 
 float brightness (vec3 color)
 {
@@ -17,18 +19,21 @@ float brightness (vec3 color)
 void main()
 {
 	vec2 texw;
-	texw.s = (passTexCoord.s + sin( passTexCoord.t * 4 + time ) * 0.0625) ;
-	texw.t = (passTexCoord.t + sin( passTexCoord.s * 4 + time ) * 0.0625) ;
+
+	// Apply water warp
+	texw.s = (fs_in.TexCoord.s + sin( fs_in.TexCoord.t * 4 + time ) * 0.0625) ;
+	texw.t = (fs_in.TexCoord.t + sin( fs_in.TexCoord.s * 4 + time ) * 0.0625) ;
 	vec4 texel = texture(tex, texw);
 
 	texel.rgb *= intensity * 1.0;
 	texel.rgb = pow(texel.rgb, vec3(gamma));
 
 	float newalpha = alpha;
+
 	if (alpha < 1)
 	{
-		vec3 viewang = normalize(viewPos - passWorldCoord.xyz);
-		float dp = dot(passNormal, viewang);
+		vec3 viewang = normalize(viewPos - fs_in.WorldCoord.xyz);
+		float dp = dot(fs_in.Normal, viewang);
 
 		newalpha += (1.0 - alpha) * pow (1 - dp, 3);
 
@@ -51,12 +56,14 @@ void main()
 
 		projCoord.xy += df;
 		projCoord = clamp(projCoord, 0.0, 1.0);	
-		vec4 refltex = texture(refl, projCoord.xyz) * newalpha;
+		vec4 refltex = texture(refl, vec3(projCoord.xy, 1)) * newalpha;
+		vec4 refrtex = texture(refl, vec3(projCoord.xy, 2)) * (1 - newalpha);
 		texel.rgb *= vec3(1 - newalpha);
 
 		texel.rgb += refltex.rgb; // * (1.0 - (texel.a * newalpha));
+		texel.rgb += refrtex.rgb;
 	}
 	outColor.rgb = texel.rgb;
 	// apply intensity and gamma
-	outColor.a = newalpha; // I think alpha shouldn't be modified by gamma and intensity
+	outColor.a = 1;//newalpha; // I think alpha shouldn't be modified by gamma and intensity
 }

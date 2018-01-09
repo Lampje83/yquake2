@@ -1,24 +1,33 @@
 // it gets attributes and uniforms from Common3D.vert
 
-out vec2 passTexCoord;
-out vec4 passColor;
-out vec3 passWorldCoord;
+out VS_OUT {
+	vec2		TexCoord;
+	vec4		Color;
+	vec3		WorldCoord;
+	flat mat4	refMatrix;
+} vs;
 
 void main()
 {
-	vec4 tmp;
-	tmp = transModel * vec4(position, 1.0);
-	passWorldCoord = tmp.xyz;
-	passColor = vertColor*overbrightbits;
-	passTexCoord = texCoord;
-	gl_Position = transProj * transView * transModel * vec4(position, 1.0);
+	//vec4 tmp;
+	//tmp = transModel * vec4(position, 1.0);
+	//vs.WorldCoord = tmp.xyz;
+	vs.Color = vertColor*overbrightbits;
+	vs.TexCoord = texCoord;
+	vs.refMatrix = refMatrix;
 
-	if (length(fluidPlane.xyz) > 0)
-	{
-		gl_ClipDistance[0] = dot (tmp.xyz, fluidPlane.xyz) + fluidPlane.w;
-	}
-	else
-	{
-		gl_ClipDistance[0] = 0;
+	vec4 worldCoord = transModel * vec4 ( position, 1.0 );
+
+	vs.WorldCoord = worldCoord.xyz;
+
+	if ( length ( fluidPlane.xyz ) > 0 ) {
+//		worldCoord = refMatrix * worldCoord;
+//		passWorldCoord = worldCoord.xyz;
+		gl_Position = transProj * transView * worldCoord;
+		gl_ClipDistance[ 0 ] = dot ( worldCoord.xyz, fluidPlane.xyz ) + fluidPlane.w;
+
+	} else {
+		gl_Position = transProj * transView * worldCoord;
+		gl_ClipDistance[ 0 ] = -dot ( worldCoord.xyz, fluidPlane.xyz ) - fluidPlane.w;
 	}
 }
