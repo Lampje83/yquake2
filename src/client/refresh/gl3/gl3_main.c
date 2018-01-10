@@ -1554,15 +1554,15 @@ GL3_RenderFrame(refdef_t *fd)
 	gl3state.uni3DData.cullDistances = HMM_Vec4 ( 1, 1, 1, 1 );
 	glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vboRefMats );
 	for ( int index = 0; index < 4; index++ ) {
-		glDisableVertexAttribArray ( GL3_ATTRIB_REFMATRIX + index );
-		glVertexAttrib4fv ( GL3_ATTRIB_REFMATRIX + index, gl3_identityMat4.Elements[ index ] );
+		glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
+		glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX + index, gl3_identityMat4.Elements[ index ] );
 	}
 	glBufferData ( GL_ARRAY_BUFFER, sizeof ( refplanedata_t ) * MAX_REF_PLANES, &gl3state.refPlanes[ 0 ], GL_DYNAMIC_DRAW );
 	GL3_UpdateUBO3D ();
 
 	//glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
 	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
-	//glViewport ( 0, 0, fd->width, fd->height );
+	glViewport ( fd->x, fd->y, fd->width, fd->height );
 	//glClearDepthf ( 10000 );
 
 	//glClearColor ( 0.0f, 0.0f, 0.0f, 0.0f );
@@ -1592,7 +1592,7 @@ GL3_RenderFrame(refdef_t *fd)
 		glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
 
 		GL3_UseProgram ( gl3state.si2Darray.shaderProgram );
-		GL3_DrawTexture ( 0, gl3_newrefdef.height, gl3_newrefdef.width, -gl3_newrefdef.height );
+		GL3_DrawTexture ( 0, vid.height, vid.width, -vid.height );
 	//}
 
 	if(v_blend[3] != 0.0f)

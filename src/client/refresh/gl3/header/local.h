@@ -73,15 +73,14 @@ qglVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, G
 
 // attribute locations for vertex shaders
 enum {
-	GL3_ATTRIB_POSITION   = 0,
-	GL3_ATTRIB_TEXCOORD   = 1, // for normal texture
-	GL3_ATTRIB_LMTEXCOORD = 2, // for lightmap
-	GL3_ATTRIB_COLOR      = 3, // per-vertex color
-	GL3_ATTRIB_NORMAL     = 4, // vertex normal
-	GL3_ATTRIB_LIGHTFLAGS = 5,  // uint, each set bit means "dyn light i affects this surface"
-	GL3_ATTRIB_SURFFLAGS  = 6, // surface flags, currently for SURF_WARP and SURF_FLOWING
-	GL3_ATTRIB_REFMATRIX  = 7, // reflection matrix, for draw instancing
-	GL3_ATTRIB_REFPLANE   = 8
+	GL3_ATTRIB_POSITION		= 0,
+	GL3_ATTRIB_TEXCOORD		= 1, // for normal texture
+	GL3_ATTRIB_LMTEXCOORD	= 2, // for lightmap
+	GL3_ATTRIB_COLOR		= 3, // per-vertex color
+	GL3_ATTRIB_NORMAL		= 4, // vertex normal
+	GL3_ATTRIB_LIGHTFLAGS	= 5,  // uint, each set bit means "dyn light i affects this surface"
+	GL3_ATTRIB_SURFFLAGS	= 6, // surface flags, currently for SURF_WARP and SURF_FLOWING
+	GL3_ATTRIB_REFINDEX		= 7 // reflection matrix, for draw instancing
 };
 
 // TODO: do we need the following configurable?
@@ -519,6 +518,7 @@ extern void GL3_UpdateUBOCommon(void);
 extern void GL3_UpdateUBO2D(void);
 extern void GL3_UpdateUBO3D(void);
 extern void GL3_UpdateUBOLights(void);
+extern void GL3_UpdateUBORefData ( void );
 
 // ############ Cvars ###########
 

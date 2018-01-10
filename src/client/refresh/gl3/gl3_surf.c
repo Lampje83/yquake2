@@ -75,20 +75,20 @@ void GL3_SurfInit(void)
 	glEnableVertexAttribArray ( GL3_ATTRIB_SURFFLAGS );
 	qglVertexAttribIPointer ( GL3_ATTRIB_SURFFLAGS, 1, GL_UNSIGNED_INT, sizeof ( gl3_3D_vtx_t ), offsetof ( gl3_3D_vtx_t, surfFlags ) );
 
-	//qglVertexAttribPointer ( GL3_ATTRIB_REFMATRIX, 16, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) );
+	//qglVertexAttribPointer ( GL3_ATTRIB_REFINDEX, 16, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) );
 /*
-	glVertexAttribFormat ( GL3_ATTRIB_REFMATRIX, 16, GL_FLOAT, GL_FALSE, 0 );
-	glVertexAttribBinding ( GL3_ATTRIB_REFMATRIX, 1 );
-	glVertexAttribDivisor ( GL3_ATTRIB_REFMATRIX, 1 );
-	//glBindVertexBuffer ( GL3_ATTRIB_REFMATRIX, gl3state.vboRefMats, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) );
-	glBindVertexBuffer ( GL3_ATTRIB_REFMATRIX, gl3state.vboRefMats, sizeof ( refplanedata_t ), 0 );
+	glVertexAttribFormat ( GL3_ATTRIB_REFINDEX, 16, GL_FLOAT, GL_FALSE, 0 );
+	glVertexAttribBinding ( GL3_ATTRIB_REFINDEX, 1 );
+	glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX, 1 );
+	//glBindVertexBuffer ( GL3_ATTRIB_REFINDEX, gl3state.vboRefMats, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) );
+	glBindVertexBuffer ( GL3_ATTRIB_REFINDEX, gl3state.vboRefMats, sizeof ( refplanedata_t ), 0 );
 */	
 	GL3_BindVBO ( gl3state.vboRefMats );
 	glBufferData ( GL_ARRAY_BUFFER, sizeof ( refplanedata_t ) * MAX_REF_PLANES, &gl3state.refPlanes[ 0 ], GL_DYNAMIC_DRAW );
 
 	for ( int index = 0; index < 4; index++ ) {
-		qglVertexAttribPointer ( GL3_ATTRIB_REFMATRIX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix) + 4 * index * sizeof ( float ) );
-		glVertexAttribDivisor ( GL3_ATTRIB_REFMATRIX + index, 1 );
+		qglVertexAttribPointer ( GL3_ATTRIB_REFINDEX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix) + 4 * index * sizeof ( float ) );
+		glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
 	}
 
 	glGenVertexArrays ( 1, &gl3state.vao3Dtrans );
@@ -115,9 +115,9 @@ void GL3_SurfInit(void)
 	GL3_BindVBO ( gl3state.vboRefMats );
 
 	for ( int index = 0; index < 4; index++ ) {
-		qglVertexAttribPointer ( GL3_ATTRIB_REFMATRIX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) + 4 * index * sizeof ( float ) );
-		glEnableVertexAttribArray ( GL3_ATTRIB_REFMATRIX + index );
-		glVertexAttribDivisor ( GL3_ATTRIB_REFMATRIX + index, 1 );
+		qglVertexAttribPointer ( GL3_ATTRIB_REFINDEX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) + 4 * index * sizeof ( float ) );
+		glEnableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
+		glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
 	}
 
 	// init VAO and VBO for model vertexdata: 9 floats
@@ -141,9 +141,9 @@ void GL3_SurfInit(void)
 	GL3_BindVBO ( gl3state.vboRefMats );
 
 	for ( int index = 0; index < 4; index++ ) {
-		qglVertexAttribPointer ( GL3_ATTRIB_REFMATRIX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) + 4 * index * sizeof ( float ) );
-		glEnableVertexAttribArray ( GL3_ATTRIB_REFMATRIX + index );
-		glVertexAttribDivisor ( GL3_ATTRIB_REFMATRIX + index, 1 );
+		qglVertexAttribPointer ( GL3_ATTRIB_REFINDEX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) + 4 * index * sizeof ( float ) );
+		glEnableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
+		glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
 	}
 
 	glGenBuffers(1, &gl3state.eboAlias);
@@ -170,9 +170,9 @@ void GL3_SurfInit(void)
 	GL3_BindVBO ( gl3state.vboRefMats );
 
 	for ( int index = 0; index < 4; index++ ) {
-		qglVertexAttribPointer ( GL3_ATTRIB_REFMATRIX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) + 4 * index * sizeof ( float ) );
-		glEnableVertexAttribArray ( GL3_ATTRIB_REFMATRIX + index );
-		glVertexAttribDivisor ( GL3_ATTRIB_REFMATRIX + index, 1 );
+		qglVertexAttribPointer ( GL3_ATTRIB_REFINDEX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) + 4 * index * sizeof ( float ) );
+		glEnableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
+		glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
 	}
 
 	// init renderbuffers for reflection, refraction and shadow mapping
@@ -184,15 +184,18 @@ void GL3_SurfInit(void)
 
 	// Setup buffer textures
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
-	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, vid.width, vid.height, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
-	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_R11F_G11F_B10F, vid.width, vid.height, 32, 0, GL_RGBA, GL_FLOAT, 0 );
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTextureDepth );
 	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 32, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0 );
-	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	// Setup the frame buffers
 	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
 	glFramebufferTexture ( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gl3state.reflectTexture, 0 );
@@ -640,21 +643,21 @@ GL3_DrawAlphaSurfaces(void)
 				// start drawing to reflection buffer
 				glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vboRefMats );
 				for ( int index = 0; index < 4; index++ ) {
-					glEnableVertexAttribArray ( GL3_ATTRIB_REFMATRIX + index );
-					glVertexAttribDivisor ( GL3_ATTRIB_REFMATRIX + index, 1 );
+					glEnableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
+					glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
 				}	
 				glBufferData ( GL_ARRAY_BUFFER, sizeof ( refplanedata_t ) * MAX_REF_PLANES, &gl3state.refPlanes[ 0 ], GL_DYNAMIC_DRAW );
 				/*
-				//glDisableVertexAttribArray ( GL3_ATTRIB_REFMATRIX );
-				glVertexAttrib4fv ( GL3_ATTRIB_REFMATRIX, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 0 ] );
-				glVertexAttrib4fv ( GL3_ATTRIB_REFMATRIX+1, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 1 ] );
-				glVertexAttrib4fv ( GL3_ATTRIB_REFMATRIX+2, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 2 ] );
-				glVertexAttrib4fv ( GL3_ATTRIB_REFMATRIX+3, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 3 ] );
+				//glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX );
+				glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 0 ] );
+				glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+1, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 1 ] );
+				glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+2, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 2 ] );
+				glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+3, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 3 ] );
 				*/
 				glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vbo3D );
 
-				glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
-				glViewport ( 0, 0, gl3_newrefdef.width, gl3_newrefdef.height );
+				//glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
+				//glViewport ( 0, 0, gl3_newrefdef.width, gl3_newrefdef.height );
 				glClearColor ( 0, 0, 0, 0 );
 				//glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
 				//glEnable ( GL_CLIP_DISTANCE0 );
@@ -677,7 +680,7 @@ GL3_DrawAlphaSurfaces(void)
 				
 				// Restore normal framebuffer
 				for ( int index = 0; index < 4; index++ ) {
-					//glDisableVertexAttribArray ( GL3_ATTRIB_REFMATRIX + index );
+					//glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
 				}
 				//gl_cullpvs->value = oldcull;
 				//glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
@@ -1049,26 +1052,22 @@ GL3_DrawBrushModel(entity_t *e)
 	currententity = e;
 	gl3state.currenttexture = -1;
 
-	if (e->angles[0] || e->angles[1] || e->angles[2])
-	{
+	if ( e->angles[ 0 ] || e->angles[ 1 ] || e->angles[ 2 ] ) {
 		rotated = true;
 
-		for (i = 0; i < 3; i++)
-		{
-			mins[i] = e->origin[i] - currentmodel->radius;
-			maxs[i] = e->origin[i] + currentmodel->radius;
+		for ( i = 0; i < 3; i++ ) {
+			mins[ i ] = e->origin[ i ] - currentmodel->radius;
+			maxs[ i ] = e->origin[ i ] + currentmodel->radius;
 		}
-	}
-	else
-	{
+	} else {
 		rotated = false;
-		VectorAdd(e->origin, currentmodel->mins, mins);
-		VectorAdd(e->origin, currentmodel->maxs, maxs);
+		VectorAdd ( e->origin, currentmodel->mins, mins );
+		VectorAdd ( e->origin, currentmodel->maxs, maxs );
 	}
-
-	if (CullBox(mins, maxs))
-	{
-		return;
+	if ( gl_cullpvs->value ) {
+		if ( CullBox ( mins, maxs ) ) {
+			return;
+		}
 	}
 
 	if (gl_zfix->value)
@@ -1296,8 +1295,7 @@ void GL3_DrawWorld(void)
 		gl3state.numRefPlanes = 0;
 		ClearTextureChains ();
 		RecursiveWorldNode ( gl3_worldmodel->nodes );
-		//glBufferData ( GL_UNIFORM_BUFFER, sizeof ( gl3state.uniRefData ), &gl3state.uniRefData, GL_DYNAMIC_DRAW );
-
+		GL3_UpdateUBORefData ();
 	}
 
 	DrawTextureChains();

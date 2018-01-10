@@ -656,19 +656,29 @@ GL3_DrawAliasModel(entity_t *entity)
 	hmm_mat4 origProjMat = {0}; // use for left-handed rendering
 	// used to restore ModelView matrix after changing it for this entities position/rotation
 	hmm_mat4 origModelMat = {0};
-
+	
 	if (!(entity->flags & RF_WEAPONMODEL))
 	{
-		if (CullAliasModel(bbox, entity))
-		{
-			return;
+		if ( gl_cullpvs->value ) {
+			if ( CullAliasModel ( bbox, entity ) ) {
+				return;
+			}
 		}
 	}
 
-	if (entity->flags & RF_WEAPONMODEL)
-	{
-		if (gl_lefthand->value == 2)
-		{
+	qboolean reflectionActive = memcmp ( &gl3state.refPlanes[ 0 ].modMatrix, &gl3_identityMat4, sizeof ( hmm_mat4 ) );
+
+	if ( entity->flags & RF_WEAPONMODEL ) {
+		if ( reflectionActive ) {
+			return;
+		}
+		if ( gl_lefthand->value == 2 ) {
+			return;
+		}
+	}
+	
+	if ( entity->flags & RF_VIEWERMODEL ) {
+		if ( !reflectionActive ) {
 			return;
 		}
 	}

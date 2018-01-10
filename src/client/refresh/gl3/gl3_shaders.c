@@ -110,7 +110,7 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_NORMAL, "normal" );
 	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_LIGHTFLAGS, "lightFlags" );
 	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_SURFFLAGS, "surfFlags" );
-	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_REFMATRIX, "refMatrix" );
+	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_REFINDEX, "refMatrix" );
 
 	// the following line is not necessary/implicit (as there's only one output)
 	// glBindFragDataLocation(shaderProgram, 0, "outColor"); XXX would this even be here?
@@ -714,22 +714,22 @@ updateUBO(GLuint ubo, GLsizeiptr size, void* data)
 	//   or https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/VideoBackends/OGL/ProgramShaderCache.cpp
 }
 
-void GL3_UpdateUBOCommon(void)
-{
-	updateUBO(gl3state.uniCommonUBO, sizeof(gl3state.uniCommonData), &gl3state.uniCommonData);
+void GL3_UpdateUBOCommon ( void ) {
+	updateUBO ( gl3state.uniCommonUBO, sizeof ( gl3state.uniCommonData ), &gl3state.uniCommonData );
 }
 
-void GL3_UpdateUBO2D(void)
-{
-	updateUBO(gl3state.uni2DUBO, sizeof(gl3state.uni2DData), &gl3state.uni2DData);
+void GL3_UpdateUBO2D ( void ) {
+	updateUBO ( gl3state.uni2DUBO, sizeof ( gl3state.uni2DData ), &gl3state.uni2DData );
 }
 
-void GL3_UpdateUBO3D(void)
-{
-	updateUBO(gl3state.uni3DUBO, sizeof(gl3state.uni3DData), &gl3state.uni3DData);
+void GL3_UpdateUBO3D ( void ) {
+	updateUBO ( gl3state.uni3DUBO, sizeof ( gl3state.uni3DData ), &gl3state.uni3DData );
 }
 
-void GL3_UpdateUBOLights(void)
-{
-	updateUBO(gl3state.uniLightsUBO, sizeof(gl3state.uniLightsData), &gl3state.uniLightsData);
+void GL3_UpdateUBOLights ( void ) {
+	updateUBO ( gl3state.uniLightsUBO, sizeof ( gl3state.uniLightsData ), &gl3state.uniLightsData );
+}
+
+void GL3_UpdateUBORefData ( void ) {
+	updateUBO ( gl3state.uniRefDataUBO, sizeof ( gl3state.uniRefData ), &gl3state.uniRefData );
 }

@@ -146,14 +146,6 @@ GL3_LoadMD2(gl3model_t *mod, void *buffer)
 			(char *)pinmodel + pheader->ofs_skins,
 			pheader->num_skins * MAX_SKINNAME);
 
-	for (i = 0; i < pheader->num_skins; i++)
-	{
-		mod->skins[i] = GL3_FindImage(
-				(char *)pheader + pheader->ofs_skins + i * MAX_SKINNAME,
-				it_skin);
-		R_Printf ( PRINT_ALL, "%s: %i x %i\n", mod->skins[ i ]->name, mod->skins[ i ]->width, mod->skins[ i ]->height );
-	}
-
 	mod->mins[0] = -32;
 	mod->mins[1] = -32;
 	mod->mins[2] = -32;
