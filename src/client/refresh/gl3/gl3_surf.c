@@ -612,88 +612,88 @@ GL3_DrawAlphaSurfaces(void)
 			( ( s->flags & SURF_PLANEBACK ) == ( gl3state.refPlanes[ 0 ].planeback * SURF_PLANEBACK ) ) &&
 			(gl_reflection->value) && 
 			(HMM_LengthVec3(gl3state.uni3DData.fluidPlane.XYZ) == 0)) {
-			if ( ( gl3state.refPlanes[ 0 ].cullDistances.Elements[ 0 ] == -gl3state.refPlanes[ 0 ].cullDistances.Elements[ 2 ] ) ||
-				 ( gl3state.refPlanes[ 0 ].cullDistances.Elements[ 1 ] == -gl3state.refPlanes[ 0 ].cullDistances.Elements[ 3 ] ) )
-				// reflection surfaces fall completely outside frustum
-				continue;
-
-			// Do reflection
 			glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
 
-			if ( gl3state.numRefPlanes > 0 && gl_reflection->value && gl3state.refPlanes[ 0 ].frameCount != gl3_framecount) {
-				gl3state.refPlanes[ 0 ].frameCount = gl3_framecount;
+			if ( ( gl3state.refPlanes[ 0 ].cullDistances.Elements[ 0 ] != -gl3state.refPlanes[ 0 ].cullDistances.Elements[ 2 ] ) &&
+				( gl3state.refPlanes[ 0 ].cullDistances.Elements[ 1 ] != -gl3state.refPlanes[ 0 ].cullDistances.Elements[ 3 ] ) )
+				// reflection surfaces fall completely outside frustum
+			{
 
-				hmm_mat4 oldViewMat = gl3state.uni3DData.transModelMat4;
-				hmm_vec4 plane = HMM_Vec4(
-					gl3state.refPlanes[ 0 ].plane->normal[ 0 ],
-					gl3state.refPlanes[ 0 ].plane->normal[ 1 ],
-					gl3state.refPlanes[ 0 ].plane->normal[ 2 ],
-					-gl3state.refPlanes[ 0 ].plane->dist );
-				if ( !gl3state.refPlanes[ 0 ].planeback ) {
-					plane.X = -plane.X;
-					plane.Y = -plane.Y;
-					plane.Z = -plane.Z;
-					plane.W = -plane.W;
+				// Do reflection
+				if ( gl3state.numRefPlanes > 0 && gl_reflection->value && gl3state.refPlanes[ 0 ].frameCount != gl3_framecount ) {
+					gl3state.refPlanes[ 0 ].frameCount = gl3_framecount;
+
+					hmm_mat4 oldViewMat = gl3state.uni3DData.transModelMat4;
+					hmm_vec4 plane = HMM_Vec4 (
+						gl3state.refPlanes[ 0 ].plane->normal[ 0 ],
+						gl3state.refPlanes[ 0 ].plane->normal[ 1 ],
+						gl3state.refPlanes[ 0 ].plane->normal[ 2 ],
+						-gl3state.refPlanes[ 0 ].plane->dist );
+					if ( !gl3state.refPlanes[ 0 ].planeback ) {
+						plane.X = -plane.X;
+						plane.Y = -plane.Y;
+						plane.Z = -plane.Z;
+						plane.W = -plane.W;
+					}
+					gl3state.refPlanes[ 0 ].modMatrix = HMM_Householder ( plane, -1 );
+
+					//gl3state.uni3DData.transModelMat4 = HMM_MultiplyMat4 ( gl3state.refPlanes[ 0 ].modMatrix, gl3state.uni3DData.transModelMat4 );
+					gl3state.uni3DData.cullDistances = gl3state.refPlanes[ 0 ].cullDistances;
+
+					// start drawing to reflection buffer
+					glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vboRefMats );
+					for ( int index = 0; index < 4; index++ ) {
+						glEnableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
+						glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
+					}
+					glBufferData ( GL_ARRAY_BUFFER, sizeof ( refplanedata_t ) * MAX_REF_PLANES, &gl3state.refPlanes[ 0 ], GL_DYNAMIC_DRAW );
+					/*
+					//glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX );
+					glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 0 ] );
+					glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+1, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 1 ] );
+					glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+2, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 2 ] );
+					glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+3, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 3 ] );
+					*/
+					glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vbo3D );
+
+					//glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
+					//glViewport ( 0, 0, gl3_newrefdef.width, gl3_newrefdef.height );
+					glClearColor ( 0, 0, 0, 0 );
+					//glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
+					//glEnable ( GL_CLIP_DISTANCE0 );
+
+					gl3state.uni3DData.fluidPlane = plane;
+					GL3_UpdateUBO3D ();
+					//GL3_RenderView (fd);
+
+					// Draw the world
+					//GL3_MarkLeafs (); /* done here so we know if we're in water */
+					//glCullFace ( GL_BACK );
+
+					gl3state.uni3DData.alpha = 1.0f;
+					GL3_UpdateUBO3D ();
+
+					GL3_DrawWorld ();
+					GL3_DrawEntitiesOnList ();
+					GL3_DrawParticles ();
+					GL3_DrawAlphaSurfaces ();
+
+					// Restore normal framebuffer
+					for ( int index = 0; index < 4; index++ ) {
+						//glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
+					}
+					//gl_cullpvs->value = oldcull;
+					//glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
+					gl3state.uni3DData.transModelMat4 = oldViewMat;
+					gl3state.uni3DData.fluidPlane = ( hmm_vec4 ) { 0, 0, 0, 0 };
+					gl3state.uni3DData.cullDistances = HMM_Vec4 ( 1, 1, 1, 1 );
+					//glCullFace ( GL_FRONT );
+					//glDisable ( GL_CLIP_DISTANCE0 );
+
+					glEnable ( GL_BLEND );
+					//		memcpy ( frustum, oldfrustum, sizeof ( cplane_t ) * 4 );
 				}
-				gl3state.refPlanes[ 0 ].modMatrix = HMM_Householder ( plane, -1 );
-
-				//gl3state.uni3DData.transModelMat4 = HMM_MultiplyMat4 ( gl3state.refPlanes[ 0 ].modMatrix, gl3state.uni3DData.transModelMat4 );
-				gl3state.uni3DData.cullDistances = gl3state.refPlanes[ 0 ].cullDistances;
-
-				// start drawing to reflection buffer
-				glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vboRefMats );
-				for ( int index = 0; index < 4; index++ ) {
-					glEnableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
-					glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
-				}	
-				glBufferData ( GL_ARRAY_BUFFER, sizeof ( refplanedata_t ) * MAX_REF_PLANES, &gl3state.refPlanes[ 0 ], GL_DYNAMIC_DRAW );
-				/*
-				//glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX );
-				glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 0 ] );
-				glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+1, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 1 ] );
-				glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+2, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 2 ] );
-				glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+3, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 3 ] );
-				*/
-				glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vbo3D );
-
-				//glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
-				//glViewport ( 0, 0, gl3_newrefdef.width, gl3_newrefdef.height );
-				glClearColor ( 0, 0, 0, 0 );
-				//glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
-				//glEnable ( GL_CLIP_DISTANCE0 );
-
-				gl3state.uni3DData.fluidPlane = plane;
-				GL3_UpdateUBO3D ();
-				//GL3_RenderView (fd);
-
-				// Draw the world
-				//GL3_MarkLeafs (); /* done here so we know if we're in water */
-				//glCullFace ( GL_BACK );
-
-				gl3state.uni3DData.alpha = 1.0f;
-				GL3_UpdateUBO3D ();
-
-				GL3_DrawWorld ();
-				GL3_DrawEntitiesOnList ();
-				GL3_DrawParticles ();
-				GL3_DrawAlphaSurfaces ();
-				
-				// Restore normal framebuffer
-				for ( int index = 0; index < 4; index++ ) {
-					//glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
-				}
-				//gl_cullpvs->value = oldcull;
-				//glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
-				gl3state.uni3DData.transModelMat4 = oldViewMat;
-				gl3state.uni3DData.fluidPlane = (hmm_vec4){ 0, 0, 0, 0 };
-				gl3state.uni3DData.cullDistances = HMM_Vec4 ( 1, 1, 1, 1 );
-				//glCullFace ( GL_FRONT );
-				//glDisable ( GL_CLIP_DISTANCE0 );
-
-				glEnable ( GL_BLEND );
-				//		memcpy ( frustum, oldfrustum, sizeof ( cplane_t ) * 4 );
 			}
-
 		} else {
 			glBindTexture ( GL_TEXTURE_2D_ARRAY, 0);
 		}
@@ -909,6 +909,7 @@ RenderLightmappedPoly(msurface_t *surf)
 void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 	qboolean addPlane = true;
 	int r = 0;
+
 	for ( r = 0; r < gl3state.numRefPlanes; r++ ) {
 		if ( gl3state.refPlanes[ r ].plane == surf->plane ) {
 			// plane already in list
@@ -917,9 +918,9 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 		}
 	}
 	if ( addPlane ) {
-		gl3state.uniRefData[ gl3state.numRefPlanes ].active = true;
+		gl3state.uniRefData[ gl3state.numRefPlanes ].flags = REFSURF_ACTIVE | (( surf->flags & SURF_PLANEBACK ) ? REFSURF_PLANEBACK : 0 );
 		gl3state.uniRefData[ gl3state.numRefPlanes ].plane = HMM_Vec4 ( surf->plane->normal[ 0 ], surf->plane->normal[ 1 ], surf->plane->normal[ 2 ], surf->plane->dist );
-		gl3state.uniRefData[ gl3state.numRefPlanes ].planeback = ( surf->flags & SURF_PLANEBACK ) != 0;
+		gl3state.uniRefData[ gl3state.numRefPlanes ].refrindex = 1.33;
 
 		gl3state.refPlanes[ gl3state.numRefPlanes ].id = gl3state.numRefPlanes;
 		gl3state.refPlanes[ gl3state.numRefPlanes ].cullDistances = HMM_Vec4 ( -1, -1, -1, -1 );

@@ -32,12 +32,14 @@ layout (std140) uniform uni3D
 	float _pad_2;
 	float _pad_3;
 };
-/*
+
 layout ( std140 ) uniform refData_s {
-	bool	active;
-	bool	planeback;
+	mat4	modMatrix;
+	vec4	color;
 	vec4	plane;
 	vec4	cullDistances;
-	mat4	modMatrix;
+	int		flags;
+	float	refrindex;
+	float	_pad_1;
+	float	_pad_2;
 } refData[];
-*/

@@ -258,7 +258,7 @@ GL3_Register(void)
 	gl_reflection = ri.Cvar_Get ( "gl_reflection", "1", CVAR_ARCHIVE );
 	gl_refraction = ri.Cvar_Get ( "gl_refraction", "1", CVAR_ARCHIVE );
 	gl_multiarray = ri.Cvar_Get ( "gl_multiarray", "1", CVAR_ARCHIVE );
-	gl_cullpvs = ri.Cvar_Get ( "gl_cullpvs", "1", 0 );
+	gl_cullpvs = ri.Cvar_Get ( "gl_cullpvs", "1", CVAR_ARCHIVE );
 
 #if 0 // TODO!
 	//gl_lefthand = ri.Cvar_Get("hand", "0", CVAR_USERINFO | CVAR_ARCHIVE);

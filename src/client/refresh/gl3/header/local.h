@@ -196,12 +196,19 @@ typedef struct 	{
 	hmm_vec4	cullDistances;	// offsets of visibility in view frame
 } refplanedata_t;
 
+typedef enum refsurf_s {
+	REFSURF_ACTIVE = 1,
+	REFSURF_PLANEBACK = 2
+} refsurf_t;
+
 typedef struct gl3UniRefdata_s {
-	GLboolean	active;
-	GLboolean	planeback;
+	hmm_mat4	modMatrix;
+	hmm_vec4	color;
 	hmm_vec4	plane;
 	hmm_vec4	cullDistances;
-	hmm_mat4	modMatrix;
+	refsurf_t	flags;
+	GLfloat		refrindex;		// index of refraction
+	int			padding[ 2 ];
 } gl3UniRefData_t;
 
 typedef struct
