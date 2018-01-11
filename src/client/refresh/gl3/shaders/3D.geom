@@ -9,10 +9,11 @@ layout (std140) uniform uni3D
 	mat4 transProj;
 	mat4 transView;
 	mat4 transModel;
-	vec4 fluidPlane;
-	vec4 cullDistances;
+//	vec4 fluidPlane;
+//	vec4 cullDistances;
 	vec3 viewPos;
 
+	int		refTexture;	// which texture to draw on reflecting surface
 	float scroll; // for SURF_FLOWING
 	float time;
 	float alpha;
@@ -21,21 +22,32 @@ layout (std140) uniform uni3D
 	uint  flags;
 	float _pad_1; // AMDs legacy windows driver needs this, otherwise uni3D has wrong size
 	float _pad_2;
-	float _pad_3;
+	//float _pad_3;
 };
+
+layout ( std140 ) uniform refData_s {
+	mat4	refMatrix;
+	vec4	color;
+	vec4	plane;
+	vec4	cullDistances;
+	int		flags;
+	float	refrindex;
+	float	_pad_1;
+	float	_pad_2;
+} refData[];
 
 in VS_OUT {
 	vec2		TexCoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	flat mat4	refMatrix;
+	flat int	refIndex;
 } gs_in[];
 
 out VS_OUT {
 	vec2		TexCoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	flat mat4	refMatrix;
+	flat int	refIndex;
 } gs_out;
 
 int count;
@@ -53,29 +65,28 @@ void outputPrimitive (bool negative, bool reverse) {
 		gs_out.TexCoord = gs_in[i].TexCoord;
 		gs_out.WorldCoord = gs_in[i].WorldCoord;
 		gs_out.Normal = gs_in[i].Normal;
-		gs_out.refMatrix = gs_in[i].refMatrix;
+		gs_out.refIndex = gs_in[i].refIndex;
 
 		gl_Position = gl_in[i].gl_Position;
 
 		if (!negative) 
 		{
-			gl_ClipDistance[0] = -gl_in[i].gl_ClipDistance[0];
+			gl_ClipDistance[0] = gl_in[i].gl_ClipDistance[0];
 			gl_Position = gl_in[i].gl_Position;
 		}
 		else
 		{
-			gl_ClipDistance[0] = gl_in[i].gl_ClipDistance[0];
-			if ((length (fluidPlane.xyz) > 0) && reverse)
+			if ((gs_in[i].refIndex >= 0) && reverse)
 			{
-				gl_ClipDistance[0] = -gl_ClipDistance[0];
-				gl_Position = transProj * transView * gs_in[i].refMatrix * vec4(gs_in[i].WorldCoord, 1.0);
+				gl_ClipDistance[0] = gl_in[i].gl_ClipDistance[0];
+				gl_Position = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4(gs_in[i].WorldCoord, 1.0);
 			}
 			else
 			{
+				gl_ClipDistance[0] = -gl_in[i].gl_ClipDistance[0];
 				gl_Position = gl_in[i].gl_Position;
 			}
 		}
-
 		EmitVertex();
 	}
 	EndPrimitive();
@@ -84,7 +95,7 @@ void outputPrimitive (bool negative, bool reverse) {
 
 void main() {
 	int i, j, k;
-	bool reflectionActive = length(fluidPlane.xyz) > 0;
+	bool reflectionActive = gs_in[i].refIndex >= 0;
 
 	// perform backface culling, improves speed
 	// if (cross(gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz, gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz).z < 0)
@@ -116,7 +127,7 @@ void main() {
 	if (reflectionActive)
 	{
 		for (i = 0; i < count; i++) {
-			if (abs(-dot ( gs_in[i].WorldCoord.xyz, fluidPlane.xyz ) - fluidPlane.w) < 0.1) k++;
+			if (abs(-dot ( gs_in[i].WorldCoord.xyz, refData[gs_in[i].refIndex].plane.xyz ) + refData[gs_in[i].refIndex].plane.w) < 0.1) k++;
 		}
 		if (k == count)
 			// discard

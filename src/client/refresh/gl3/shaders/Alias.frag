@@ -6,7 +6,7 @@ in VS_OUT {
 	vec2		TexCoord;
 	vec4		Color;
 	vec3		WorldCoord;
-	flat mat4	refMatrix;
+	flat mat4	refIndex;
 } fs_in;
 
 void main()

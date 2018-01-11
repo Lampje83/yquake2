@@ -146,17 +146,18 @@ typedef struct
 	hmm_mat4 transProjMat4;
 	hmm_mat4 transViewMat4;
 	hmm_mat4 transModelMat4;
-	hmm_vec4 fluidPlane;
-	hmm_vec4 cullDistances;
+//	hmm_vec4 fluidPlane;
+//	hmm_vec4 cullDistances;
 	hmm_vec3 viewPos;
 
+	GLint	refTexture;		// reflection texture index
 	GLfloat scroll; // for SURF_FLOWING
 	GLfloat time; // for warping surfaces like water & possibly other things
 	GLfloat alpha; // for translucent surfaces (water, glass, ..)
 	GLfloat overbrightbits; // gl3_overbrightbits, applied to lightmaps (and elsewhere to models)
 	GLfloat particleFadeFactor; // gl3_particle_fade_factor, higher => less fading out towards edges
 	GLuint	flags;	// 1 = fullbright, 2 = lightmap, 3 = flat lightmap
-		GLfloat _padding[3]; // again, some padding to ensure this has right size
+		GLfloat _padding[2]; // again, some padding to ensure this has right size
 } gl3Uni3D_t;
 
 extern const hmm_mat4 gl3_identityMat4;
@@ -202,7 +203,7 @@ typedef enum refsurf_s {
 } refsurf_t;
 
 typedef struct gl3UniRefdata_s {
-	hmm_mat4	modMatrix;
+	hmm_mat4	refMatrix;
 	hmm_vec4	color;
 	hmm_vec4	plane;
 	hmm_vec4	cullDistances;
@@ -260,7 +261,7 @@ typedef struct
 	gl3ShaderInfo_t siParticle; // for particles. surprising, right?
 
 	GLuint vao3D, vbo3D; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
-	GLuint vboRefMats;					// for reflection matrices
+	GLuint vboRefData;					// for reflection matrices
 	GLuint vao3Dtrans, vbo3Dtrans; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
 	GLuint vaoAlias, vboAlias, eboAlias; // for models, using 9 floats as (x,y,z, s,t, r,g,b,a)
 	GLuint vaoParticle, vboParticle; // for particles, using 9 floats (x,y,z, size,distance, r,g,b,a)
@@ -288,6 +289,8 @@ typedef struct
 	refplanedata_t	refPlanes[ MAX_REF_PLANES + 1 ]; // Contains the currently found reflection planes. 1 extra for neutral data
 	int				numRefPlanes;					// Total number of refplanes found
 	int				currentRefPlane;				// Current reflection plane. Still needed?
+	qboolean		refActive;
+	int				refIndices[ MAX_REF_PLANES ];
 
 } gl3state_t;
 

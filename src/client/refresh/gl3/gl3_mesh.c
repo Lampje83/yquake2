@@ -666,10 +666,8 @@ GL3_DrawAliasModel(entity_t *entity)
 		}
 	}
 
-	qboolean reflectionActive = memcmp ( &gl3state.refPlanes[ 0 ].modMatrix, &gl3_identityMat4, sizeof ( hmm_mat4 ) );
-
 	if ( entity->flags & RF_WEAPONMODEL ) {
-		if ( reflectionActive ) {
+		if ( gl3state.refActive ) {
 			return;
 		}
 		if ( gl_lefthand->value == 2 ) {
@@ -678,7 +676,7 @@ GL3_DrawAliasModel(entity_t *entity)
 	}
 	
 	if ( entity->flags & RF_VIEWERMODEL ) {
-		if ( !reflectionActive ) {
+		if ( !gl3state.refActive ) {
 			return;
 		}
 	}

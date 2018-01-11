@@ -21,10 +21,11 @@ layout (std140) uniform uni3D
 	mat4 transProj;
 	mat4 transView;
 	mat4 transModel;
-	vec4 fluidPlane;
-	vec4 cullDistances;
+//	vec4 fluidPlane;
+//	vec4 cullDistances;
 	vec3 viewPos;
 
+	int		refTexture;	// which texture to draw on reflecting surface
 	float scroll; // for SURF_FLOWING
 	float time;
 	float alpha;
@@ -33,5 +34,5 @@ layout (std140) uniform uni3D
 	uint  flags;
 	float _pad_1; // AMDs legacy windows driver needs this, otherwise uni3D has wrong size
 	float _pad_2;
-	float _pad_3;
+	//float _pad_3;
 };

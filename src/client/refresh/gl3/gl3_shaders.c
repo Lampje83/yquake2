@@ -110,7 +110,7 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_NORMAL, "normal" );
 	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_LIGHTFLAGS, "lightFlags" );
 	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_SURFFLAGS, "surfFlags" );
-	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_REFINDEX, "refMatrix" );
+	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_REFINDEX, "refIndex" );
 
 	// the following line is not necessary/implicit (as there's only one output)
 	// glBindFragDataLocation(shaderProgram, 0, "outColor"); XXX would this even be here?

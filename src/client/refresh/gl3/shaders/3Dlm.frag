@@ -31,7 +31,7 @@ in VS_OUT {
 	vec3		WorldCoord;
 	vec3		Normal;
 	flat uint	LightFlags;
-	flat mat4	refMatrix;
+	flat int	refIndex;
 } fs_in;
 
 void main()

@@ -6,7 +6,7 @@ out VS_OUT {
 	vec3		WorldCoord;
 	vec3		Normal;
 	flat uint	LightFlags;
-	flat mat4	refMatrix;
+	flat int	refIndex;
 } vs;
 
 void main()
@@ -21,18 +21,8 @@ void main()
 	vec4 worldNormal = transModel * vec4(normal, 0.0f);
 	vs.Normal = normalize(worldNormal.xyz);
 	vs.LightFlags = lightFlags;
-	vs.refMatrix = refMatrix;
+	vs.refIndex = refIndex;
 
 	gl_Position = transProj * transView * worldCoord;
-
-	if ( length ( fluidPlane.xyz ) > 0 ) {
-		//worldCoord = refMatrix * worldCoord;
-		//vs.WorldCoord = worldCoord.xyz;
-		gl_Position = transProj * transView * worldCoord;
-		gl_ClipDistance[ 0 ] = dot ( worldCoord.xyz, fluidPlane.xyz ) + fluidPlane.w;
-
-	} else {
-		gl_Position = transProj * transView * worldCoord;
-		gl_ClipDistance[ 0 ] = dot ( worldCoord.xyz, fluidPlane.xyz ) + fluidPlane.w;
-	}
+	gl_ClipDistance[ 0 ] = 0.0;
 }

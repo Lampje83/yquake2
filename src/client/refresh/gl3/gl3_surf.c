@@ -54,7 +54,7 @@ void GL3_SurfInit(void)
 	GL3_BindVAO(gl3state.vao3D);
 
 	glGenBuffers(1, &gl3state.vbo3D);
-	glGenBuffers ( 1, &gl3state.vboRefMats );
+	glGenBuffers ( 1, &gl3state.vboRefData );
 	GL3_BindVBO(gl3state.vbo3D);
 
 	glEnableVertexAttribArray(GL3_ATTRIB_POSITION);
@@ -80,16 +80,22 @@ void GL3_SurfInit(void)
 	glVertexAttribFormat ( GL3_ATTRIB_REFINDEX, 16, GL_FLOAT, GL_FALSE, 0 );
 	glVertexAttribBinding ( GL3_ATTRIB_REFINDEX, 1 );
 	glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX, 1 );
-	//glBindVertexBuffer ( GL3_ATTRIB_REFINDEX, gl3state.vboRefMats, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) );
-	glBindVertexBuffer ( GL3_ATTRIB_REFINDEX, gl3state.vboRefMats, sizeof ( refplanedata_t ), 0 );
+	//glBindVertexBuffer ( GL3_ATTRIB_REFINDEX, gl3state.vboRefData, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) );
+	glBindVertexBuffer ( GL3_ATTRIB_REFINDEX, gl3state.vboRefData, sizeof ( refplanedata_t ), 0 );
 */	
-	GL3_BindVBO ( gl3state.vboRefMats );
+	GL3_BindVBO ( gl3state.vboRefData );
+#if 0	// ERIK: move refdata from VAO to UBO
 	glBufferData ( GL_ARRAY_BUFFER, sizeof ( refplanedata_t ) * MAX_REF_PLANES, &gl3state.refPlanes[ 0 ], GL_DYNAMIC_DRAW );
 
 	for ( int index = 0; index < 4; index++ ) {
 		qglVertexAttribPointer ( GL3_ATTRIB_REFINDEX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix) + 4 * index * sizeof ( float ) );
 		glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
 	}
+#else
+	glBufferData ( GL_ARRAY_BUFFER, sizeof ( int ), gl3state.refIndices, GL_DYNAMIC_DRAW );
+	glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX, 1 );
+	qglVertexAttribIPointer ( GL3_ATTRIB_REFINDEX, 1, GL_INT, 0, 0 );
+#endif
 
 	glGenVertexArrays ( 1, &gl3state.vao3Dtrans );
 	GL3_BindVAO ( gl3state.vao3Dtrans );
@@ -112,13 +118,17 @@ void GL3_SurfInit(void)
 	glEnableVertexAttribArray ( GL3_ATTRIB_LIGHTFLAGS );
 	qglVertexAttribIPointer ( GL3_ATTRIB_LIGHTFLAGS, 1, GL_UNSIGNED_INT, sizeof ( gl3_3D_vtx_t ), offsetof ( gl3_3D_vtx_t, lightFlags ) );
 
-	GL3_BindVBO ( gl3state.vboRefMats );
-
+	GL3_BindVBO ( gl3state.vboRefData );
+#if 0	// ERIK: move refdata from VAO to UBO
 	for ( int index = 0; index < 4; index++ ) {
 		qglVertexAttribPointer ( GL3_ATTRIB_REFINDEX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) + 4 * index * sizeof ( float ) );
 		glEnableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
 		glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
 	}
+#else
+	glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX, 1 );
+	qglVertexAttribIPointer ( GL3_ATTRIB_REFINDEX, 1, GL_INT, 0, 0 );
+#endif
 
 	// init VAO and VBO for model vertexdata: 9 floats
 	// (X,Y,Z), (S,T), (R,G,B,A)
@@ -138,13 +148,17 @@ void GL3_SurfInit(void)
 	glEnableVertexAttribArray(GL3_ATTRIB_COLOR);
 	qglVertexAttribPointer(GL3_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 9*sizeof(GLfloat), 5*sizeof(GLfloat));
 
-	GL3_BindVBO ( gl3state.vboRefMats );
-
-	for ( int index = 0; index < 4; index++ ) {
-		qglVertexAttribPointer ( GL3_ATTRIB_REFINDEX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) + 4 * index * sizeof ( float ) );
-		glEnableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
-		glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
-	}
+	GL3_BindVBO ( gl3state.vboRefData );
+#if 0	// ERIK: move refdata from VAO to UBO
+		for ( int index = 0; index < 4; index++ ) {
+			qglVertexAttribPointer ( GL3_ATTRIB_REFINDEX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) + 4 * index * sizeof ( float ) );
+			glEnableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
+			glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
+		}
+#else
+	glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX, 1 );
+	qglVertexAttribIPointer ( GL3_ATTRIB_REFINDEX, 1, GL_INT, 0, 0 );
+#endif
 
 	glGenBuffers(1, &gl3state.eboAlias);
 
@@ -167,13 +181,17 @@ void GL3_SurfInit(void)
 	glEnableVertexAttribArray(GL3_ATTRIB_COLOR);
 	qglVertexAttribPointer(GL3_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 9*sizeof(GLfloat), 5*sizeof(GLfloat));
 
-	GL3_BindVBO ( gl3state.vboRefMats );
-
+	GL3_BindVBO ( gl3state.vboRefData );
+#if 0	// ERIK: move refdata from VAO to UBO
 	for ( int index = 0; index < 4; index++ ) {
 		qglVertexAttribPointer ( GL3_ATTRIB_REFINDEX + index, 4, GL_FLOAT, GL_FALSE, sizeof ( refplanedata_t ), offsetof ( refplanedata_t, modMatrix ) + 4 * index * sizeof ( float ) );
 		glEnableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
 		glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
 	}
+#else
+	glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX, 1 );
+	qglVertexAttribIPointer ( GL3_ATTRIB_REFINDEX, 1, GL_INT, 0, 0 );
+#endif
 
 	// init renderbuffers for reflection, refraction and shadow mapping
 	GLenum DrawBuffers[ 2 ] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT };
@@ -184,7 +202,8 @@ void GL3_SurfInit(void)
 
 	// Setup buffer textures
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
-	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_R11F_G11F_B10F, vid.width, vid.height, 32, 0, GL_RGBA, GL_FLOAT, 0 );
+//	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_R11F_G11F_B10F, vid.width, vid.height, 32, 0, GL_RGBA, GL_FLOAT, 0 );
+	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_RGB, vid.width, vid.height, 32, 0, GL_RGBA, GL_BYTE, 0 );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -611,7 +630,12 @@ GL3_DrawAlphaSurfaces(void)
 		if (planeEquals (s->plane, gl3state.refPlanes[0].plane) &&
 			( ( s->flags & SURF_PLANEBACK ) == ( gl3state.refPlanes[ 0 ].planeback * SURF_PLANEBACK ) ) &&
 			(gl_reflection->value) && 
-			(HMM_LengthVec3(gl3state.uni3DData.fluidPlane.XYZ) == 0)) {
+#if 0 // ERIK: move refdata from VAO to UBO
+			(HMM_LengthVec3(gl3state.uni3DData.fluidPlane.XYZ) == 0) 
+#else
+			!gl3state.refActive
+#endif
+			) {
 			glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
 
 			if ( ( gl3state.refPlanes[ 0 ].cullDistances.Elements[ 0 ] != -gl3state.refPlanes[ 0 ].cullDistances.Elements[ 2 ] ) &&
@@ -635,59 +659,50 @@ GL3_DrawAlphaSurfaces(void)
 						plane.Z = -plane.Z;
 						plane.W = -plane.W;
 					}
-					gl3state.refPlanes[ 0 ].modMatrix = HMM_Householder ( plane, -1 );
-
+					//gl3state.uniRefData[ 0 ].refMatrix = gl3state.refPlanes[ 0 ].modMatrix = HMM_Householder ( plane, -1 );
+					
 					//gl3state.uni3DData.transModelMat4 = HMM_MultiplyMat4 ( gl3state.refPlanes[ 0 ].modMatrix, gl3state.uni3DData.transModelMat4 );
+					
+#if 0				// ERIK: Move refdata to UBO
 					gl3state.uni3DData.cullDistances = gl3state.refPlanes[ 0 ].cullDistances;
+					
 
 					// start drawing to reflection buffer
-					glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vboRefMats );
+					glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vboRefData );
 					for ( int index = 0; index < 4; index++ ) {
 						glEnableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
 						glVertexAttribDivisor ( GL3_ATTRIB_REFINDEX + index, 1 );
 					}
 					glBufferData ( GL_ARRAY_BUFFER, sizeof ( refplanedata_t ) * MAX_REF_PLANES, &gl3state.refPlanes[ 0 ], GL_DYNAMIC_DRAW );
-					/*
-					//glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX );
-					glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 0 ] );
-					glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+1, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 1 ] );
-					glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+2, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 2 ] );
-					glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX+3, gl3state.refPlanes[ 0 ].modMatrix.Elements[ 3 ] );
-					*/
+#else
+					glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX );
+					glVertexAttribI1i ( GL3_ATTRIB_REFINDEX, 0 );
+					gl3state.refActive = true;
+#endif
 					glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vbo3D );
 
-					//glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
-					//glViewport ( 0, 0, gl3_newrefdef.width, gl3_newrefdef.height );
-					glClearColor ( 0, 0, 0, 0 );
-					//glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
-					//glEnable ( GL_CLIP_DISTANCE0 );
-
-					gl3state.uni3DData.fluidPlane = plane;
-					GL3_UpdateUBO3D ();
-					//GL3_RenderView (fd);
+					//gl3state.uni3DData.fluidPlane = plane;
+					GL3_UpdateUBORefData ();
 
 					// Draw the world
-					//GL3_MarkLeafs (); /* done here so we know if we're in water */
-					//glCullFace ( GL_BACK );
-
 					gl3state.uni3DData.alpha = 1.0f;
 					GL3_UpdateUBO3D ();
 
+					glDisable ( GL_BLEND );
 					GL3_DrawWorld ();
 					GL3_DrawEntitiesOnList ();
 					GL3_DrawParticles ();
 					GL3_DrawAlphaSurfaces ();
 
 					// Restore normal framebuffer
-					for ( int index = 0; index < 4; index++ ) {
-						//glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
-					}
-					//gl_cullpvs->value = oldcull;
-					//glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
 					gl3state.uni3DData.transModelMat4 = oldViewMat;
+#if 0
 					gl3state.uni3DData.fluidPlane = ( hmm_vec4 ) { 0, 0, 0, 0 };
 					gl3state.uni3DData.cullDistances = HMM_Vec4 ( 1, 1, 1, 1 );
-					//glCullFace ( GL_FRONT );
+#else
+					glVertexAttribI1i ( GL3_ATTRIB_REFINDEX, -1 );
+					gl3state.refActive = false;
+#endif
 					//glDisable ( GL_CLIP_DISTANCE0 );
 
 					glEnable ( GL_BLEND );
@@ -759,7 +774,8 @@ DrawTextureChains(void)
 
 	GL3_BindVAO ( gl3state.vao3D );
 	GL3_BindVBO ( gl3state.vbo3D );
-	
+	GL3_UpdateUBORefData ();
+
 	for (i = 0, image = gl3textures; i < numgl3textures; i++, image++)
 	{
 		if (!image->registration_sequence)
@@ -921,7 +937,7 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 		gl3state.uniRefData[ gl3state.numRefPlanes ].flags = REFSURF_ACTIVE | (( surf->flags & SURF_PLANEBACK ) ? REFSURF_PLANEBACK : 0 );
 		gl3state.uniRefData[ gl3state.numRefPlanes ].plane = HMM_Vec4 ( surf->plane->normal[ 0 ], surf->plane->normal[ 1 ], surf->plane->normal[ 2 ], surf->plane->dist );
 		gl3state.uniRefData[ gl3state.numRefPlanes ].refrindex = 1.33;
-
+		gl3state.uniRefData[ gl3state.numRefPlanes ].refMatrix = HMM_Householder ( gl3state.uniRefData[ gl3state.numRefPlanes ].plane, -1 );
 		gl3state.refPlanes[ gl3state.numRefPlanes ].id = gl3state.numRefPlanes;
 		gl3state.refPlanes[ gl3state.numRefPlanes ].cullDistances = HMM_Vec4 ( -1, -1, -1, -1 );
 		gl3state.refPlanes[ gl3state.numRefPlanes ].plane = surf->plane;
@@ -996,7 +1012,7 @@ DrawInlineBModel(void)
 		{
 			if ((psurf->texinfo->flags & (SURF_TRANS33 | SURF_TRANS66)))
 			{
-				if ( ( HMM_LengthVec3 ( gl3state.uni3DData.fluidPlane.XYZ ) == 0 ) ) {
+				if ( !gl3state.refActive ) {
 					/* add to the translucent chain */
 					psurf->texturechain = gl3_alpha_surfaces;
 					gl3_alpha_surfaces = psurf;
@@ -1290,7 +1306,7 @@ void GL3_DrawWorld(void)
 	gl3state.currenttexture = -1;
 	glEnable ( GL_PRIMITIVE_RESTART_FIXED_INDEX );
 
-	if ( HMM_LengthVec3 ( gl3state.uni3DData.fluidPlane.XYZ ) == 0 ) {
+	if ( !gl3state.refActive ) {
 		// Do this only when starting a new frame
 		GL3_ClearSkyBox ();
 		gl3state.numRefPlanes = 0;

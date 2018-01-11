@@ -4,7 +4,7 @@ out VS_OUT {
 	vec2		TexCoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	flat mat4	refMatrix;
+	flat int	refIndex;
 } vs;
 
 void main()
@@ -20,16 +20,19 @@ void main()
 	vs.WorldCoord = worldCoord.xyz;
 	vec4 worldNormal = transModel * vec4 ( normal, 0.0f );
 	vs.Normal = normalize ( worldNormal.xyz );
-	vs.refMatrix = refMatrix;
+	vs.refIndex = refIndex;
 
-	if ( length ( fluidPlane.xyz ) > 0 ) {
+	if ( vs.refIndex >= 0 ) {
 		//worldCoord = refMatrix * worldCoord;
 		//vs.WorldCoord = worldCoord.xyz;
 		gl_Position = transProj * transView * worldCoord;
-		gl_ClipDistance[ 0 ] = dot ( worldCoord.xyz, fluidPlane.xyz ) + fluidPlane.w;
+		gl_ClipDistance[ 0 ] = dot ( worldCoord.xyz, refData[ refIndex ].plane.xyz ) - refData[ refIndex ].plane.w;
+		if ( ( refData[ refIndex ].flags & REFSURF_PLANEBACK ) != 0 ) {
+			gl_ClipDistance[ 0 ] = -gl_ClipDistance[ 0 ];
+		}
 
 	} else {
 		gl_Position = transProj * transView * worldCoord;
-		gl_ClipDistance[ 0 ] = dot ( worldCoord.xyz, fluidPlane.xyz ) + fluidPlane.w;
+		gl_ClipDistance[ 0 ] = 0; // dot ( worldCoord.xyz, refData[ refIndex ].plane.xyz ) + refData[ refIndex ].plane.w;
 	}
 }

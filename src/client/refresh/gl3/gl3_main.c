@@ -1105,6 +1105,9 @@ SetupFrame(void)
 	c_brush_polys = 0;
 	c_alias_polys = 0;
 
+	glVertexAttribI1i ( GL3_ATTRIB_REFINDEX, -1 );
+	gl3state.refActive = false;
+
 	/* clear out the portion of the screen that the NOWORLDMODEL defines */
 	if (gl3_newrefdef.rdflags & RDF_NOWORLDMODEL)
 	{
@@ -1113,7 +1116,7 @@ SetupFrame(void)
 		glScissor(gl3_newrefdef.x,
 				vid.height - gl3_newrefdef.height - gl3_newrefdef.y,
 				gl3_newrefdef.width, gl3_newrefdef.height);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(1, 0, 0.5, 0.5);
 		glDisable(GL_SCISSOR_TEST);
 	}
@@ -1548,16 +1551,22 @@ extern GLuint vao2D, vbo2D;
 static void
 GL3_RenderFrame(refdef_t *fd)
 {	
+#if 0	// ERIK: move refdata from VAO to UBO
 	gl3state.uni3DData.fluidPlane = HMM_Vec4 ( 0, 0, 0, 0 );
 	gl3state.refPlanes[ 0 ].modMatrix = gl3_identityMat4;
 
 	gl3state.uni3DData.cullDistances = HMM_Vec4 ( 1, 1, 1, 1 );
-	glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vboRefMats );
+	glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vboRefData );
 	for ( int index = 0; index < 4; index++ ) {
 		glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
 		glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX + index, gl3_identityMat4.Elements[ index ] );
 	}
 	glBufferData ( GL_ARRAY_BUFFER, sizeof ( refplanedata_t ) * MAX_REF_PLANES, &gl3state.refPlanes[ 0 ], GL_DYNAMIC_DRAW );
+#else
+	glVertexAttribI1i ( GL3_ATTRIB_REFINDEX, 0 ); // -1
+	glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX );
+	gl3state.refActive = false;
+#endif
 	GL3_UpdateUBO3D ();
 
 	//glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
@@ -1565,23 +1574,11 @@ GL3_RenderFrame(refdef_t *fd)
 	glViewport ( fd->x, fd->y, fd->width, fd->height );
 	//glClearDepthf ( 10000 );
 
-	//glClearColor ( 0.0f, 0.0f, 0.0f, 0.0f );
-	glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
+	glClearColor ( 0.0f, 0.0f, 0.0f, 0.0f );
+	glClear ( GL_DEPTH_BUFFER_BIT );// | GL_COLOR_BUFFER_BIT );
 	GL3_RenderView ( fd );
 	GL3_SetLightLevel ();
 
-/*
-	glBindFramebuffer ( GL_FRAMEBUFFER, gl3state.reflectFB );
-	glViewport (0, 0, fd->width, fd->height );
-	glClear ( GL_DEPTH_BUFFER_BIT );
-
-	fd->viewangles[ 1 ] += 180;
-	fd->viewangles[ 0 ] = -fd->viewangles[ 0 ];
-	GL3_RenderView(fd);
-	fd->viewangles[ 1 ] -= 180;
-	fd->viewangles[ 0 ] = -fd->viewangles[ 0 ];
-
-*/
 	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
 	GL3_SetGL2D ();
 	//glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
@@ -1798,10 +1795,11 @@ GL3_SetPalette(const unsigned char *palette)
 			rp[i * 4 + 3] = 0xff;
 		}
 	}
-
+/*
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(1, 0, 0.5, 0.5);
+*/
 }
 
 Q2_DLL_EXPORTED refexport_t

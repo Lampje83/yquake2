@@ -1546,17 +1546,17 @@ HMM_Householder ( hmm_vec4 plane, float scale ) {
 	Result.Elements[ 0 ][ 0 ] = 1 + scale * plane.X * plane.X;
 	Result.Elements[ 1 ][ 0 ] =     scale * plane.X * plane.Y;
 	Result.Elements[ 2 ][ 0 ] =     scale * plane.X * plane.Z;
-	Result.Elements[ 3 ][ 0 ] =     scale * plane.X * plane.W;
+	Result.Elements[ 3 ][ 0 ] =     scale * plane.X *-plane.W;
 
 	Result.Elements[ 0 ][ 1 ] =     scale * plane.Y * plane.X;
 	Result.Elements[ 1 ][ 1 ] = 1 + scale * plane.Y * plane.Y;
 	Result.Elements[ 2 ][ 1 ] =     scale * plane.Y * plane.Z;
-	Result.Elements[ 3 ][ 1 ] =     scale * plane.Y * plane.W;
+	Result.Elements[ 3 ][ 1 ] =     scale * plane.Y *-plane.W;
 
 	Result.Elements[ 0 ][ 2 ] =     scale * plane.Z * plane.X;
 	Result.Elements[ 1 ][ 2 ] =     scale * plane.Z * plane.Y;
 	Result.Elements[ 2 ][ 2 ] = 1 + scale * plane.Z * plane.Z;
-	Result.Elements[ 3 ][ 2 ] =     scale * plane.Z * plane.W;
+	Result.Elements[ 3 ][ 2 ] =     scale * plane.Z *-plane.W;
 
 	Result.Elements[ 0 ][ 3 ] = 0;
 	Result.Elements[ 1 ][ 3 ] = 0;
