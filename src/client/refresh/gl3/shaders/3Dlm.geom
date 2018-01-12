@@ -96,7 +96,7 @@ void outputPrimitive (bool negative, bool reverse) {
 			}
 			else
 			{
-				gl_ClipDistance[0] = 0;//-refPlaneDist[i];
+				gl_ClipDistance[0] = 0.0;//-refPlaneDist[i];
 				gl_Position = gl_in[i].gl_Position;
 			}
 		}

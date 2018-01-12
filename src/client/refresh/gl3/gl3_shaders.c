@@ -447,7 +447,9 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 			R_Printf ( PRINT_ALL, "WARNING: OpenGL driver disagrees with us about UBO size of 'refDat'\n" );
 			R_Printf ( PRINT_ALL, "         OpenGL says %d, we say %d\n", blockSize, ( int )sizeof ( gl3UniRefData_t ) );
 
-			goto err_cleanup;
+			if (blockSize / sizeof (gl3UniRefData_t) != floor (blockSize / sizeof (gl3UniRefData_t))) {
+				goto err_cleanup;
+			}
 		}
 
 		if ( blockIndex != GL_INVALID_INDEX ) {

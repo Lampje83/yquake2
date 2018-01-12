@@ -25,6 +25,8 @@ layout (std140) uniform uni3D
 	//float _pad_3;
 };
 
+#define REFSURF_PLANEBACK	2
+
 struct refData_s {
 	mat4	refMatrix;
 	vec4	color;
@@ -56,6 +58,8 @@ out VS_OUT {
 
 int count;
 
+float refPlaneDist [6];
+
 void outputPrimitive (bool negative, bool reverse) {
 	for (int j = 0; j < count; j++) {
 		int i;
@@ -67,25 +71,25 @@ void outputPrimitive (bool negative, bool reverse) {
 		}
 
 		gs_out.TexCoord = gs_in[i].TexCoord;
-		gs_out.WorldCoord = gs_in[i].WorldCoord;
 		gs_out.Color = gs_in[i].Color;
+		gs_out.WorldCoord = gs_in[i].WorldCoord;
 		gs_out.refIndex = gs_in[i].refIndex;
 
 		if (!negative) 
 		{
-			gl_ClipDistance[0] = gl_in[i].gl_ClipDistance[0];
+			gl_ClipDistance[0] = 0.0;
 			gl_Position = gl_in[i].gl_Position;
 		}
 		else
 		{
 			if ((gs_in[i].refIndex >= 0) && reverse)
 			{
-				gl_ClipDistance[0] = gl_in[i].gl_ClipDistance[0];
+				gl_ClipDistance[0] = refPlaneDist[i];
 				gl_Position = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4(gs_in[i].WorldCoord, 1.0);
 			}
 			else
 			{
-				gl_ClipDistance[0] = -gl_in[i].gl_ClipDistance[0];
+				gl_ClipDistance[0] = -refPlaneDist[i];
 				gl_Position = gl_in[i].gl_Position;
 			}
 		}
@@ -112,21 +116,34 @@ void main() {
 			vec4 pos = gl_in[i].gl_Position;
 			if (reflectionActive)
 			{
-				if (gl_in[i].gl_ClipDistance[0] < 0)
+				if (j == 0)
+				{
+					refPlaneDist[i] = dot ( gs_in[i].WorldCoord.xyz, refData[ gs_in[i].refIndex ].plane.xyz ) - refData[ gs_in[i].refIndex ].plane.w;
+
+					if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
+						refPlaneDist[i] = -refPlaneDist[i];
+				}
+
+				if (refPlaneDist[i] > 0)
 					pos = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4(gs_in[i].WorldCoord, 1.0);
 
 				if (j < 4) {
 					// test for view culling
 					if ( (pos[j & 1] * (1.0 - (j & 2))) > (refData[gs_in[i].refIndex].cullDistances[j] * pos.w)) k++;
 				} else {
-					if ((-dot ( pos.xyz, refData[gs_in[i].refIndex].plane.xyz ) - refData[gs_in[i].refIndex].plane.w) < 0) k++;
+					//if ((dot ( pos.xyz, refData[gs_in[i].refIndex].plane.xyz ) - refData[gs_in[i].refIndex].plane.w) < 0) k++;
+					if (refPlaneDist[i] < 0) k++;
 				}
+			}
+			else
+			{
+				refPlaneDist[i] = 0;
 			}
 		}
 		if (j < 4) {
 			//if (k == count)
 				// discard
-				// return;
+				//return;
 		}
 	}
 
