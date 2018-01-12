@@ -438,18 +438,24 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	}
 	// else: as uniLights is only used in the LM shaders, it's ok if it's missing
 
-	blockIndex = glGetUniformBlockIndex ( prog, "refData_s" );
+	blockIndex = glGetUniformBlockIndex ( prog, "refDat" );
+	//int blockIndex2 = glGetUniformBlockIndex ( prog, "refData" );
 	if ( blockIndex != GL_INVALID_INDEX ) {
 		GLint blockSize;
 		glGetActiveUniformBlockiv ( prog, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize );
 		if ( blockSize != sizeof ( gl3UniRefData_t ) ) {
-			R_Printf ( PRINT_ALL, "WARNING: OpenGL driver disagrees with us about UBO size of 'refData_s'\n" );
+			R_Printf ( PRINT_ALL, "WARNING: OpenGL driver disagrees with us about UBO size of 'refDat'\n" );
 			R_Printf ( PRINT_ALL, "         OpenGL says %d, we say %d\n", blockSize, ( int )sizeof ( gl3UniRefData_t ) );
 
 			goto err_cleanup;
 		}
 
-		glUniformBlockBinding ( prog, blockIndex, GL3_BINDINGPOINT_REFDATA );
+		if ( blockIndex != GL_INVALID_INDEX ) {
+			glUniformBlockBinding ( prog, blockIndex, GL3_BINDINGPOINT_REFDATA );
+		}
+		else {
+			R_Printf ( PRINT_ALL, "WARNING: Block index of 'refData' not found\n" );
+		}
 	}
 	else {
 		R_Printf ( PRINT_ALL, "WARNING: Couldn't find uniform block index 'refData_s'\n" );
@@ -553,8 +559,12 @@ static void initUBOs(void)
 	glBindBuffer ( GL_UNIFORM_BUFFER, gl3state.uniRefDataUBO );
 	glBindBufferBase ( GL_UNIFORM_BUFFER, GL3_BINDINGPOINT_REFDATA, gl3state.uniRefDataUBO );
 	glBufferData ( GL_UNIFORM_BUFFER, sizeof ( gl3state.uniRefData ), &gl3state.uniRefData, GL_DYNAMIC_DRAW );
+/*
+	int blockSize;
+	glGetActiveUniformBlockiv ( gl3state.si3Dlm.shaderProgram, glGetUniformBlockIndex ( gl3state.si3Dlm.shaderProgram, "refDat" ), GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize );
+*/	
+	gl3state.currentUBO = gl3state.uniRefDataUBO;
 
-	gl3state.currentUBO = gl3state.uniRefData;
 }
 
 static qboolean createShaders ( void ) {
@@ -734,5 +744,5 @@ void GL3_UpdateUBOLights ( void ) {
 }
 
 void GL3_UpdateUBORefData ( void ) {
-	updateUBO ( gl3state.uniRefDataUBO, sizeof ( gl3state.uniRefData ), &gl3state.uniRefData );
+	updateUBO ( gl3state.uniRefDataUBO, sizeof ( gl3state.uniRefData ), gl3state.uniRefData );
 }

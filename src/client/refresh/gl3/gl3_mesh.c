@@ -607,11 +607,11 @@ CullAliasModel(vec3_t bbox[8], entity_t *e)
 		bbox[i][2] = DotProduct(vectors[2], tmp);
 
 		VectorAdd(e->origin, bbox[i], bbox[i]);
-		if ( memcmp ( &gl3state.refPlanes[ 0 ].modMatrix, &gl3_identityMat4, sizeof ( hmm_mat4 ) ) ) {
+		if ( gl3state.refActive ) {
 			hmm_vec4 tmp;
 			memcpy ( &tmp, bbox[ i ], sizeof ( vec3_t ) );
 			tmp.W = 1;
-			tmp = HMM_MultiplyMat4ByVec4 ( gl3state.refPlanes[ 0 ].modMatrix, tmp );
+			tmp = HMM_MultiplyMat4ByVec4 ( gl3state.uniRefData[ 0 ].refMatrix, tmp );
 			memcpy ( bbox[ i ], &tmp, sizeof ( vec3_t ) );
 		}
 	}
@@ -678,6 +678,11 @@ GL3_DrawAliasModel(entity_t *entity)
 	if ( entity->flags & RF_VIEWERMODEL ) {
 		if ( !gl3state.refActive ) {
 			return;
+		}
+		else {
+			vec3_t tempvec;
+			//VectorSubtract ( entity->oldorigin, entity->origin, tempvec );
+			//VectorMA ( entity->origin, entity->backlerp, tempvec, entity->origin );
 		}
 	}
 

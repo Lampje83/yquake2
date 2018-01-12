@@ -183,7 +183,7 @@ CL_AddPacketEntities(frame_t *frame)
 		ent.oldframe = cent->prev.frame;
 		ent.backlerp = 1.0f - cl.lerpfrac;
 
-		if (renderfx & (RF_FRAMELERP | RF_BEAM))
+		if (renderfx & (RF_FRAMELERP | RF_BEAM ))
 		{
 			/* step origin discretely, because the
 			   frames do the animation properly */

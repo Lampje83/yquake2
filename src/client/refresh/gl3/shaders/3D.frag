@@ -28,10 +28,12 @@ void main()
 
 		vec4 projCoord = gl_FragCoord;
 		projCoord.xy *= bufSize.xy;
-		projCoord.z = 1;
+		projCoord.z = 1 + 2 * refTexture;
 
 		vec4 refltex = texture(refl, projCoord.xyz) * newalpha;
 		texel.rgb *= vec3(1 - newalpha);
+		// debug
+		//texel += vec3(((refTexture + 1) & 1) / 1, ((refTexture + 1) & 6) / 6.0, ((refTexture + 1) & 8) / 8.0) * 0.25;
 
 		texel.rgb += refltex.rgb; // * (1.0 - (texel.a * newalpha));
 	}

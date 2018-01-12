@@ -36,6 +36,8 @@
 #include <SDL/SDL.h>
 #endif //SDL2
 
+#include <SDL_syswm.h>
+
 
 
 
@@ -189,6 +191,7 @@ int GL3_InitContext(void* win)
 	window = (SDL_Window*)win;
 
 	context = SDL_GL_CreateContext(window);
+
 	if(context == NULL)
 	{
 		R_Printf(PRINT_ALL, "GL3_InitContext(): Creating OpenGL Context failed: %s\n", SDL_GetError());
@@ -295,7 +298,21 @@ qboolean GL3_IsVsyncActive(void)
 void GL3_EndFrame(void)
 {
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-	SDL_GL_SwapWindow(window);
+#ifdef WIN32
+	/*
+	SDL_SysWMinfo info;
+	SDL_GetWindowWMInfo ( window, &info );
+	SwapBuffers ( info.info.win.hdc );
+	wglSwapLayerBuffers ( info.info.win.hdc, WGL_SWAP_MAIN_PLANE );
+	*/
+	HDC hdc = wglGetCurrentDC ();
+	HGLRC hglrc = wglGetCurrentContext ();
+	//wglMakeCurrent ( hdc, hglrc );
+	SwapBuffers ( hdc );
+#else
+	SDL_GL_SwapWindow ( window );
+#endif
+
 #else
 	SDL_GL_SwapBuffers();
 #endif

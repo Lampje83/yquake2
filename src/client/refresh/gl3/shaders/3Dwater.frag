@@ -56,10 +56,12 @@ void main()
 
 		projCoord.xy += df;
 		projCoord = clamp(projCoord, 0.0, 1.0);	
-		vec4 refltex = texture(refl, vec3(projCoord.xy, 1)) * newalpha;
-		vec4 refrtex = texture(refl, vec3(projCoord.xy, 2)) * (1 - newalpha);
+		vec4 refltex = texture(refl, vec3(projCoord.xy, 1 + 2 * refTexture)) * newalpha;
+		vec4 refrtex = texture(refl, vec3(projCoord.xy, 2 + 2 * refTexture)) * (1 - newalpha);
 		texel.rgb *= vec3(1 - newalpha);
 
+		// debug
+		// texel += vec3(((refTexture + 1) & 1) / 1, ((refTexture + 1) & 6) / 6.0, ((refTexture + 1) & 8) / 8.0) * 0.25;
 		texel.rgb += refltex.rgb; // * (1.0 - (texel.a * newalpha));
 		texel.rgb += refrtex.rgb;
 	}

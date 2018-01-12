@@ -25,7 +25,7 @@ layout (std140) uniform uni3D
 	//float _pad_3;
 };
 
-layout ( std140 ) uniform refData_s {
+struct refData_s {
 	mat4	refMatrix;
 	vec4	color;
 	vec4	plane;
@@ -34,7 +34,11 @@ layout ( std140 ) uniform refData_s {
 	float	refrindex;
 	float	_pad_1;
 	float	_pad_2;
-} refData[];
+};
+
+layout ( std140 ) uniform refDat {
+	refData_s	refData[];
+};
 
 in VS_OUT {
 	vec2		TexCoord;
@@ -134,12 +138,12 @@ void main() {
 			return;
 		if (k <= count) {
 			// output reflected triangle
-			gl_Layer = 1;
+			gl_Layer = 1 + gs_in[0].refIndex * 2;
 			outputPrimitive (true, true);
 		}
 		if (k >= 0) {
 			// output refracted triangle
-			gl_Layer = 2;
+			gl_Layer = 2 + gs_in[0].refIndex * 2;
 			outputPrimitive (true, false);
 		}
 	}

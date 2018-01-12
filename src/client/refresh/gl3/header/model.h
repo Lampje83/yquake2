@@ -130,6 +130,8 @@ typedef struct msurface_s
 	// I think cached_light is not used/needed anymore
 	//float cached_light[MAXLIGHTMAPS];       /* values currently used in lightmap */
 	byte *samples;                          /* [numstyles*surfsize] */
+
+	int		refIndex;			// reflection plane index
 } msurface_t;
 
 typedef struct mnode_s

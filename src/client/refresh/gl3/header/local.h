@@ -193,7 +193,7 @@ typedef struct 	{
 	cplane_t	*plane;		// The actual reflection plane
 	int			frameCount;	// Last seen frame index
 	qboolean	planeback;		// is surface on back side of plane
-	hmm_mat4	modMatrix;		// World reflection modification matrix
+	//hmm_mat4	modMatrix;		// World reflection modification matrix
 	hmm_vec4	cullDistances;	// offsets of visibility in view frame
 } refplanedata_t;
 

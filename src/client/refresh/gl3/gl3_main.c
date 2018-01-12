@@ -1551,22 +1551,10 @@ extern GLuint vao2D, vbo2D;
 static void
 GL3_RenderFrame(refdef_t *fd)
 {	
-#if 0	// ERIK: move refdata from VAO to UBO
-	gl3state.uni3DData.fluidPlane = HMM_Vec4 ( 0, 0, 0, 0 );
-	gl3state.refPlanes[ 0 ].modMatrix = gl3_identityMat4;
-
-	gl3state.uni3DData.cullDistances = HMM_Vec4 ( 1, 1, 1, 1 );
-	glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vboRefData );
-	for ( int index = 0; index < 4; index++ ) {
-		glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX + index );
-		glVertexAttrib4fv ( GL3_ATTRIB_REFINDEX + index, gl3_identityMat4.Elements[ index ] );
-	}
-	glBufferData ( GL_ARRAY_BUFFER, sizeof ( refplanedata_t ) * MAX_REF_PLANES, &gl3state.refPlanes[ 0 ], GL_DYNAMIC_DRAW );
-#else
-	glVertexAttribI1i ( GL3_ATTRIB_REFINDEX, 0 ); // -1
+	glVertexAttribI1i ( GL3_ATTRIB_REFINDEX, -1 ); // -1
 	glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX );
 	gl3state.refActive = false;
-#endif
+
 	GL3_UpdateUBO3D ();
 
 	//glBindFramebuffer ( GL_FRAMEBUFFER, 0 );

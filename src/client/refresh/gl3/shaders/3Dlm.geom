@@ -27,7 +27,8 @@ layout (std140) uniform uni3D
 
 #define REFSURF_PLANEBACK	2
 
-layout ( std140 ) uniform refData_s {
+
+struct refData_s {
 	mat4	refMatrix;
 	vec4	color;
 	vec4	plane;
@@ -36,7 +37,11 @@ layout ( std140 ) uniform refData_s {
 	float	refrindex;
 	float	_pad_1;
 	float	_pad_2;
-} refData[];
+};
+
+layout ( std140 ) uniform refDat {
+	refData_s refData[];
+};
 
 in VS_OUT {
 	vec2		TexCoord;
