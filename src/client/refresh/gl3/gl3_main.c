@@ -622,6 +622,7 @@ GL3_DrawBeam(entity_t *e)
 
 	enum { NUM_BEAM_SEGS = 6 };
 
+
 	vec3_t perpvec;
 	vec3_t direction, normalized_direction;
 	vec3_t start_points[NUM_BEAM_SEGS], end_points[NUM_BEAM_SEGS];

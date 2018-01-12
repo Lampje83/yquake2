@@ -33,7 +33,7 @@ void main()
 	if (alpha < 1)
 	{
 		vec3 viewang = normalize(viewPos - fs_in.WorldCoord.xyz);
-		float dp = dot(fs_in.Normal, viewang);
+		float dp = abs(dot(fs_in.Normal, viewang));
 
 		newalpha += (1.0 - alpha) * pow (1 - dp, 3.0);
 

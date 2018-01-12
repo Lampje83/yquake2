@@ -75,7 +75,7 @@ void outputPrimitive (bool negative, bool reverse) {
 
 		if (!negative) 
 		{
-			gl_ClipDistance[0] = gl_in[i].gl_ClipDistance[0];
+			gl_ClipDistance[0] = 0.0; //gl_in[i].gl_ClipDistance[0];
 			gl_Position = gl_in[i].gl_Position;
 		}
 		else
