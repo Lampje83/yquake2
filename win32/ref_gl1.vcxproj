@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{527DDA59-DBAA-4BBE-825A-1F3D5DD3FD92}</ProjectGuid>
     <RootNamespace>ref_gl1</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -70,20 +70,26 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\src\SDL2-2.0.7\lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\src\SDL2-2.0.7\lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\src\SDL2-2.0.7\lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\src\SDL2-2.0.7\lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
