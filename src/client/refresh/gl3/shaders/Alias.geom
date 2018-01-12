@@ -39,7 +39,7 @@ struct refData_s {
 };
 
 layout ( std140 ) uniform refDat {
-	refData_s	refData[];
+	refData_s	refData[16];
 };
 
 in VS_OUT {
