@@ -2,6 +2,7 @@
 
 uniform sampler2D tex;
 uniform	sampler2DArray refl;
+uniform sampler2DArray reflDepth;
 
 in VS_OUT {
 	vec2 TexCoord;
@@ -14,7 +15,8 @@ void main()
 	vec4 texel = texture(tex, fs_in.TexCoord);
 
 	// apply intensity and gamma
-	texel.rgb *= intensity;
+	texel.rgb *= intensity * alpha;
+	texel.rgb = pow(texel.rgb, vec3(gamma));
 
 	float newalpha = alpha;
 	if (alpha < 1)
@@ -36,8 +38,9 @@ void main()
 		//texel += vec3(((refTexture + 1) & 1) / 1, ((refTexture + 1) & 6) / 6.0, ((refTexture + 1) & 8) / 8.0) * 0.25;
 
 		texel.rgb += refltex.rgb; // * (1.0 - (texel.a * newalpha));
+		texel.rgb += texture(refl, vec3(projCoord.xy, projCoord.z + 1)).rgb * (1 - newalpha);
 	}
 
-	outColor.rgb = pow(texel.rgb, vec3(gamma));
-	outColor.a = texel.a*newalpha; // I think alpha shouldn't be modified by gamma and intensity
+	outColor.rgb = texel.rgb;
+	outColor.a = 1; //texel.a*newalpha; // I think alpha shouldn't be modified by gamma and intensity
 }

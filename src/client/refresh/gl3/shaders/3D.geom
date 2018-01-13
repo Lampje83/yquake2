@@ -127,7 +127,6 @@ void main() {
 		//}
 	}
 */
-
 	if (reflectionActive)
 	{
 		for (i = 0; i < count; i++) {

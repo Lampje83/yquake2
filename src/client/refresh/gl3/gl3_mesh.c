@@ -318,7 +318,7 @@ DrawAliasFrameLerp(dmdl_t *paliashdr, entity_t* entity, vec3_t shadelight)
 	glBufferData(GL_ARRAY_BUFFER, da_count(vtxBuf)*sizeof(gl3_alias_vtx_t), vtxBuf.p, GL_STREAM_DRAW);
 	GL3_BindEBO(gl3state.eboAlias);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, da_count(idxBuf)*sizeof(GLushort), idxBuf.p, GL_STREAM_DRAW);
-	glDrawElements(GL_TRIANGLES, da_count(idxBuf), GL_UNSIGNED_SHORT, NULL);
+	glDrawElementsInstanced (GL_TRIANGLES, da_count (idxBuf), GL_UNSIGNED_SHORT, NULL, gl3state.instanceCount + 1);
 }
 
 static void
@@ -642,6 +642,7 @@ CullAliasModel(vec3_t bbox[8], entity_t *e)
 
 	return false;
 }
+static vec3_t viewofs;
 
 void
 GL3_DrawAliasModel(entity_t *entity)
@@ -666,9 +667,15 @@ GL3_DrawAliasModel(entity_t *entity)
 		}
 	}
 
+	int oldInstanceCount = gl3state.instanceCount;
+
 	if ( entity->flags & RF_WEAPONMODEL ) {
+
 		if ( gl3state.refActive ) {
 			return;
+		} else {
+			// don't reflect weapon model
+			gl3state.instanceCount = 0;
 		}
 		if ( gl_lefthand->value == 2 ) {
 			return;
@@ -676,13 +683,26 @@ GL3_DrawAliasModel(entity_t *entity)
 	}
 	
 	if ( entity->flags & RF_VIEWERMODEL ) {
-		if ( !gl3state.refActive ) {
-			return;
-		}
-		else {
-			vec3_t tempvec;
+//		if ( !gl3state.refActive ) {
+			if (!memcmp (entity->oldorigin, entity->origin, sizeof (entity->origin))) {
+				// entity is stationary, we can derive view offset
+				if (entity->frame == 0) {
+					VectorSubtract (gl3_newrefdef.vieworg, entity->origin, viewofs);
+				}
+			}
+//		}
+//		else {
+		if (gl3state.instanceCount > 0) {
+			VectorSubtract (gl3_newrefdef.vieworg, viewofs, entity->origin);
+			VectorCopy (entity->origin, entity->oldorigin);
+
+			entity->angles[1] = gl3_newrefdef.viewangles[1];
 			//VectorSubtract ( entity->oldorigin, entity->origin, tempvec );
 			//VectorMA ( entity->origin, entity->backlerp, tempvec, entity->origin );
+			glVertexAttribI1i (GL3_ATTRIB_REFINDEX, 0);
+			gl3state.instanceCount -= 1;
+		} else {
+			return;
 		}
 	}
 
@@ -938,6 +958,14 @@ GL3_DrawAliasModel(entity_t *entity)
 		si.entity = entity;
 
 		da_push(shadowModels, si);
+	}
+
+	if (entity->flags & (RF_VIEWERMODEL | RF_WEAPONMODEL))
+	{
+		gl3state.instanceCount = oldInstanceCount;
+		if (entity->flags & RF_VIEWERMODEL) {
+			glVertexAttribI1i (GL3_ATTRIB_REFINDEX, -1);
+		}
 	}
 }
 

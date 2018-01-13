@@ -20,7 +20,7 @@ void main()
 	vs.WorldCoord = worldCoord.xyz;
 	vec4 worldNormal = transModel * vec4 ( normal, 0.0f );
 	vs.Normal = normalize ( worldNormal.xyz );
-	vs.refIndex = refIndex;
+	vs.refIndex = refIndex + gl_InstanceID;
 
 	if ( vs.refIndex >= 0 ) {
 		//worldCoord = refMatrix * worldCoord;

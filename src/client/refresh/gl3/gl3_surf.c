@@ -256,6 +256,8 @@ void GL3_SurfShutdown(void)
 
 }
 
+int reflectionCount = 0;
+
 void GL_MultiDrawArrays ( void ) {
 	if ( numarrays > MAX_INDICES ) {
 		ri.Sys_Error ( ERR_DROP, __FUNCTION__": Array list overrun: %d, max %d\n", numarrays, MAX_INDICES );
@@ -280,7 +282,7 @@ void GL_DrawElements ( void ) {
 		GL3_BindVBO ( gl3state.vbo3D );
 		//glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*gl3_worldmodel->numglverts, gl3_worldmodel->glverts, GL_STREAM_DRAW );
 
-		glDrawElementsInstancedBaseInstance ( GL_TRIANGLE_FAN, numelements, GL_UNSIGNED_INT, elementlist, 1, 0 );
+		glDrawElementsInstanced ( GL_TRIANGLE_FAN, numelements, GL_UNSIGNED_INT, elementlist, gl3state.instanceCount + 1);
 		numelements = 0;
 	}
 }
@@ -631,6 +633,7 @@ void GL3_RenderReflection ( int refp ) {
 	glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vbo3D );
 	glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX );
 	glVertexAttribI1i ( GL3_ATTRIB_REFINDEX, refp );
+	gl3state.currentRefPlane = refp;
 	gl3state.refActive = true;
 
 	//gl3state.uni3DData.fluidPlane = plane;
@@ -666,17 +669,32 @@ void GL3_DrawAlphaSurfaces ( void ) {
 	GL3_UpdateUBO3D ();
 
 	glEnable ( GL_BLEND );
-
+#if 0
 	if (gl3state.numRefPlanes > 0 )
 		R_Printf ( PRINT_ALL, "refplanes: %i\n", gl3state.numRefPlanes );
-
+#endif
 	int refsurfcount[ MAX_REF_PLANES ];
 	memset ( refsurfcount, 0, sizeof ( refsurfcount ) );
+
+	int currentref;
 
 	for ( s = gl3_alpha_surfaces; s != NULL; s = s->texturechain ) {
 		GL3_SelectTMU ( GL_TEXTURE5 );
 
-		if ( s->refIndex >= 0 ) {
+		if (s->refIndex >= 0 && gl3state.refActive) {
+			if (gl3state.currentRefPlane >= 0) {
+				while (s->plane == gl3state.refPlanes[gl3state.currentRefPlane].plane) {
+					// don't render on self
+					//GL3_SelectTMU (GL_TEXTURE0);
+					//continue;
+					s = s->texturechain;
+					if (s == NULL) break;
+				}
+			}
+		}
+		if (s == NULL) break;
+		if (s->refIndex >= 0) {
+
 			glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
 			refsurfcount[ s->refIndex ]++;
 			
@@ -692,7 +710,7 @@ void GL3_DrawAlphaSurfaces ( void ) {
 				{
 
 					// Do reflection
-					GL3_RenderReflection ( refp );
+//					GL3_RenderReflection ( refp );
 				}
 			}
 		} else {
@@ -1304,7 +1322,11 @@ void GL3_DrawWorld(void)
 		ClearTextureChains ();
 		RecursiveWorldNode ( gl3_worldmodel->nodes );
 		GL3_UpdateUBORefData ();
+
+		gl3state.instanceCount = gl3state.numRefPlanes;
+
 	}
+
 
 	DrawTextureChains();
 	GL3_DrawSkyBox();

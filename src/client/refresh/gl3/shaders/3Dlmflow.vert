@@ -21,7 +21,7 @@ void main()
 	vec4 worldNormal = transModel * vec4(normal, 0.0f);
 	vs.Normal = normalize(worldNormal.xyz);
 	vs.LightFlags = lightFlags;
-	vs.refIndex = refIndex;
+	vs.refIndex = refIndex + gl_InstanceID;
 
 	gl_Position = transProj * transView * worldCoord;
 	gl_ClipDistance[0] = 0.0;

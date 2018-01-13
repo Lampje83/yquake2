@@ -27,7 +27,6 @@ layout (std140) uniform uni3D
 
 #define REFSURF_PLANEBACK	2
 
-
 struct refData_s {
 	mat4	refMatrix;
 	vec4	color;

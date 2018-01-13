@@ -15,7 +15,7 @@ void main()
 	vec4 worldCoord = transModel * vec4 ( position, 1.0 );
 
 	vs.WorldCoord = worldCoord.xyz;
-	vs.refIndex = refIndex;
+	vs.refIndex = refIndex + gl_InstanceID;
 
 	gl_Position = transProj * transView * worldCoord;
 	gl_ClipDistance[0] = 0.0;

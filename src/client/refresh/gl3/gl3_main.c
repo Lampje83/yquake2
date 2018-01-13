@@ -1454,10 +1454,12 @@ GL3_RenderView(refdef_t *fd)
 	SetFrustum();
 	SetupGL();
 
+	gl3state.instanceCount = gl3state.numRefPlanes;
 	GL3_MarkLeafs(); /* done here so we know if we're in water */
 	GL3_DrawWorld();
 	GL3_DrawEntitiesOnList();
 	GL3_DrawParticles();
+	gl3state.instanceCount = 0;
 
 	GL3_DrawAlphaSurfaces();
 

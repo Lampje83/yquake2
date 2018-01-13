@@ -28,14 +28,14 @@ void main()
 	texel.rgb *= intensity * 1.0;
 	texel.rgb = pow(texel.rgb, vec3(gamma));
 
-	float newalpha = pow(alpha, 2.0);
+	float newalpha = pow(alpha, 3.0);
 
 	if (alpha < 1)
 	{
 		vec3 viewang = normalize(viewPos - fs_in.WorldCoord.xyz);
 		float dp = abs(dot(fs_in.Normal, viewang));
 
-		newalpha += (1.0 - alpha) * pow (1 - dp, 3.0);
+		newalpha += (1.0 - newalpha) * pow (1 - dp, 3.0);
 
 		vec3 bufSize = 1.0 / textureSize(refl, 0);
 

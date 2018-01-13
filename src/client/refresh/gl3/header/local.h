@@ -292,6 +292,8 @@ typedef struct
 	qboolean		refActive;
 	int				refIndices[ MAX_REF_PLANES ];
 
+	int				instanceCount;
+
 } gl3state_t;
 
 extern gl3config_t gl3config;

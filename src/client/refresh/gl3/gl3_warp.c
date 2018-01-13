@@ -740,7 +740,7 @@ GL3_DrawSkyBox(void)
 		MakeSkyVec( skymaxs [ 0 ] [ i ], skymins [ 1 ] [ i ], i, &skyVertices[3] );
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(skyVertices), skyVertices, GL_STREAM_DRAW);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		glDrawArraysInstanced (GL_TRIANGLE_FAN, 0, 4, gl3state.instanceCount + 1);
 	}
 
 	if ( gl_showtris->value ) {
