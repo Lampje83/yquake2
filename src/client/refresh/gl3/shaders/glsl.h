@@ -39,7 +39,7 @@
 
 
 #define in
-#define out
+#define out struct
 #define inout
 #define varying
 #define uniform
@@ -54,6 +54,7 @@
 #define centroid 
 #define sample
 #define patch 
+#define flat
 
 #define triangles
 #define quads
@@ -667,8 +668,8 @@ GENFUN3 ( fma );
 GENFUN3D ( fma );
 GENFUN_ALL ( fract );
 
-float frexp ( float x, out int exp ); vec2 frexp ( vec2 x, out int exp ); vec3 frexp ( vec3 x, out int exp ); vec4 frexp ( vec4 x, out int exp );
-double frexp ( double x, out int exp ); dvec2 frexp ( dvec2 x, out int exp ); dvec3 frexp ( dvec3 x, out int exp ); dvec4 frexp ( dvec4 x, out int exp );
+float frexp ( float x, int exp ); vec2 frexp ( vec2 x, int exp ); vec3 frexp ( vec3 x, int exp ); vec4 frexp ( vec4 x, int exp );
+double frexp ( double x, int exp ); dvec2 frexp ( dvec2 x, int exp ); dvec3 frexp ( dvec3 x, int exp ); dvec4 frexp ( dvec4 x, int exp );
 
 GENFUN_ALL ( fwidth );
 

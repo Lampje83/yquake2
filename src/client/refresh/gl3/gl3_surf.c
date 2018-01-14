@@ -202,15 +202,16 @@ void GL3_SurfInit(void)
 
 	// Setup buffer textures
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
-//	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_R11F_G11F_B10F, vid.width, vid.height, 32, 0, GL_RGBA, GL_FLOAT, 0 );
-	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_RGB, vid.width, vid.height, 32, 0, GL_RGBA, GL_BYTE, 0 );
+	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_R11F_G11F_B10F, vid.width, vid.height, 32, 0, GL_RGBA, GL_FLOAT, 0 );
+//	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_RGB, vid.width, vid.height, 32, 0, GL_RGBA, GL_BYTE, 0 );
+//	glTexImage3D (GL_TEXTURE_2D_ARRAY, 0, GL_RGB, 1024, 1024, 32, 0, GL_RGBA, GL_BYTE, 0);
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTextureDepth );
-	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 32, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0 );
+	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 32, 0, GL_DEPTH_COMPONENT, GL_BYTE, 0 );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -258,13 +259,33 @@ void GL3_SurfShutdown(void)
 
 int reflectionCount = 0;
 
+typedef struct {
+	GLuint	count;
+	GLuint	instanceCount;
+	GLuint	first;
+	GLuint	baseInstance;
+} DrawArraysIndirectCommand;
+
 void GL_MultiDrawArrays ( void ) {
 	if ( numarrays > MAX_INDICES ) {
 		ri.Sys_Error ( ERR_DROP, __FUNCTION__": Array list overrun: %d, max %d\n", numarrays, MAX_INDICES );
 	} else if ( numarrays ) {
 		GL3_BindVAO ( gl3state.vao3D );
 		GL3_BindVBO ( gl3state.vbo3D );
-		glMultiDrawArrays ( GL_TRIANGLE_FAN, arraystart, arraylength, numarrays );
+	
+		DrawArraysIndirectCommand dc[MAX_INDICES];
+		for (int i = 0; i < numarrays; i++)
+		{
+			dc[i].first = arraystart[i];
+			dc[i].count = arraylength[i];
+			dc[i].baseInstance = 0;
+			dc[i].instanceCount = gl3state.instanceCount + 1;
+			glDrawArraysInstanced (GL_TRIANGLE_FAN, dc[i].first, dc[i].count, gl3state.instanceCount + 1);
+		}
+//		somehow this doesn't work
+//		glMultiDrawArraysIndirect (GL_TRIANGLE_FAN, 0, numarrays, 0);
+	
+		//glMultiDrawArrays ( GL_TRIANGLE_FAN, arraystart, arraylength, numarrays );
 		numarrays = 0;
 	}
 }
@@ -660,6 +681,8 @@ void GL3_RenderReflection ( int refp ) {
 	//		memcpy ( frustum, oldfrustum, sizeof ( cplane_t ) * 4 );
 }
 
+//#define DEBUGREFL
+
 void GL3_DrawAlphaSurfaces ( void ) {
 	msurface_t *s;
 
@@ -669,43 +692,34 @@ void GL3_DrawAlphaSurfaces ( void ) {
 	GL3_UpdateUBO3D ();
 
 	glEnable ( GL_BLEND );
-#if 0
+#ifdef DEBUGREFL
+	int refsurfcount[MAX_REF_PLANES];
+	memset (refsurfcount, 0, sizeof (refsurfcount));
+
 	if (gl3state.numRefPlanes > 0 )
-		R_Printf ( PRINT_ALL, "refplanes: %i\n", gl3state.numRefPlanes );
+		R_Printf ( PRINT_ALL, "refplanes: %i ", gl3state.numRefPlanes );
 #endif
-	int refsurfcount[ MAX_REF_PLANES ];
-	memset ( refsurfcount, 0, sizeof ( refsurfcount ) );
 
 	int currentref;
 
 	for ( s = gl3_alpha_surfaces; s != NULL; s = s->texturechain ) {
-		GL3_SelectTMU ( GL_TEXTURE5 );
 
-		if (s->refIndex >= 0 && gl3state.refActive) {
-			if (gl3state.currentRefPlane >= 0) {
-				while (s->plane == gl3state.refPlanes[gl3state.currentRefPlane].plane) {
-					// don't render on self
-					//GL3_SelectTMU (GL_TEXTURE0);
-					//continue;
-					s = s->texturechain;
-					if (s == NULL) break;
-				}
-			}
-		}
-		if (s == NULL) break;
 		if (s->refIndex >= 0) {
-
+			GL3_SelectTMU (GL_TEXTURE5);
 			glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
+			GL3_SelectTMU (GL_TEXTURE6);
+			glBindTexture (GL_TEXTURE_2D_ARRAY, gl3state.reflectTextureDepth);
+#ifdef DEBUGREFL
 			refsurfcount[ s->refIndex ]++;
-			
+#endif			
 			gl3state.uni3DData.refTexture = s->refIndex;
 			if ( ( ( s->flags & SURF_PLANEBACK ) == ( gl3state.refPlanes[ s->refIndex ].planeback ? SURF_PLANEBACK : 0 ) ) &&
 				( gl_reflection->value )
 				// && !gl3state.refActive
 				) {
 				int refp = s->refIndex;
-				if ( ( gl3state.refPlanes[ refp ].cullDistances.Elements[ 0 ] != -gl3state.refPlanes[ refp ].cullDistances.Elements[ 2 ] ) &&
-					( gl3state.refPlanes[ refp ].cullDistances.Elements[ 1 ] != -gl3state.refPlanes[ refp ].cullDistances.Elements[ 3 ] ) )
+//				if ( ( gl3state.refPlanes[ refp ].cullDistances.Elements[ 0 ] != -gl3state.refPlanes[ refp ].cullDistances.Elements[ 2 ] ) &&
+//					( gl3state.refPlanes[ refp ].cullDistances.Elements[ 1 ] != -gl3state.refPlanes[ refp ].cullDistances.Elements[ 3 ] ) )
 					// reflection surfaces fall completely outside frustum
 				{
 
@@ -715,7 +729,12 @@ void GL3_DrawAlphaSurfaces ( void ) {
 			}
 		} else {
 			gl3state.uni3DData.refTexture = -1;
-			glBindTexture ( GL_TEXTURE_2D_ARRAY, 0 );
+
+			GL3_SelectTMU (GL_TEXTURE5);
+			glBindTexture (GL_TEXTURE_2D_ARRAY, 0);
+			GL3_SelectTMU (GL_TEXTURE6);
+			glBindTexture (GL_TEXTURE_2D_ARRAY, 0);
+			//glBindTexture ( GL_TEXTURE_2D_ARRAY, 0 );
 		}
 
 		GL3_SelectTMU ( GL_TEXTURE0 );
@@ -745,12 +764,12 @@ void GL3_DrawAlphaSurfaces ( void ) {
 		GL3_UpdateUBORefData ();
 			GL_DrawElements ();
 	}
-
-//	for ( int i = 0; i < gl3state.numRefPlanes; i++ ) {
-//		R_Printf ( PRINT_ALL, "%i ", refsurfcount[ i ] );
-//	}
-//	if (gl3state.numRefPlanes > 0) R_Printf ( PRINT_ALL, "\n" );
-
+#ifdef DEBUGREFL
+	for ( int i = 0; i < gl3state.numRefPlanes; i++ ) {
+		R_Printf ( PRINT_ALL, "%i ", refsurfcount[ i ] );
+	}
+	if (gl3state.numRefPlanes > 0) R_Printf ( PRINT_ALL, "\n" );
+#endif
 	gl3state.uni3DData.alpha = 1.0f;
 	GL3_UpdateUBO3D ();
 
@@ -1030,18 +1049,18 @@ DrawInlineBModel(void)
 		dot = DotProduct(modelorg, pplane->normal) - pplane->dist;
 
 		/* draw the polygon */
-		if (((psurf->flags & SURF_PLANEBACK) && (dot < -BACKFACE_EPSILON)) ||
-			(!(psurf->flags & SURF_PLANEBACK) && (dot > BACKFACE_EPSILON)))
+//		if (((psurf->flags & SURF_PLANEBACK) && (dot < -BACKFACE_EPSILON)) ||
+//			(!(psurf->flags & SURF_PLANEBACK) && (dot > BACKFACE_EPSILON)))
 		{
 			if ((psurf->texinfo->flags & (SURF_TRANS33 | SURF_TRANS66)))
 			{
-				if ( !gl3state.refActive ) {
+				//if ( !gl3state.refActive ) {
 					/* add to the translucent chain */
 					psurf->texturechain = gl3_alpha_surfaces;
 					gl3_alpha_surfaces = psurf;
 
-					AddSurfToReflectionBuffer ( psurf );
-				}
+					//AddSurfToReflectionBuffer ( psurf );
+				//}
 			}
 			else if(!(psurf->flags & SURF_DRAWTURB))
 			{
@@ -1321,6 +1340,39 @@ void GL3_DrawWorld(void)
 		gl3state.numRefPlanes = 0;
 		ClearTextureChains ();
 		RecursiveWorldNode ( gl3_worldmodel->nodes );
+
+		// Find reflection surfaces in submodels
+		for (int e = 0; e < gl3_newrefdef.num_entities; e++) {
+			entity_t ent = gl3_newrefdef.entities[e];
+			if (!ent.model)
+				continue;
+
+			if (ent.model->type != mod_brush)
+				continue;
+
+//			if (!(ent.flags & RF_TRANSLUCENT))
+//				continue;
+			gl3model_t *mod = ent.model;
+			vec3_t org;
+			VectorSubtract (gl3_newrefdef.vieworg, ent.origin, org);
+			// TODO: include rotation
+
+			for (int j = 0; j < mod->nummodelsurfaces; j++) {
+				msurface_t *m = &mod->surfaces[j + mod->firstmodelsurface];
+				if (m->texinfo->flags & (SURF_TRANS33 | SURF_TRANS66)) {
+					// add to reflection list
+					float dot = DotProduct (org, m->plane->normal) - m->plane->dist;
+
+					/* draw the polygon */
+					if (((m->flags & SURF_PLANEBACK) && (dot < -BACKFACE_EPSILON)) ||
+						(!(m->flags & SURF_PLANEBACK) && (dot > BACKFACE_EPSILON)))
+					{
+						AddSurfToReflectionBuffer (m);
+					}
+				}
+			}
+		}
+
 		GL3_UpdateUBORefData ();
 
 		gl3state.instanceCount = gl3state.numRefPlanes;

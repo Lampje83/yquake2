@@ -120,7 +120,9 @@ void main() {
 				{
 					refPlaneDist[i] = dot ( gs_in[i].WorldCoord.xyz, refData[ gs_in[i].refIndex ].plane.xyz ) - refData[ gs_in[i].refIndex ].plane.w;
 
-					if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
+					if (dot (viewPos, refData[gs_in[i].refIndex].plane.xyz) - refData[gs_in[i].refIndex].plane.w < 0)
+						// we are looking at the backside of the plane
+					//if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
 						refPlaneDist[i] = -refPlaneDist[i];
 				}
 

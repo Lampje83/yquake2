@@ -65,17 +65,16 @@ CompileShader(GLenum shaderType, const char* shaderSrc, const char* shaderSrc2)
 		glGetShaderInfoLog(shader, bufLen, NULL, bufPtr);
 
 		const char* shaderTypeStr = "";
-		switch(shaderType)
-		{
-			case GL_VERTEX_SHADER:   shaderTypeStr = "Vertex"; break;
-			case GL_FRAGMENT_SHADER: shaderTypeStr = "Fragment"; break;
-			case GL_GEOMETRY_SHADER: shaderTypeStr = "Geometry"; break;
-			case GL_COMPUTE_SHADER:  shaderTypeStr = "Compute"; break;
-			case GL_TESS_CONTROL_SHADER:    shaderTypeStr = "TessControl"; break;
-			case GL_TESS_EVALUATION_SHADER: shaderTypeStr = "TessEvaluation"; break;
+		switch (shaderType) {
+		case GL_VERTEX_SHADER:   shaderTypeStr = "Vertex"; break;
+		case GL_FRAGMENT_SHADER: shaderTypeStr = "Fragment"; break;
+		case GL_GEOMETRY_SHADER: shaderTypeStr = "Geometry"; break;
+		case GL_COMPUTE_SHADER:  shaderTypeStr = "Compute"; break;
+		case GL_TESS_CONTROL_SHADER:    shaderTypeStr = "TessControl"; break;
+		case GL_TESS_EVALUATION_SHADER: shaderTypeStr = "TessEvaluation"; break;
 		}
-		eprintf("ERROR: Compiling %s Shader failed: %s\n", shaderTypeStr, bufPtr);
-		glDeleteShader(shader);
+		eprintf ("ERROR: Compiling %s Shader failed: %s\n", shaderTypeStr, bufPtr);
+		glDeleteShader (shader);
 
 		if(bufPtr != buf)  free(bufPtr);
 
@@ -484,6 +483,11 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	GLint reflLoc = glGetUniformLocation ( prog, "refl" );
 	if ( reflLoc != -1 ) {
 		glUniform1i ( reflLoc, 5 );
+	}
+
+	GLint reflDLoc = glGetUniformLocation (prog, "reflDepth");
+	if (reflDLoc != -1) {
+		glUniform1i (reflDLoc, 6);
 	}
 
 	GLint lmScalesLoc = glGetUniformLocation(prog, "lmScales");

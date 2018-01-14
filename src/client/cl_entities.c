@@ -846,6 +846,10 @@ CL_CalcViewValues(void)
 		cl.refdef.blend[i] = ps->blend[i];
 	}
 
+	cl.refdef.viewofs[0] = ps->viewoffset[0];
+	cl.refdef.viewofs[1] = ps->viewoffset[1];
+	cl.refdef.viewofs[2] = ps->viewoffset[2];
+
 	/* add the weapon */
 	CL_AddViewWeapon(ps, ops);
 }

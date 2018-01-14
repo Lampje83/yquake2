@@ -1459,6 +1459,17 @@ GL3_RenderView(refdef_t *fd)
 	GL3_DrawWorld();
 	GL3_DrawEntitiesOnList();
 	GL3_DrawParticles();
+
+	// render alpha surfaces into reflection buffers first
+	if (gl3state.instanceCount > 0)
+	{
+		gl3state.instanceCount -= 1;
+		glVertexAttribI1i (GL3_ATTRIB_REFINDEX, 0);
+		glDepthMask (0);
+		GL3_DrawAlphaSurfaces ();
+		glDepthMask (1);
+		glVertexAttribI1i (GL3_ATTRIB_REFINDEX, -1);
+	}
 	gl3state.instanceCount = 0;
 
 	GL3_DrawAlphaSurfaces();
@@ -1566,7 +1577,7 @@ GL3_RenderFrame(refdef_t *fd)
 	//glClearDepthf ( 10000 );
 
 	glClearColor ( 0.0f, 0.0f, 0.0f, 0.0f );
-	glClear ( GL_DEPTH_BUFFER_BIT );// | GL_COLOR_BUFFER_BIT );
+	glClear ( GL_DEPTH_BUFFER_BIT | (gl_clear->value ? GL_COLOR_BUFFER_BIT : 0) );
 	GL3_RenderView ( fd );
 	GL3_SetLightLevel ();
 

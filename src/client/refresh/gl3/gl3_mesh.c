@@ -683,17 +683,11 @@ GL3_DrawAliasModel(entity_t *entity)
 	}
 	
 	if ( entity->flags & RF_VIEWERMODEL ) {
-//		if ( !gl3state.refActive ) {
-			if (!memcmp (entity->oldorigin, entity->origin, sizeof (entity->origin))) {
-				// entity is stationary, we can derive view offset
-				if (entity->frame == 0) {
-					VectorSubtract (gl3_newrefdef.vieworg, entity->origin, viewofs);
-				}
-			}
-//		}
-//		else {
 		if (gl3state.instanceCount > 0) {
-			VectorSubtract (gl3_newrefdef.vieworg, viewofs, entity->origin);
+			//VectorSubtract (gl3_newrefdef.vieworg, viewofs, entity->origin);
+			entity->origin[0] = gl3_newrefdef.vieworg[0];
+			entity->origin[1] = gl3_newrefdef.vieworg[1];
+			entity->origin[2] = gl3_newrefdef.vieworg[2] - gl3_newrefdef.viewofs[2];
 			VectorCopy (entity->origin, entity->oldorigin);
 
 			entity->angles[1] = gl3_newrefdef.viewangles[1];

@@ -121,7 +121,9 @@ void main() {
 				{
 					refPlaneDist[i] = dot ( gs_in[i].WorldCoord.xyz, refData[ gs_in[i].refIndex ].plane.xyz ) - refData[ gs_in[i].refIndex ].plane.w;
 
-					if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
+					// check on which side of the plane we are
+					if (dot (viewPos, refData[gs_in[i].refIndex].plane.xyz) - refData[gs_in[i].refIndex].plane.w < 0)
+					//if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
 						refPlaneDist[i] = -refPlaneDist[i];
 				}
 

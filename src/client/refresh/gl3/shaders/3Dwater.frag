@@ -3,7 +3,7 @@
 uniform sampler2D tex;
 
 uniform	sampler2DArray refl;
-// uniform sampler2D refr;
+uniform sampler2DArray reflDepth;
 
 in VS_OUT {
 	vec2 TexCoord;
@@ -13,7 +13,7 @@ in VS_OUT {
 
 float brightness (vec3 color)
 {
-	return (color.r + color.g + color.b) / 3;
+	return (color.r + color.g + color.b);
 }
 
 void main()
@@ -33,6 +33,8 @@ void main()
 	if (alpha < 1)
 	{
 		vec3 viewang = normalize(viewPos - fs_in.WorldCoord.xyz);
+		vec2 delta = 1.0 / textureSize (tex, 0);
+
 		float dp = abs(dot(fs_in.Normal, viewang));
 
 		newalpha += (1.0 - newalpha) * pow (1 - dp, 3.0);
@@ -44,20 +46,44 @@ void main()
 		projCoord.z = 0;
 
 		vec2 df;
-		float intens = brightness (texel.rgb);
-		float intensityX1 = brightness (texture(tex, texw - vec2(0.004, 0)).rgb);
-		float intensityX2 = brightness (texture(tex, texw + vec2(0.004, 0)).rgb);
-		float intensityY1 = brightness (texture(tex, texw - vec2(0, 0.004)).rgb);
-		float intensityY2 = brightness (texture(tex, texw + vec2(0, 0.004)).rgb);
-		df.x = intensityX2 - intensityX1;
-		df.y = intensityY2 - intensityY1;
+		df.x = -brightness (texture(tex, texw + vec2(-delta.x, 0)).rgb)
+			   -brightness (texture(tex, texw + vec2(-delta.x, delta.y)).rgb) / 3
+			   -brightness (texture(tex, texw + vec2(-delta.x, -delta.y)).rgb) / 3
+			   +brightness (texture(tex, texw + vec2(delta.x, 0)).rgb)
+			   +brightness (texture(tex, texw + vec2(delta.x, delta.y)).rgb) / 3
+			   +brightness (texture(tex, texw + vec2(delta.x, -delta.y)).rgb) / 3;
+		df.y = -brightness (texture(tex, texw + vec2(0, -delta.y)).rgb)
+			   -brightness (texture(tex, texw + vec2(delta.x, -delta.y)).rgb) / 3
+			   -brightness (texture(tex, texw + vec2(-delta.x, -delta.y)).rgb) / 3
+			   +brightness (texture(tex, texw + vec2(0, delta.y)).rgb)
+			   +brightness (texture(tex, texw + vec2(delta.x, delta.y)).rgb) / 3
+			   +brightness (texture(tex, texw + vec2(-delta.x, delta.y)).rgb) / 3;
+
+		float intensityX2 = brightness (texture(tex, texw + vec2(delta.x, 0)).rgb);
+		float intensityY1 = brightness (texture(tex, texw - vec2(0, delta.y)).rgb);
+		float intensityY2 = brightness (texture(tex, texw + vec2(0, delta.y)).rgb);
+		//df.x = intensityX2 - intensityX1;
+		//df.y = intensityY2 - intensityY1;
 		//df -= vec2(0.09);
 		//df *= 0.1;
 
-		projCoord.xy += df;
-		projCoord = clamp(projCoord, 0.0, 1.0);	
+		float refldepth = 0.002 / (1.0 - texture(reflDepth, vec3(projCoord.xy, 1 + 2 * refTexture)).r);
+		refldepth -= 0.002 / (1.0 - gl_FragCoord.z);
+		refldepth = clamp(refldepth, 0.0, 0.125);
+
+		projCoord.zw = projCoord.xy;
+		projCoord.xy += df * refldepth;
+		//projCoord.xy += df * (texture (reflDepth, vec3(projCoord.xy, 1 + 2 * refTexture)).z - gl_FragCoord.z);
+		//projCoord.zw += df * (texture (reflDepth, vec3(projCoord.xy, 2 + 2 * refTexture)).z - gl_FragCoord.z);
+		float refrdepth = 0.002 / (1.0 - texture(reflDepth, vec3(projCoord.zw, 2 + 2 * refTexture)).r);
+		refrdepth -= 0.002 / (1.0 - gl_FragCoord.z);
+		refrdepth = clamp(refrdepth, 0.0, 0.125);
+
+		projCoord.zw += df * refrdepth;
+		projCoord = clamp(projCoord, 0.0, 1.0);
+
 		vec4 refltex = texture(refl, vec3(projCoord.xy, 1 + 2 * refTexture)) * newalpha;
-		vec4 refrtex = texture(refl, vec3(projCoord.xy, 2 + 2 * refTexture)) * (1 - newalpha);
+		vec4 refrtex = texture(refl, vec3(projCoord.zw, 2 + 2 * refTexture)) * (1 - newalpha);
 		texel.rgb *= vec3(1 - newalpha);
 
 		// debug
