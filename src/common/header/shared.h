@@ -487,6 +487,7 @@ typedef enum
 	/* can accelerate and turn */
 	PM_NORMAL,
 	PM_SPECTATOR,
+	PM_FLY,
 	/* no acceleration or turning */
 	PM_DEAD,
 	PM_GIB, /* different bounding box */

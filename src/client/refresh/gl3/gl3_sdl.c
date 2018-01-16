@@ -260,7 +260,7 @@ int GL3_InitContext(void* win)
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB); // TODO: only do this if gl3_debugcontext->value >= 2 ?
 
 		// TODO: the following line could control verboseness (in that case we'd get all the low prio messages)
-		// glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_ARB, 0, NULL, true);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_ARB, 0, NULL, true);
 	}
 
 	/* Window title - set here so we can display renderer name in it */
@@ -298,7 +298,7 @@ qboolean GL3_IsVsyncActive(void)
 void GL3_EndFrame(void)
 {
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-#ifdef WIN32
+#ifdef WIN32kkl
 	/*
 	SDL_SysWMinfo info;
 	SDL_GetWindowWMInfo ( window, &info );

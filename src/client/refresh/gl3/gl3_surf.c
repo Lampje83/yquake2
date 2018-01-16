@@ -202,8 +202,8 @@ void GL3_SurfInit(void)
 
 	// Setup buffer textures
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
-	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_R11F_G11F_B10F, vid.width, vid.height, 32, 0, GL_RGBA, GL_FLOAT, 0 );
-//	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_RGB, vid.width, vid.height, 32, 0, GL_RGBA, GL_BYTE, 0 );
+//	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_R11F_G11F_B10F, vid.width, vid.height, 32, 0, GL_RGBA, GL_FLOAT, 0 );
+	glTexImage3D (GL_TEXTURE_2D_ARRAY, 0, GL_RGB, vid.width, vid.height, 32, 0, GL_RGBA, GL_BYTE, 0);
 //	glTexImage3D (GL_TEXTURE_2D_ARRAY, 0, GL_RGB, 1024, 1024, 32, 0, GL_RGBA, GL_BYTE, 0);
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -255,6 +255,11 @@ void GL3_SurfShutdown(void)
 	glDeleteTextures ( 1, &gl3state.reflectTexture );
 	glDeleteTextures ( 1, &gl3state.reflectTextureDepth );
 
+	if (gl3_worldmodel) {
+		if (gl3_worldmodel->glverts) {
+			Hunk_Free (gl3_worldmodel->glverts);
+		}
+	}
 }
 
 int reflectionCount = 0;
@@ -939,7 +944,7 @@ RenderLightmappedPoly(msurface_t *surf)
 
 void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 	qboolean addPlane = true;
-	int r;
+	int r = 0;
 
 	if ( gl3state.refActive )
 		// we are in reflection mode, don't do recursive reflections (yet)
@@ -958,8 +963,6 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 			break;
 		}
 	}
-
-	surf->refIndex = r;
 
 	if ( addPlane ) {
 		// reset cull distances
@@ -990,15 +993,18 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 		if ( ( -viewvec.Y / viewvec.W ) > gl3state.refPlanes[ r ].cullDistances.Elements[ 3 ] ) gl3state.refPlanes[ r ].cullDistances.Elements[ 3 ] = min ( -viewvec.Y / viewvec.W, 1 );
 	}
 
+	gl3state.uniRefData[r].cullDistances = gl3state.refPlanes[r].cullDistances;
+
 	if ( ( gl3state.refPlanes[ r ].cullDistances.Elements[ 0 ] == -gl3state.refPlanes[ r ].cullDistances.Elements[ 2 ] ) ||
 		( gl3state.refPlanes[ r ].cullDistances.Elements[ 1 ] == -gl3state.refPlanes[ r ].cullDistances.Elements[ 3 ] ) ) {
 		// surface is completely outside of frustum, don't add
-		addPlane = false;
+		return;
 	}
-	gl3state.uniRefData[ r ].cullDistances = gl3state.refPlanes[ r ].cullDistances;
+
+	surf->refIndex = r;
 
 	if ( addPlane ) {
-		gl3state.uniRefData[ r ].flags = REFSURF_ACTIVE | ( ( surf->flags & SURF_PLANEBACK ) ? REFSURF_PLANEBACK : 0 );
+		gl3state.uniRefData[ r ].flags = REFSURF_ACTIVE | ( ( surf->flags & SURF_PLANEBACK ) ? REFSURF_PLANEBACK : 0 ) | (surf->flags & SURF_UNDERWATER);
 		gl3state.uniRefData[ r ].plane = HMM_Vec4 ( surf->plane->normal[ 0 ], surf->plane->normal[ 1 ], surf->plane->normal[ 2 ], surf->plane->dist );
 		gl3state.uniRefData[ r ].refrindex = 1.33;
 		gl3state.uniRefData[ r ].refMatrix = HMM_Householder ( gl3state.uniRefData[ r ].plane, -1 );

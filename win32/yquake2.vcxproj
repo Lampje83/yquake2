@@ -234,6 +234,12 @@
     <ClInclude Include="..\src\backends\generic\header\qal.h" />
     <ClInclude Include="..\src\backends\windows\header\resource.h" />
     <ClInclude Include="..\src\backends\windows\header\winquake.h" />
+    <ClInclude Include="..\src\client\header\client.h" />
+    <ClInclude Include="..\src\client\header\console.h" />
+    <ClInclude Include="..\src\client\header\keyboard.h" />
+    <ClInclude Include="..\src\client\header\ref.h" />
+    <ClInclude Include="..\src\client\header\screen.h" />
+    <ClInclude Include="..\src\client\header\vid.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\backends\windows\icon.rc" />

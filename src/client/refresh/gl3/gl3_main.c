@@ -200,6 +200,9 @@ GL3_Strings(void)
 	}
 	R_Printf(PRINT_ALL, "\n");
 }
+void cmd_recreate_shaders () {
+	GL3_RecreateShaders ();
+}
 
 static void
 GL3_Register(void)
@@ -329,6 +332,7 @@ GL3_Register(void)
 	gl_stereo_convergence = ri.Cvar_Get( "gl_stereo_convergence", "1", CVAR_ARCHIVE );
 #endif // 0
 
+	ri.Cmd_AddCommand ("reloadshaders", cmd_recreate_shaders);
 	ri.Cmd_AddCommand("imagelist", GL3_ImageList_f);
 	ri.Cmd_AddCommand("screenshot", GL3_ScreenShot);
 	ri.Cmd_AddCommand("modellist", GL3_Mod_Modellist_f);
@@ -932,7 +936,18 @@ GL3_DrawEntitiesOnList(void)
 			switch (currentmodel->type)
 			{
 				case mod_alias:
-					GL3_DrawAliasModel(currententity);
+					if ((currententity->flags & RF_WEAPONMODEL) && gl_lefthand->value == 3.0) {
+						gl3state.uni3DData.transProjMat4.Elements[3][0] -= 2;
+						gl_lefthand->value = 1;
+						GL3_DrawAliasModel(currententity);
+						gl3state.uni3DData.transProjMat4.Elements[3][0] += 4;
+						gl_lefthand->value = 0;
+						GL3_DrawAliasModel (currententity);
+						gl_lefthand->value = 3;
+						gl3state.uni3DData.transProjMat4.Elements[3][0] -= 2;
+					} else {
+						GL3_DrawAliasModel (currententity);
+					}
 					break;
 				case mod_brush:
 					GL3_DrawBrushModel(currententity);
@@ -1454,6 +1469,7 @@ GL3_RenderView(refdef_t *fd)
 	SetFrustum();
 	SetupGL();
 
+	glEnable (GL_CLIP_DISTANCE0);
 	gl3state.instanceCount = gl3state.numRefPlanes;
 	GL3_MarkLeafs(); /* done here so we know if we're in water */
 	GL3_DrawWorld();
@@ -1473,6 +1489,7 @@ GL3_RenderView(refdef_t *fd)
 	gl3state.instanceCount = 0;
 
 	GL3_DrawAlphaSurfaces();
+	glDisable (GL_CLIP_DISTANCE0);
 
 	// Note: R_Flash() is now GL3_Draw_Flash() and called from GL3_RenderFrame()
 

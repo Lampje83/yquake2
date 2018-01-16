@@ -313,7 +313,7 @@ PM_Friction(void)
 
 	/* apply ground friction */
 	if ((pm->groundentity && pml.groundsurface &&
-		 !(pml.groundsurface->flags & SURF_SLICK)) || (pml.ladder))
+		 !(pml.groundsurface->flags & SURF_SLICK)) || (pml.ladder) || (pm->s.pm_type == PM_FLY))
 	{
 		friction = pm_friction;
 		control = speed < pm_stopspeed ? pm_stopspeed : speed;
@@ -433,26 +433,30 @@ PM_AddCurrents(vec3_t wishvel)
 			wishvel[2] = 0;
 		}
 
+		if (pm->s.pm_type != PM_FLY) {
 		/* limit horizontal speed when on a ladder */
-		if (wishvel[0] < -25)
-		{
-			wishvel[0] = -25;
-		}
-		else if (wishvel[0] > 25)
-		{
-			wishvel[0] = 25;
-		}
+			if (wishvel[0] < -25) {
+				wishvel[0] = -25;
+			} else if (wishvel[0] > 25) {
+				wishvel[0] = 25;
+			}
 
-		if (wishvel[1] < -25)
-		{
-			wishvel[1] = -25;
-		}
-		else if (wishvel[1] > 25)
-		{
-			wishvel[1] = 25;
+			if (wishvel[1] < -25) {
+				wishvel[1] = -25;
+			} else if (wishvel[1] > 25) {
+				wishvel[1] = 25;
+			}
 		}
 	}
-
+#if 0
+	if (pm->s.pm_type == PM_FLY) {
+		if (pm->cmd.upmove > 0) {
+			wishvel[2] = 200;
+		} else if (pm->cmd.upmove < 0) {
+			wishvel[2] = -200;
+		}
+	}
+#endif
 	/* add water currents  */
 	if (pm->watertype & MASK_CURRENT)
 	{
@@ -584,20 +588,27 @@ PM_AirMove(void)
 {
 	int i;
 	vec3_t wishvel;
-	float fmove, smove;
+	float fmove, smove, umove;
 	vec3_t wishdir;
 	float wishspeed;
 	float maxspeed;
 
 	fmove = pm->cmd.forwardmove;
 	smove = pm->cmd.sidemove;
+	umove = pm->cmd.upmove;
 
-	for (i = 0; i < 2; i++)
-	{
-		wishvel[i] = pml.forward[i] * fmove + pml.right[i] * smove;
+	if (pm->s.pm_type != PM_FLY) {
+		// normal move
+		for (i = 0; i < 2; i++) {
+			wishvel[i] = pml.forward[i] * fmove + pml.right[i] * smove;
+		}
+		wishvel[2] = 0;
+	} else {
+		for (i = 0; i < 3; i++) {
+			wishvel[i] = pml.forward[i] * fmove + pml.right[i] * smove; // +pml.up[i] * umove;
+		}
+		wishvel[2] += pm->cmd.upmove;
 	}
-
-	wishvel[2] = 0;
 
 	PM_AddCurrents(wishvel);
 
@@ -613,7 +624,7 @@ PM_AirMove(void)
 		wishspeed = maxspeed;
 	}
 
-	if (pml.ladder)
+	if (pml.ladder || (pm->s.pm_type == PM_FLY))
 	{
 		PM_Accelerate(wishdir, wishspeed, pm_accelerate);
 
@@ -644,16 +655,17 @@ PM_AirMove(void)
 	else if (pm->groundentity)
 	{
 		/* walking on ground */
-		pml.velocity[2] = 0;
-		PM_Accelerate(wishdir, wishspeed, pm_accelerate);
-
-		if (pm->s.gravity > 0)
-		{
+		if (pm->s.pm_type != PM_FLY) {
 			pml.velocity[2] = 0;
 		}
-		else
-		{
-			pml.velocity[2] -= pm->s.gravity * pml.frametime;
+		PM_Accelerate(wishdir, wishspeed, pm_accelerate);
+
+		if (pm->s.pm_type != PM_FLY) {
+			if (pm->s.gravity > 0) {
+				pml.velocity[2] = 0;
+			} else {
+				pml.velocity[2] -= pm->s.gravity * pml.frametime;
+			}
 		}
 
 		if (!pml.velocity[0] && !pml.velocity[1])
@@ -666,7 +678,7 @@ PM_AirMove(void)
 	else
 	{
 		/* not on ground, so little effect on velocity */
-		if (pm_airaccelerate)
+		if (pm_airaccelerate && (pm->s.pm_type != PM_FLY))
 		{
 			PM_AirAccelerate(wishdir, wishspeed, pm_accelerate);
 		}
@@ -676,7 +688,9 @@ PM_AirMove(void)
 		}
 
 		/* add gravity */
-		pml.velocity[2] -= pm->s.gravity * pml.frametime;
+		if (pm->s.pm_type != PM_FLY) {
+			pml.velocity[2] -= pm->s.gravity * pml.frametime;
+		}
 		PM_StepSlideMove();
 	}
 }
@@ -791,6 +805,9 @@ PM_CatagorizePosition(void)
 void
 PM_CheckJump(void)
 {
+	if (pm->s.pm_type == PM_FLY)
+		return;
+
 	if (pm->s.pm_flags & PMF_TIME_LAND)
 	{
 		/* hasn't been long enough since landing to jump again */
@@ -1366,7 +1383,6 @@ Pmove(pmove_t *pmove)
 		PM_SnapPosition();
 		return;
 	}
-
 	if (pm->s.pm_type >= PM_DEAD)
 	{
 		pm->cmd.forwardmove = 0;
@@ -1432,7 +1448,7 @@ Pmove(pmove_t *pmove)
 	{
 		/* teleport pause stays exactly in place */
 	}
-	else if (pm->s.pm_flags & PMF_TIME_WATERJUMP)
+	else if ((pm->s.pm_flags & PMF_TIME_WATERJUMP) && (pm->s.pm_type != PM_FLY))
 	{
 		/* waterjump has no control, but falls */
 		pml.velocity[2] -= pm->s.gravity * pml.frametime;

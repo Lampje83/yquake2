@@ -431,6 +431,10 @@ berserk_dead(edict_t *self)
 	self->svflags |= SVF_DEADMONSTER;
 	self->nextthink = 0;
 	gi.linkentity(self);
+	if (skill->value >= 3.0) {
+		self->nextthink = level.time + 30;
+		self->think = monster_resurrect;
+	}
 }
 
 mframe_t berserk_frames_death1[] = {

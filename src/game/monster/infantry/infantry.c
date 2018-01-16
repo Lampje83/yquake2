@@ -399,6 +399,10 @@ infantry_dead(edict_t *self)
 	gi.linkentity(self);
 
 	M_FlyCheck(self);
+	if (skill->value >= 3.0) {
+		self->nextthink = level.time + 30;
+		self->think = monster_resurrect;
+	}
 }
 
 mframe_t infantry_frames_death1[] = {

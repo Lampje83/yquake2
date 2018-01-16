@@ -241,6 +241,24 @@
     <ClInclude Include="..\src\backends\windows\header\winquake.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\client\header\client.h">
+      <Filter>Client\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\header\console.h">
+      <Filter>Client\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\header\keyboard.h">
+      <Filter>Client\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\header\ref.h">
+      <Filter>Client\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\header\screen.h">
+      <Filter>Client\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\client\header\vid.h">
+      <Filter>Client\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\backends\windows\icon.rc">

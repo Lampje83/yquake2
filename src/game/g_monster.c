@@ -544,34 +544,49 @@ M_MoveFrame(edict_t *self)
 			}
 		}
 
-		if ((self->s.frame < move->firstframe) ||
-			(self->s.frame > move->lastframe))
+		if ((((self->s.frame < move->firstframe) || (self->s.frame > move->lastframe)) && move->lastframe >= move->firstframe) ||
+			(((self->s.frame > move->firstframe) || (self->s.frame < move->lastframe)) && move->lastframe < move->firstframe))
 		{
 			self->monsterinfo.aiflags &= ~AI_HOLD_FRAME;
 			self->s.frame = move->firstframe;
 		}
 		else
 		{
-			if (!(self->monsterinfo.aiflags & AI_HOLD_FRAME))
-			{
-				self->s.frame++;
+			if (!(self->monsterinfo.aiflags & AI_HOLD_FRAME)) {
+				if (move->firstframe <= move->lastframe) {
+					self->s.frame++;
 
-				if (self->s.frame > move->lastframe)
-				{
-					self->s.frame = move->firstframe;
+					if (self->s.frame > move->lastframe) {
+						self->s.frame = move->firstframe;
+					}
+				} else {
+					self->s.frame--;
+
+					if (self->s.frame < move->lastframe) {
+						self->s.frame = move->firstframe;
+					}
 				}
 			}
 		}
 	}
 
-	index = self->s.frame - move->firstframe;
+	if (move->firstframe <= move->lastframe) {
+		index = self->s.frame - move->firstframe;
+	} else {
+		index = self->s.frame - move->lastframe;
+	}
 
 	if (move->frame[index].aifunc)
 	{
 		if (!(self->monsterinfo.aiflags & AI_HOLD_FRAME))
 		{
-			move->frame[index].aifunc(self,
+			if (move->firstframe <= move->lastframe) {
+				move->frame[index].aifunc (self,
 					move->frame[index].dist * self->monsterinfo.scale);
+			} else {
+				move->frame[index].aifunc (self,
+					-move->frame[index].dist * self->monsterinfo.scale);
+			}
 		}
 		else
 		{
@@ -743,6 +758,40 @@ monster_death_use(edict_t *self)
 
 	G_UseTargets(self, self->enemy);
 }
+
+void ED_CallSpawn (edict_t *ent);
+
+void monster_respawn (edict_t *self) {
+	self->spawnflags = 0;
+	self->monsterinfo.aiflags = 0;
+	self->svflags &= ~SVF_DEADMONSTER;
+	self->target = NULL;
+	self->targetname = NULL;
+	self->combattarget = NULL;
+	self->deathtarget = NULL;
+	self->owner = self;
+	if (self->monsterinfo.currentmove) {
+		free (self->monsterinfo.currentmove);
+		self->monsterinfo.currentmove = NULL;
+	}
+	ED_CallSpawn (self);
+	self->owner = NULL;
+}
+
+void monster_resurrect (edict_t *self) {
+
+	mmove_t *monster_move_resurrect = malloc (sizeof (mmove_t));
+
+	monster_move_resurrect->firstframe = self->monsterinfo.currentmove->lastframe;
+	monster_move_resurrect->lastframe = self->monsterinfo.currentmove->firstframe;
+	monster_move_resurrect->frame = self->monsterinfo.currentmove->frame;
+	monster_move_resurrect->endfunc = monster_respawn;
+
+	self->monsterinfo.currentmove = monster_move_resurrect;
+	self->nextthink = level.time + FRAMETIME;
+	self->think = monster_think;
+}
+
 
 /* ================================================================== */
 

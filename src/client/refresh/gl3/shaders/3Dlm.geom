@@ -1,46 +1,6 @@
-#version 430 core
-
-layout (triangles) in;
-layout (triangle_strip, max_vertices = 6) out;
-
-// for UBO shared between all 3D shaders
-layout (std140) uniform uni3D
-{
-	mat4 transProj;
-	mat4 transView;
-	mat4 transModel;
-//	vec4 fluidPlane;
-//	vec4 cullDistances;
-	vec3 viewPos;
-
-	int		refTexture;
-	float scroll; // for SURF_FLOWING
-	float time;
-	float alpha;
-	float overbrightbits;
-	float particleFadeFactor;
-	uint  flags;
-	float _pad_1; // AMDs legacy windows driver needs this, otherwise uni3D has wrong size
-	float _pad_2;
-	//float _pad_3;
-};
-
-#define REFSURF_PLANEBACK	2
-
-struct refData_s {
-	mat4	refMatrix;
-	vec4	color;
-	vec4	plane;
-	vec4	cullDistances;
-	int		flags;
-	float	refrindex;
-	float	_pad_1;
-	float	_pad_2;
-};
-
-layout ( std140 ) uniform refDat {
-	refData_s refData[16];
-};
+#ifdef __INTELLISENSE__
+#include "common3d.geom"
+#endif
 
 in VS_OUT {
 	vec2		TexCoord;
@@ -60,9 +20,14 @@ out VS_OUT {
 	flat int	refIndex;
 } gs_out;
 
-int count;
-
-float refPlaneDist [6];
+void writeVertexData (int index) {
+	gs_out.LMcoord = gs_in[index].LMcoord;
+	gs_out.TexCoord = gs_in[index].TexCoord;
+	gs_out.WorldCoord = gs_in[index].WorldCoord;
+	gs_out.Normal = gs_in[index].Normal;
+	gs_out.LightFlags = gs_in[index].LightFlags;
+	gs_out.refIndex = gs_in[index].refIndex;
+}
 
 void outputPrimitive (bool negative, bool reverse) {
 	for (int j = 0; j < count; j++) {
@@ -74,12 +39,7 @@ void outputPrimitive (bool negative, bool reverse) {
 			i = j;
 		}
 
-		gs_out.LMcoord = gs_in[i].LMcoord;
-		gs_out.TexCoord = gs_in[i].TexCoord;
-		gs_out.WorldCoord = gs_in[i].WorldCoord;
-		gs_out.Normal = gs_in[i].Normal;
-		gs_out.LightFlags = gs_in[i].LightFlags;
-		gs_out.refIndex = gs_in[i].refIndex;
+		writeVertexData (i);
 
 		if (!negative) 
 		{

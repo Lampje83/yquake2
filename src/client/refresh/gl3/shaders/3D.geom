@@ -1,44 +1,6 @@
-#version 430 core
-
-layout (triangles) in;
-layout (triangle_strip, max_vertices = 6) out;
-
-// for UBO shared between all 3D shaders
-layout (std140) uniform uni3D
-{
-	mat4 transProj;
-	mat4 transView;
-	mat4 transModel;
-//	vec4 fluidPlane;
-//	vec4 cullDistances;
-	vec3 viewPos;
-
-	int		refTexture;	// which texture to draw on reflecting surface
-	float scroll; // for SURF_FLOWING
-	float time;
-	float alpha;
-	float overbrightbits;
-	float particleFadeFactor;
-	uint  flags;
-	float _pad_1; // AMDs legacy windows driver needs this, otherwise uni3D has wrong size
-	float _pad_2;
-	//float _pad_3;
-};
-
-struct refData_s {
-	mat4	refMatrix;
-	vec4	color;
-	vec4	plane;
-	vec4	cullDistances;
-	int		flags;
-	float	refrindex;
-	float	_pad_1;
-	float	_pad_2;
-};
-
-layout ( std140 ) uniform refDat {
-	refData_s	refData[16];
-};
+#ifdef __INTELLISENSE__
+#include "common3d.geom"
+#endif
 
 in VS_OUT {
 	vec2		TexCoord;
@@ -53,10 +15,6 @@ out VS_OUT {
 	vec3		Normal;
 	flat int	refIndex;
 } gs_out;
-
-int count;
-
-float refPlaneDist [6];
 
 void outputPrimitive (bool negative, bool reverse) {
 	for (int j = 0; j < count; j++) {
@@ -170,7 +128,7 @@ void main() {
 			if (dot (viewPos, refData[gs_in[i].refIndex].plane.xyz) - refData[gs_in[i].refIndex].plane.w < 0)
 			//if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
 				refPlaneDist[i] = -refPlaneDist[i];
-			if (abs(-dot ( gs_in[i].WorldCoord.xyz, refData[gs_in[i].refIndex].plane.xyz ) + refData[gs_in[i].refIndex].plane.w) < 0.1) k++;
+			if (abs(-dot ( gs_in[i].WorldCoord.xyz, refData[gs_in[i].refIndex].plane.xyz ) + refData[gs_in[i].refIndex].plane.w) < 1) k++;
 //			if (abs(newplane.w) < 0.1) k++;
 		}
 		if (k == count)

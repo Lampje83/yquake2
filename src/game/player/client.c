@@ -2247,6 +2247,9 @@ ClientThink(edict_t *ent, usercmd_t *ucmd)
 		{
 			client->ps.pmove.pm_type = PM_SPECTATOR;
 		}
+		else if (ent->movetype == MOVETYPE_FLY) {
+			client->ps.pmove.pm_type = PM_FLY;
+		}
 		else if (ent->s.modelindex != 255)
 		{
 			client->ps.pmove.pm_type = PM_GIB;

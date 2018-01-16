@@ -729,13 +729,14 @@ Cmd_RemoveCommand(char *cmd_name)
 			return;
 		}
 
-		if (!strcmp(cmd_name, cmd->name))
-		{
-			*back = cmd->next;
-			Z_Free(cmd);
-			return;
+		if (cmd->name) {
+			// TODO: find out why this is happening
+			if (!strcmp (cmd_name, cmd->name)) {
+				*back = cmd->next;
+				Z_Free (cmd);
+				return;
+			}
 		}
-
 		back = &cmd->next;
 	}
 }

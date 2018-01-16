@@ -495,6 +495,9 @@ Mod_LoadFaces(lump_t *l)
 
 	// ERIK: allocate space for gl vertices
 	loadmodel->maxglverts = loadmodel->numsurfedges * 2;
+	if (loadmodel->glverts) {
+		Hunk_Free (loadmodel->glverts);
+	}
 	loadmodel->glverts = Hunk_Alloc ( loadmodel->maxglverts * sizeof ( gl3_3D_vtx_t ) );
 	loadmodel->numglverts = 0;
 

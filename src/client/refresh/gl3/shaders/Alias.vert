@@ -1,4 +1,7 @@
 // it gets attributes and uniforms from Common3D.vert
+#ifdef __INTELLISENSE__
+#include "Common3D.vert"
+#endif
 
 out VS_OUT {
 	vec2		TexCoord;
@@ -18,5 +21,12 @@ void main()
 	vs.refIndex = refIndex + gl_InstanceID;
 
 	gl_Position = transProj * transView * worldCoord;
-	gl_ClipDistance[0] = 0.0;
+
+	float refPlaneDist;
+
+	refPlaneDist = dot (vs.WorldCoord.xyz, refData[vs.refIndex].plane.xyz) - refData[vs.refIndex].plane.w;
+	if (dot (viewPos, refData[vs.refIndex].plane.xyz)-refData[vs.refIndex].plane.w < 0)
+		//if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
+		refPlaneDist = -refPlaneDist;
+	gl_ClipDistance[0] = -refPlaneDist; // dot ( worldCoord.xyz, refData[ refIndex ].plane.xyz ) + refData[ refIndex ].plane.w;
 }

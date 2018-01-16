@@ -324,7 +324,12 @@
       <FileType>Document</FileType>
     </ClInclude>
     <None Include="..\src\client\refresh\gl3\shaders\3D.geom" />
-    <None Include="..\src\client\refresh\gl3\shaders\Alias.geom" />
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\Alias.geom">
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </ClInclude>
+    <None Include="..\src\client\refresh\gl3\shaders\Common3D.geom" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

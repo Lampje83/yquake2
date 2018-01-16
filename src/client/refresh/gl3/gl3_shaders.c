@@ -89,15 +89,18 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 {
 	int i=0;
 	GLuint shaderProgram = glCreateProgram();
-	if(shaderProgram == 0)
-	{
-		eprintf("ERROR: Couldn't create a new Shader Program!\n");
+
+	if(shaderProgram == 0) {
+		R_Printf (PRINT_ALL, "ERROR: Couldn't create a new Shader Program!\n");
 		return 0;
 	}
 
-	for(i=0; i<numShaders; ++i)
-	{
+	for(i=0; i<numShaders; ++i) {
 		glAttachShader(shaderProgram, shaders[i]);
+		int err = glGetError ();
+		if (err != GL_NO_ERROR) {
+			R_Printf (PRINT_ALL, __FUNCTION__": Error %i while attaching shader. Program #%i, shader #%i\n", err, shaderProgram, shaders[i]);
+		}
 	}
 
 	// make sure all shaders use the same attribute locations for common attributes
@@ -167,7 +170,7 @@ enum {
 };
 
 static qboolean
-initShader2D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* fragFilename)
+initShader2D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* fragFilename, const char *shaderDesc)
 {
 	GLuint shaders2D[2] = {0};
 	GLuint prog = 0;
@@ -276,12 +279,14 @@ err_cleanup:
 
 	if(prog != 0)  glDeleteProgram(prog);
 
+	R_Printf (PRINT_ALL, "WARNING: Failed to create shader program for %s!\n", shaderDesc);
+
 	return false;
 }
 
 // geometry shader is optional
 static qboolean
-initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* fragFilename, const char* geomFilename)
+initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* fragFilename, const char* geomFilename, const char* shaderDesc)
 {
 	GLuint shaders3D[3] = {0};
 	GLuint prog = 0;
@@ -290,7 +295,7 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	char*	vertSrc;
 	char*	fragSrc;
 	char*	geomSrc;
-	char*	vertCommon, *fragCommon;
+	char*	vertCommon, *fragCommon, *geomCommon;
 	int		fileSize = 0;
 
 	// load shader files
@@ -299,23 +304,29 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		R_Printf( PRINT_ALL, __FUNCTION__": Failed to load 3D common fragment shader!\n" );
 		return false;
 	}
-
-	if ( !( fileSize = ri.FS_LoadFile( "shaders/Common3D.vert", (void **) &vertCommon ) ) ) {
-		R_Printf( PRINT_ALL, __FUNCTION__": Failed to load 3D common vertex shader!\n" );
+	if ( !( fileSize = ri.FS_LoadFile( "shaders/Common3D.geom", (void **) &geomCommon ) ) ) {
+		R_Printf( PRINT_ALL, __FUNCTION__": Failed to load 3D common geometry shader!\n" );
 		ri.FS_FreeFile( fragCommon );
+		return false;
+	}
+	if (!(fileSize = ri.FS_LoadFile ("shaders/Common3D.vert", (void **) &vertCommon))) {
+		R_Printf (PRINT_ALL, __FUNCTION__": Failed to load 3D common vertex shader!\n");
+		ri.FS_FreeFile (geomCommon);
+		ri.FS_FreeFile (fragCommon);
 		return false;
 	}
 
 	if ( !( fileSize = ri.FS_LoadFile( fragFilename, (void **) &fragSrc ) ) ) {
 		R_Printf( PRINT_ALL, __FUNCTION__": Failed to load 3D fragment shader!\n" );
 		ri.FS_FreeFile( fragCommon );
+		ri.FS_FreeFile (geomCommon);
 		ri.FS_FreeFile( vertCommon );
 		return false;
 	}
-
 	if ( !( fileSize = ri.FS_LoadFile( vertFilename, (void **) &vertSrc ) ) ) {
 		R_Printf( PRINT_ALL, __FUNCTION__": Failed to load 3D vertex shader!\n" );
 		ri.FS_FreeFile( fragCommon );
+		ri.FS_FreeFile (geomCommon);
 		ri.FS_FreeFile( vertCommon );
 		ri.FS_FreeFile( fragSrc );
 		return false;
@@ -356,20 +367,18 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 				ri.FS_FreeFile ( geomSrc );
 			} else {
 				shaders3D[ 2 ] = shaders3D[ 1 ];
-				shaders3D[ 1 ] = CompileShader ( GL_GEOMETRY_SHADER, geomSrc, NULL );
+				shaders3D[ 1 ] = CompileShader ( GL_GEOMETRY_SHADER, geomCommon, geomSrc );
 			} 
 		}
 	}
 
-	if ( shaders3D[ 1 ] == 0 ) {
+	if (shaders3D[1] == 0) {
 		// Couldn't create geometry shader, so try without
-		R_Printf ( PRINT_ALL, __FUNCTION__": Failed to compile 3D geometry shader!\n" );
-		shaders3D[ 1 ] = shaders3D[ 2 ];
-		shaders3D[ 2 ] = 0;
-		prog = CreateShaderProgram ( 2, shaders3D );
-	} else {
-		prog = CreateShaderProgram ( 3, shaders3D );
+		R_Printf (PRINT_ALL, __FUNCTION__": Failed to compile 3D geometry shader!\n");
+		shaders3D[1] = shaders3D[2];
+		shaders3D[2] = 0;
 	}
+	prog = CreateShaderProgram ( shaders3D[2] != 0 ? 3 : 2, shaders3D );
 
 	if(prog == 0)
 	{
@@ -517,6 +526,7 @@ err_cleanup:
 
 	if ( prog != 0 )  glDeleteProgram ( prog );
 
+	R_Printf (PRINT_ALL, "WARNING: Failed to create shader program for %s!\n", shaderDesc);
 	return false;
 }
 
@@ -574,78 +584,26 @@ static void initUBOs(void)
 }
 
 static qboolean createShaders ( void ) {
-	if ( !initShader2D ( &gl3state.si2D, "shaders/2d.vert", "shaders/2d.frag" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for textured 2D rendering!\n" );
-		return false;
-	}
-	if ( !initShader2D ( &gl3state.si2Darray, "shaders/2d.vert", "shaders/2darray.frag" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for array-textured 2D rendering!\n" );
-		return false;
-	}
-	if ( !initShader2D ( &gl3state.si2Dcolor, "shaders/2Dcolor.vert", "shaders/2Dcolor.frag" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for color-only 2D rendering!\n" );
-		return false;
-	}
-	if ( !initShader3D ( &gl3state.si3Dlm, "shaders/3Dlmflow.vert", "shaders/3Dlm.frag", "shaders/3Dlm.geom" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for textured 3D rendering with lightmap!\n" );
-		return false;
-	}
-	if ( !initShader3D ( &gl3state.si3Dtrans, "shaders/3D.vert", "shaders/3D.frag", "shaders/3D.geom" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for rendering translucent 3D things!\n" );
-		return false;
-	}
-	if ( !initShader3D ( &gl3state.si3DcolorOnly, "shaders/3D.vert", "shaders/3Dcolor.frag", "shaders/3D.geom" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for flat-colored 3D rendering!\n" );
-		return false;
-	}
-	/*
-	if(!initShader3D(&gl3state.si3Dlm, vertexSrc3Dlm, fragmentSrc3D)) {
-		R_Printf(PRINT_ALL, "WARNING: Failed to create shader program for blending 3D lightmaps rendering!\n");
-		return false;
-	}
-	*/
-	if ( !initShader3D ( &gl3state.si3Dturb, "shaders/3D.vert", "shaders/3Dwater.frag", "shaders/3D.geom" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for water rendering!\n" );
-		return false;
-	}
-	if ( !initShader3D ( &gl3state.si3DlmFlow, "shaders/3DlmFlow.vert", "shaders/3Dlm.frag", "shaders/3Dlm.geom" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for scrolling textured 3D rendering with lightmap!\n" );
-		return false;
-	}
-	if ( !initShader3D ( &gl3state.si3DtransFlow, "shaders/3D.vert", "shaders/3D.frag", "shaders/3d.geom" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for scrolling textured translucent 3D rendering!\n" );
-		return false;
-	}
-	if ( !initShader3D ( &gl3state.si3Dsky, "shaders/3D.vert", "shaders/3Dsky.frag", "shaders/3d.geom" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for sky rendering!\n" );
-		return false;
-	}
-	if ( !initShader3D ( &gl3state.si3Dsprite, "shaders/3D.vert", "shaders/3Dsprite.frag", "shaders/3d.geom" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for sprite rendering!\n" );
-		return false;
-	}
-	if ( !initShader3D ( &gl3state.si3DspriteAlpha, "shaders/3D.vert", "shaders/3DspriteAlpha.frag", "shaders/3d.geom" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for alpha-tested sprite rendering!\n" );
-		return false;
-	}
-	if ( !initShader3D ( &gl3state.si3Dalias, "shaders/Alias.vert", "shaders/Alias.frag", "shaders/Alias.geom" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for rendering textured models!\n" );
-		return false;
-	}
-	if ( !initShader3D ( &gl3state.si3DaliasColor, "shaders/Alias.vert", "shaders/AliasColor.frag", "shaders/Alias.geom" ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for rendering flat-colored models!\n" );
-		return false;
-	}
+	if ( !initShader2D ( &gl3state.si2D,			"shaders/2d.vert",		"shaders/2d.frag",		"textured 2D rendering" ) ) { return false; }
+	if ( !initShader2D ( &gl3state.si2Darray,		"shaders/2d.vert",		"shaders/2darray.frag",	"array-textured 2D rendering" ) ) { return false; }
+	if ( !initShader2D ( &gl3state.si2Dcolor,		"shaders/2Dcolor.vert", "shaders/2Dcolor.frag",	"color-only 2D rendering" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3Dlm,			"shaders/3Dlmflow.vert","shaders/3Dlm.frag",	"shaders/3Dlm.geom", "textured 3D rendering with lightmap" ) ) { return false; }
+	if ( !initShader3D ( &gl3state.si3Dtrans,		"shaders/3D.vert",		"shaders/3D.frag",				"shaders/3D.geom",		"rendering translucent 3D things" ) ) { return false; }
+	if ( !initShader3D ( &gl3state.si3DcolorOnly,	"shaders/3D.vert",		"shaders/3Dcolor.frag",			"shaders/3D.geom",		"flat-colored 3D rendering" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3Dturb,		"shaders/3D.vert",		"shaders/3Dwater.frag",			"shaders/3D.geom",		"water rendering" ) ) { return false; }
+	if ( !initShader3D ( &gl3state.si3DlmFlow,		"shaders/3DlmFlow.vert","shaders/3Dlm.frag",			"shaders/3Dlm.geom",	"scrolling textured 3D rendering with lightmap" ) ) {	return false; }
+	if ( !initShader3D ( &gl3state.si3DtransFlow,	"shaders/3D.vert",		"shaders/3D.frag",				"shaders/3d.geom",		"scrolling textured translucent 3D rendering" ) ) { return false; }
+	if ( !initShader3D ( &gl3state.si3Dsky,			"shaders/3D.vert",		"shaders/3Dsky.frag",			"shaders/3d.geom",		"sky rendering" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3Dsprite,		"shaders/3D.vert",		"shaders/3Dsprite.frag",		"shaders/3d.geom",		"sprite rendering" ) ) { return false; }
+	if ( !initShader3D ( &gl3state.si3DspriteAlpha, "shaders/3D.vert",		"shaders/3DspriteAlpha.frag",	"shaders/3d.geom",		"alpha-tested sprite rendering" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3Dalias,		"shaders/Alias.vert",	"shaders/Alias.frag",			"shaders/Alias.geom",	"rendering textured models" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3DaliasColor,	"shaders/Alias.vert",	"shaders/AliasColor.frag",		"shaders/Alias.geom",	"flat-colored models" ) ) { return false;	}
 
 	const char* particleFrag = "shaders/Particles.frag";
 	if ( gl3_particle_square->value != 0.0f ) {
 		particleFrag = "shaders/ParticlesSquare.frag";
 	}
-
-	if ( !initShader3D ( &gl3state.siParticle, "shaders/Particles.vert", particleFrag, NULL ) ) {
-		R_Printf ( PRINT_ALL, "WARNING: Failed to create shader program for rendering particles!\n" );
-		return false;
-	}
+	if ( !initShader3D ( &gl3state.siParticle, "shaders/Particles.vert", particleFrag, NULL, "rendering particles" ) ) { return false; }
 
 	gl3state.currentShaderProgram = 0;
 

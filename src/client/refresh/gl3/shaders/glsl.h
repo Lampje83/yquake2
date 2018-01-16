@@ -38,7 +38,7 @@
 #define GENFUN3_ALL(name) GENFUN3(name) GENFUN3D(name) GENFUN3I(name) GENFUN3U(name) 
 
 
-#define in
+#define in struct
 #define out struct
 #define inout
 #define varying
