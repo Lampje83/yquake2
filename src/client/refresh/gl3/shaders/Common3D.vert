@@ -59,3 +59,13 @@ layout ( std140 ) uniform refDat {
 #ifndef __INTELLISENSE__
 };
 #endif
+
+#ifndef __INTELLISENSE__
+out gl_PerVertex {
+#endif
+    vec4 gl_Position;
+    float gl_PointSize;
+    float gl_ClipDistance[1];
+#ifndef __INTELLISENSE__
+};
+#endif

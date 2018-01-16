@@ -200,7 +200,7 @@ GL3_Strings(void)
 	}
 	R_Printf(PRINT_ALL, "\n");
 }
-void cmd_recreate_shaders () {
+void cmd_recreate_shaders (void) {
 	GL3_RecreateShaders ();
 }
 
@@ -332,11 +332,11 @@ GL3_Register(void)
 	gl_stereo_convergence = ri.Cvar_Get( "gl_stereo_convergence", "1", CVAR_ARCHIVE );
 #endif // 0
 
-	ri.Cmd_AddCommand ("reloadshaders", cmd_recreate_shaders);
 	ri.Cmd_AddCommand("imagelist", GL3_ImageList_f);
 	ri.Cmd_AddCommand("screenshot", GL3_ScreenShot);
 	ri.Cmd_AddCommand("modellist", GL3_Mod_Modellist_f);
 	ri.Cmd_AddCommand("gl_strings", GL3_Strings);
+	ri.Cmd_AddCommand ("reloadshaders", cmd_recreate_shaders);
 }
 
 /*
@@ -601,6 +601,7 @@ GL3_Shutdown(void)
 	ri.Cmd_RemoveCommand("screenshot");
 	ri.Cmd_RemoveCommand("imagelist");
 	ri.Cmd_RemoveCommand("gl_strings");
+	ri.Cmd_RemoveCommand ("reloadshaders");
 
 	// only call all these if we have an OpenGL context and the gl function pointers
 	// randomly chose one function that should always be there to test..
@@ -732,7 +733,7 @@ GL3_DrawSpriteModel(entity_t *e)
 		GL3_UpdateUBO3D();
 	}
 
-	GL3_Bind(currentmodel->skins[e->frame]->texnum);
+	GL3_Bind(currentmodel->skins[e->frame]->texnum, 0);
 
 	if (alpha == 1.0)
 	{
@@ -1603,8 +1604,7 @@ GL3_RenderFrame(refdef_t *fd)
 	//glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
 
 	//if ( gl3state.numRefPlanes > 0 && gl_reflection->value ) {
-		GL3_SelectTMU ( GL_TEXTURE0 );
-		GL3_Bind ( gl3state.reflectTexture );
+		GL3_Bind ( gl3state.reflectTexture, 0 );
 		glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
 
 		GL3_UseProgram ( gl3state.si2Darray.shaderProgram );

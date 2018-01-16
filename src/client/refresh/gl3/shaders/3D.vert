@@ -42,6 +42,6 @@ void main()
 	if (dot (viewPos, refData[vs.refIndex].plane.xyz)-refData[vs.refIndex].plane.w < 0)
 		//if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
 		refPlaneDist = -refPlaneDist;
-	gl_ClipDistance[ 0 ] = refPlaneDist; // dot ( worldCoord.xyz, refData[ refIndex ].plane.xyz ) + refData[ refIndex ].plane.w;
+	// gl_ClipDistance[ 0 ] = refPlaneDist; // dot ( worldCoord.xyz, refData[ refIndex ].plane.xyz ) + refData[ refIndex ].plane.w;
 //	}
 }

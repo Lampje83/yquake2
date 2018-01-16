@@ -452,10 +452,9 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		GLint blockSize;
 		glGetActiveUniformBlockiv ( prog, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize );
 		if ( blockSize != sizeof ( gl3UniRefData_t ) ) {
-			R_Printf ( PRINT_ALL, "WARNING: OpenGL driver disagrees with us about UBO size of 'refDat'\n" );
-			R_Printf ( PRINT_ALL, "         OpenGL says %d, we say %d\n", blockSize, ( int )sizeof ( gl3UniRefData_t ) );
-
 			if (blockSize / sizeof (gl3UniRefData_t) != floor (blockSize / sizeof (gl3UniRefData_t))) {
+				R_Printf (PRINT_ALL, "WARNING: OpenGL driver disagrees with us about UBO size of 'refDat'\n");
+				R_Printf (PRINT_ALL, "         OpenGL says %d, we say %d\n", blockSize, (int)sizeof (gl3UniRefData_t));
 				goto err_cleanup;
 			}
 		}
@@ -468,7 +467,7 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		}
 	}
 	else {
-		R_Printf ( PRINT_ALL, "WARNING: Couldn't find uniform block index 'refData_s'\n" );
+		R_Printf ( PRINT_ALL, "WARNING: Couldn't find uniform block index 'refDat' at program %s\n", shaderDesc );
 	}
 
 	// make sure texture is GL_TEXTURE0

@@ -56,3 +56,23 @@ layout (std140) uniform refDat {
 int count;
 
 float refPlaneDist[6];
+
+#ifndef __INTELLISENSE__
+in gl_PerVertex{
+#endif
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+#ifndef __INTELLISENSE__
+} gl_in[];
+#endif
+
+#ifndef __INTELLISENSE__
+out gl_PerVertex{
+#endif
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+#ifndef __INTELLISENSE__
+};
+#endif

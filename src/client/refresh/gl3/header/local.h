@@ -226,7 +226,7 @@ typedef struct
 	// most surfaces only have one really and the remaining for are filled with dummy data
 	GLuint lightmap_textureIDs[MAX_LIGHTMAPS][MAX_LIGHTMAPS_PER_SURFACE]; // instead of lightmap_textures+i use lightmap_textureIDs[i]
 
-	GLuint currenttexture; // bound to GL_TEXTURE0
+	GLuint currenttexture[128]; // bound to GL_TEXTURE0 + index
 	int currentlightmap; // lightmap_textureIDs[currentlightmap] bound to GL_TEXTURE1
 	GLuint currenttmu; // GL_TEXTURE0 or GL_TEXTURE1
 
@@ -467,7 +467,7 @@ GL3_SelectTMU(GLenum tmu)
 }
 
 extern void GL3_TextureMode(char *string);
-extern void GL3_Bind(GLuint texnum);
+extern void GL3_Bind(GLuint texnum, GLuint texunit);
 extern void GL3_BindLightmap(int lightmapnum);
 extern gl3image_t *GL3_LoadPic(char *name, byte *pic, int width, int realwidth,
                                int height, int realheight, imagetype_t type, int bits);
@@ -476,6 +476,7 @@ extern gl3image_t *GL3_RegisterSkin(char *name);
 extern void GL3_ShutdownImages(void);
 extern void GL3_FreeUnusedImages(void);
 extern void GL3_ImageList_f(void);
+extern void cmd_recreate_shaders (void);
 
 // gl3_light.c
 extern void GL3_MarkLights(dlight_t *light, int bit, mnode_t *node);

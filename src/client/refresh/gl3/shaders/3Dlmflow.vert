@@ -24,5 +24,5 @@ void main()
 	vs.refIndex = refIndex + gl_InstanceID;
 
 	gl_Position = transProj * transView * worldCoord;
-	gl_ClipDistance[0] = 0.0;
+	// gl_ClipDistance[0] = 0.0;
 }

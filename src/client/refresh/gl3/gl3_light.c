@@ -154,7 +154,7 @@ void GL3_RenderShadows(void)
 	// Create the depth buffer
 	if (!m_depth) {
 		glGenTextures(1, &m_depth);
-		glBindTexture(GL_TEXTURE_2D, m_depth);
+		GL3_Bind ( m_depth, 0 );
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, SHADOWMAPSIZE, SHADOWMAPSIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -162,13 +162,14 @@ void GL3_RenderShadows(void)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}
 	else {
-		glBindTexture(GL_TEXTURE_2D, m_depth);
+		GL3_Bind ( m_depth, 0 );
 	}
 
 	// Create the cube map
 	if (!m_shadowMap) {
 		glGenTextures(1, &m_shadowMap);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, m_shadowMap);
+		// TODO: GL_TEXTURE_CUBE_MAP
+		GL3_Bind (m_shadowMap, 0);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -181,7 +182,8 @@ void GL3_RenderShadows(void)
 		}
 	}
 	else {
-		glBindTexture(GL_TEXTURE_CUBE_MAP, m_shadowMap);
+		// TODO: GL_TEXTURE_CUBE_MAP
+		GL3_Bind ( m_shadowMap, 0 );
 	}
 
 	// Setup depth frame buffer
