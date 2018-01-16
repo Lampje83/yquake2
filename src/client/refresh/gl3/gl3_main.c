@@ -601,7 +601,7 @@ GL3_Shutdown(void)
 	ri.Cmd_RemoveCommand("screenshot");
 	ri.Cmd_RemoveCommand("imagelist");
 	ri.Cmd_RemoveCommand("gl_strings");
-
+	ri.Cmd_RemoveCommand ("reloadshaders");
 	// only call all these if we have an OpenGL context and the gl function pointers
 	// randomly chose one function that should always be there to test..
 	if(glDeleteBuffers != NULL)
@@ -732,7 +732,7 @@ GL3_DrawSpriteModel(entity_t *e)
 		GL3_UpdateUBO3D();
 	}
 
-	GL3_Bind(currentmodel->skins[e->frame]->texnum);
+	GL3_Bind(GL_TEXTURE_2D, 0, currentmodel->skins[e->frame]->texnum);
 
 	if (alpha == 1.0)
 	{
@@ -1603,9 +1603,7 @@ GL3_RenderFrame(refdef_t *fd)
 	//glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
 
 	//if ( gl3state.numRefPlanes > 0 && gl_reflection->value ) {
-		GL3_SelectTMU ( GL_TEXTURE0 );
-		GL3_Bind ( gl3state.reflectTexture );
-		glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
+		GL3_Bind (GL_TEXTURE_2D_ARRAY, 0, gl3state.reflectTexture );
 
 		GL3_UseProgram ( gl3state.si2Darray.shaderProgram );
 		GL3_DrawTexture ( 0, vid.height, vid.width, -vid.height );

@@ -893,7 +893,7 @@ GL3_DrawAliasModel(entity_t *entity)
 		skin = gl3_notexture; /* fallback... */
 	}
 
-	GL3_Bind(skin->texnum);
+	GL3_Bind(GL_TEXTURE_2D, 0, skin->texnum);
 
 	if (entity->flags & RF_TRANSLUCENT)
 	{

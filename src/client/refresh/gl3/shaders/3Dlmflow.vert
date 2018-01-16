@@ -1,4 +1,7 @@
-// it gets attributes and uniforms from vertexCommon3D
+// it gets attributes and uniforms from Common3D.vert
+#ifdef __INTELLISENSE__
+#include "Common3D.vert"
+#endif
 
 out VS_OUT {
 	vec2		TexCoord;

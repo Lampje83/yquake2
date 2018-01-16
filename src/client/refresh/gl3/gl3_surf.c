@@ -571,7 +571,7 @@ RenderBrushPoly(msurface_t *fa)
 
 	if (fa->flags & SURF_DRAWTURB)
 	{
-		GL3_Bind(image->texnum);
+		GL3_Bind(GL_TEXTURE_2D, 0, image->texnum);
 
 		GL3_EmitWaterPolys(fa);
 
@@ -579,7 +579,7 @@ RenderBrushPoly(msurface_t *fa)
 	}
 	else
 	{
-		GL3_Bind(image->texnum);
+		GL3_Bind(GL_TEXTURE_2D, 0, image->texnum);
 	}
 
 	hmm_vec4 lmScales[MAX_LIGHTMAPS_PER_SURFACE] = {0};
@@ -710,40 +710,25 @@ void GL3_DrawAlphaSurfaces ( void ) {
 	for ( s = gl3_alpha_surfaces; s != NULL; s = s->texturechain ) {
 
 		if (s->refIndex >= 0) {
-			GL3_SelectTMU (GL_TEXTURE5);
-			glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
-			GL3_SelectTMU (GL_TEXTURE6);
-			glBindTexture (GL_TEXTURE_2D_ARRAY, gl3state.reflectTextureDepth);
+			GL3_Bind ( GL_TEXTURE_2D_ARRAY, 5, gl3state.reflectTexture );
+			GL3_Bind (GL_TEXTURE_2D_ARRAY, 6, gl3state.reflectTextureDepth);
 #ifdef DEBUGREFL
 			refsurfcount[ s->refIndex ]++;
 #endif			
 			gl3state.uni3DData.refTexture = s->refIndex;
 			if ( ( ( s->flags & SURF_PLANEBACK ) == ( gl3state.refPlanes[ s->refIndex ].planeback ? SURF_PLANEBACK : 0 ) ) &&
 				( gl_reflection->value )
-				// && !gl3state.refActive
 				) {
 				int refp = s->refIndex;
-//				if ( ( gl3state.refPlanes[ refp ].cullDistances.Elements[ 0 ] != -gl3state.refPlanes[ refp ].cullDistances.Elements[ 2 ] ) &&
-//					( gl3state.refPlanes[ refp ].cullDistances.Elements[ 1 ] != -gl3state.refPlanes[ refp ].cullDistances.Elements[ 3 ] ) )
-					// reflection surfaces fall completely outside frustum
-				{
-
-					// Do reflection
-//					GL3_RenderReflection ( refp );
-				}
 			}
 		} else {
 			gl3state.uni3DData.refTexture = -1;
 
-			GL3_SelectTMU (GL_TEXTURE5);
-			glBindTexture (GL_TEXTURE_2D_ARRAY, 0);
-			GL3_SelectTMU (GL_TEXTURE6);
-			glBindTexture (GL_TEXTURE_2D_ARRAY, 0);
-			//glBindTexture ( GL_TEXTURE_2D_ARRAY, 0 );
+			GL3_Bind (GL_TEXTURE_2D_ARRAY, 5, 0);
+			GL3_Bind (GL_TEXTURE_2D_ARRAY, 6, 0);
 		}
 
-		GL3_SelectTMU ( GL_TEXTURE0 );
-		GL3_Bind ( s->texinfo->image->texnum );
+		GL3_Bind (GL_TEXTURE_2D, 0, s->texinfo->image->texnum );
 		c_brush_polys++;
 		float alpha = 1.0f;
 		if ( s->texinfo->flags & SURF_TRANS33 ) {
@@ -926,7 +911,7 @@ RenderLightmappedPoly(msurface_t *surf)
 
 	c_brush_polys++;
 
-	GL3_Bind(image->texnum);
+	GL3_Bind(GL_TEXTURE_2D, 0, image->texnum);
 	GL3_BindLightmap(surf->lightmaptexturenum);
 
 	if (surf->texinfo->flags & SURF_FLOWING)
@@ -1100,7 +1085,7 @@ GL3_DrawBrushModel(entity_t *e)
 	}
 
 	currententity = e;
-	gl3state.currenttexture = -1;
+	gl3state.currenttexture[0] = -1;
 
 	if ( e->angles[ 0 ] || e->angles[ 1 ] || e->angles[ 2 ] ) {
 		rotated = true;
@@ -1337,7 +1322,7 @@ void GL3_DrawWorld(void)
 	ent.frame = (int)(gl3_newrefdef.time * 2);
 	currententity = &ent;
 
-	gl3state.currenttexture = -1;
+	gl3state.currenttexture[0] = -1;
 	glEnable ( GL_PRIMITIVE_RESTART_FIXED_INDEX );
 
 	if ( !gl3state.refActive ) {

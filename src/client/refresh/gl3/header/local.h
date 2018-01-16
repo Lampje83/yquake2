@@ -212,6 +212,8 @@ typedef struct gl3UniRefdata_s {
 	int			padding[ 2 ];
 } gl3UniRefData_t;
 
+#define MAX_TEXTURE_UNITS 64
+
 typedef struct
 {
 	// TODO: what of this do we need?
@@ -226,7 +228,8 @@ typedef struct
 	// most surfaces only have one really and the remaining for are filled with dummy data
 	GLuint lightmap_textureIDs[MAX_LIGHTMAPS][MAX_LIGHTMAPS_PER_SURFACE]; // instead of lightmap_textures+i use lightmap_textureIDs[i]
 
-	GLuint currenttexture; // bound to GL_TEXTURE0
+	GLenum currenttarget[MAX_TEXTURE_UNITS];
+	GLuint currenttexture[MAX_TEXTURE_UNITS]; // bound to GL_TEXTURE0
 	int currentlightmap; // lightmap_textureIDs[currentlightmap] bound to GL_TEXTURE1
 	GLuint currenttmu; // GL_TEXTURE0 or GL_TEXTURE1
 
@@ -467,7 +470,7 @@ GL3_SelectTMU(GLenum tmu)
 }
 
 extern void GL3_TextureMode(char *string);
-extern void GL3_Bind(GLuint texnum);
+extern void GL3_Bind(GLenum target, GLuint texunit, GLuint texnum);
 extern void GL3_BindLightmap(int lightmapnum);
 extern gl3image_t *GL3_LoadPic(char *name, byte *pic, int width, int realwidth,
                                int height, int realheight, imagetype_t type, int bits);

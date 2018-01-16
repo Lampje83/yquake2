@@ -53,6 +53,18 @@ layout (std140) uniform refDat {
 };
 #endif
 
+in gl_PerVertex {
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+} gl_in[];
+
+out gl_PerVertex {
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+};
+
 int count;
 
 float refPlaneDist[6];
