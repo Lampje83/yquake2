@@ -69,3 +69,7 @@ out gl_PerVertex {
 #ifndef __INTELLISENSE__
 };
 #endif
+
+float distToPlane (vec3 point, vec4 plane) {
+	return  dot (point, plane.xyz) - plane.w;
+}

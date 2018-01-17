@@ -71,6 +71,9 @@ out gl_PerVertex {
 int count;
 
 float refPlaneDist[6];
+
+void writeVertexData (int index);
+
 /*
 mat4 rotationMatrix (vec3 axis, float angle) {
 	axis = normalize (axis);
