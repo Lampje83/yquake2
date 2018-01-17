@@ -263,7 +263,7 @@ typedef struct
 	// NOTE: make sure siParticle is always the last shaderInfo (or adapt GL3_ShutdownShaders())
 	gl3ShaderInfo_t siParticle; // for particles. surprising, right?
 
-	GLuint vao3D, vbo3D; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
+	GLuint vao3D, vbo3D, ebo3D; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
 	GLuint vboRefData;					// for reflection matrices
 	GLuint vao3Dtrans, vbo3Dtrans; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
 	GLuint vaoAlias, vboAlias, eboAlias; // for models, using 9 floats as (x,y,z, s,t, r,g,b,a)

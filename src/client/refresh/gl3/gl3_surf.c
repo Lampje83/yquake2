@@ -160,7 +160,8 @@ void GL3_SurfInit(void)
 	qglVertexAttribIPointer ( GL3_ATTRIB_REFINDEX, 1, GL_INT, 0, 0 );
 #endif
 
-	glGenBuffers(1, &gl3state.eboAlias);
+	glGenBuffers (1, &gl3state.eboAlias);
+	glGenBuffers (1, &gl3state.ebo3D);
 
 	// init VAO and VBO for particle vertexdata: 9 floats
 	// (X,Y,Z), (point_size,distace_to_camera), (R,G,B,A)
@@ -233,6 +234,8 @@ void GL3_SurfInit(void)
 
 void GL3_SurfShutdown(void)
 {
+	glDeleteBuffers (1, &gl3state.ebo3D);
+	gl3state.ebo3D = 0;
 	glDeleteBuffers ( 1, &gl3state.vbo3D );
 	gl3state.vbo3D = 0;
 	glDeleteVertexArrays ( 1, &gl3state.vao3D );
@@ -308,7 +311,9 @@ void GL_DrawElements ( void ) {
 		GL3_BindVBO ( gl3state.vbo3D );
 		//glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*gl3_worldmodel->numglverts, gl3_worldmodel->glverts, GL_STREAM_DRAW );
 
-		glDrawElementsInstanced ( GL_TRIANGLE_FAN, numelements, GL_UNSIGNED_INT, elementlist, gl3state.instanceCount + 1);
+		GL3_BindEBO (gl3state.ebo3D);
+		glBufferData (GL_ELEMENT_ARRAY_BUFFER, numelements * sizeof (GLuint), elementlist, GL_STREAM_DRAW);
+		glDrawElementsInstanced ( GL_TRIANGLE_FAN, numelements, GL_UNSIGNED_INT, NULL, gl3state.instanceCount + 1);
 		numelements = 0;
 	}
 }

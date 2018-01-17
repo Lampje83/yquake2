@@ -8,6 +8,7 @@ out VS_OUT {
 	vec2		TexCoord;
 	vec3		WorldCoord;
 	vec3		Normal;
+	float		refPlaneDist;
 	flat int	refIndex;
 } vs;
 
@@ -24,6 +25,7 @@ void main()
 	vec4 worldNormal = transModel * vec4 ( normal, 0.0f );
 	vs.Normal = normalize ( worldNormal.xyz );
 	vs.refIndex = refIndex + gl_InstanceID;
+	vs.refPlaneDist = dot (vs.WorldCoord.xyz, refData[refIndex].plane.xyz) - refData[refIndex].plane.w;
 
 /*	if ( vs.refIndex >= 0 ) {
 		//worldCoord = refMatrix * worldCoord;
