@@ -9,6 +9,7 @@ out VS_OUT {
 	vec3		WorldCoord;
 	vec3		Normal;
 	float		refPlaneDist;
+	flat uint	SurfFlags;
 	flat int	refIndex;
 } vs;
 
@@ -25,25 +26,17 @@ void main()
 	vec4 worldNormal = transModel * vec4 ( normal, 0.0f );
 	vs.Normal = normalize ( worldNormal.xyz );
 	vs.refIndex = refIndex + gl_InstanceID;
-	vs.refPlaneDist = dot (vs.WorldCoord.xyz, refData[refIndex].plane.xyz) - refData[refIndex].plane.w;
-
-/*	if ( vs.refIndex >= 0 ) {
-		//worldCoord = refMatrix * worldCoord;
-		//vs.WorldCoord = worldCoord.xyz;
-		gl_Position = transProj * transView * worldCoord;
-		gl_ClipDistance[ 0 ] = dot ( worldCoord.xyz, refData[ refIndex ].plane.xyz ) - refData[ refIndex ].plane.w;
-		if ( ( refData[ refIndex ].flags & REFSURF_PLANEBACK ) != 0 ) {
-			gl_ClipDistance[ 0 ] = -gl_ClipDistance[ 0 ];
-		}
-
-	} else {
-*/		gl_Position = transProj * transView * vec4(vs.WorldCoord, 1.0);
+	gl_Position = transProj * transView * vec4(vs.WorldCoord, 1.0);
 	float refPlaneDist;
 
-	refPlaneDist = dot (vs.WorldCoord.xyz, refData[vs.refIndex].plane.xyz)-refData[vs.refIndex].plane.w;
-	if (dot (viewPos, refData[vs.refIndex].plane.xyz)-refData[vs.refIndex].plane.w < 0)
-		//if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
-		refPlaneDist = -refPlaneDist;
-	gl_ClipDistance[ 0 ] = refPlaneDist; // dot ( worldCoord.xyz, refData[ refIndex ].plane.xyz ) + refData[ refIndex ].plane.w;
-//	}
+	vec4 plane = refData[refIndex + gl_InstanceID].plane;
+	if (distToPlane (viewPos, plane) < 0) {
+		vs.refPlaneDist = -distToPlane (vs.WorldCoord.xyz, plane);
+		vs.SurfFlags = surfFlags | REFSURF_PLANEBACK;
+	} else {
+		vs.refPlaneDist = distToPlane (vs.WorldCoord.xyz, plane);
+		vs.SurfFlags = surfFlags & (~REFSURF_PLANEBACK);
+	}
+	gl_Position = transProj * transView * vec4(vs.WorldCoord, 1);
+	gl_ClipDistance[0] = 0.0;
 }

@@ -53,7 +53,7 @@ void outputPrimitive (bool clip, bool reverse) {
 		}
 		else
 		{
-			if ((gs_in[i].refIndex >= 0) && reverse)
+			if (reverse)
 			{
 				gl_ClipDistance[0] = gs_in[i].refPlaneDist;
 				gl_Position = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4(gs_in[i].WorldCoord, 1.0);
@@ -73,8 +73,6 @@ void main() {
 	int i, j, k;
 	bool reflectionActive = gs_in[0].refIndex >= 0;
 
-	count = gl_in.length ();
-
 	if (reflectionActive) {
 		// perform frustum culling
 		for (j = 0; j < 5; j++) {
@@ -88,23 +86,22 @@ void main() {
 					// test for view culling
 					if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[gs_in[i].refIndex].cullDistances[j] * pos.w)) k++;
 				} else {
-					//if ((dot ( pos.xyz, refData[gs_in[i].refIndex].plane.xyz ) - refData[gs_in[i].refIndex].plane.w) < 0) k++;
-					if (refPlaneDist[i] < 0) k++;
+					if (gs_in[i].refPlaneDist < 0) k++;
 				}
 			}
 			if (j < 4) {
-				if (k == count)
+				if (k == gl_in.length ())
 					// discard
 					return;
 			}
 		}
 
-		if (k <= count) {
+		if (k < gl_in.length ()) {
 			// output reflected triangle
 			gl_Layer = 1 + gs_in[0].refIndex * 2;
 			outputPrimitive (true, true);
 		}
-		if (k >= 0) {
+		if (k > 0) {
 			// output refracted triangle
 			gl_Layer = 2 + gs_in[0].refIndex * 2;
 			outputPrimitive (true, false);

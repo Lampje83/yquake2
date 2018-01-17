@@ -210,6 +210,9 @@
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3D.vert">
       <Filter>Shader Files\Brush</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\Common.glsl">
+      <Filter>Shader Files\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\client\refresh\gl3\shaders\2d.frag">

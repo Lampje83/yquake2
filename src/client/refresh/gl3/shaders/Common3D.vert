@@ -1,4 +1,4 @@
-#version 430 core
+//#version 430 core
 #ifdef __INTELLISENSE__
 #include "glsl.h"
 #endif
@@ -69,7 +69,3 @@ out gl_PerVertex {
 #ifndef __INTELLISENSE__
 };
 #endif
-
-float distToPlane (vec3 point, vec4 plane) {
-	return  dot (point, plane.xyz) - plane.w;
-}

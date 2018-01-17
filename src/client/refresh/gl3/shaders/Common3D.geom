@@ -1,4 +1,4 @@
-#version 430 core
+//#version 430 core
 #ifdef __INTELLISENSE__
 #include "glsl.h"
 #endif

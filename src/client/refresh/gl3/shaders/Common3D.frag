@@ -1,11 +1,12 @@
-#version 430 core
+//#version 430 core
 #ifdef __INTELLISENSE__
 #include "glsl.h"
 #endif
 
-#define SURF_FLOWING	0x40
-#define SURF_WARP		0x08
-#define SURF_UNDERWATER	128
+#define SURF_FLOWING		0x40
+#define SURF_WARP			0x08
+#define SURF_UNDERWATER		128
+#define REFSURF_PLANEBACK	2
 
 layout (location = 0) out vec4 outColor;
 

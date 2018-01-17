@@ -1,4 +1,6 @@
-#version 150
+#ifdef __INTELLISENSE__
+#include "glsl.h"
+#endif
 
 // for UBO shared between all shaders (incl. 2D)
 layout (std140) uniform uniCommon
