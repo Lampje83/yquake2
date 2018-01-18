@@ -1255,8 +1255,7 @@ RecursiveWorldNode(mnode_t *node)
 			continue;
 		}
 
-		if ((surf->flags & SURF_PLANEBACK) != sidebit)
-		{
+		if ((surf->flags & SURF_PLANEBACK) != sidebit) {
 			continue; /* wrong side */
 		}
 

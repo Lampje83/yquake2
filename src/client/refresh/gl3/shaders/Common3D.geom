@@ -1,6 +1,7 @@
-#version 430 core
+//#version 430 core
 #ifdef __INTELLISENSE__
 #include "glsl.h"
+#include "Common.glsl"
 #endif
 
 layout (triangles) in;
@@ -71,6 +72,39 @@ out gl_PerVertex {
 int count;
 
 float refPlaneDist[6];
+
+void writeVertexData (int index);
+
+float cosToSin (float value) {
+	return sqrt (1 - value * value);
+}
+vec4 findRefractedPos (vec3 viewpos, vec3 worldpos, refData_s plane) {
+	vec3 dir = normalize (worldpos - viewpos);			// original viewing direction
+	float dist = distToPlane (viewpos, plane.plane);	// distance from view to plane
+	vec3 planePos = viewpos + dir * abs(dist);				// point where original view ray intersects with the plane
+	
+	if (abs (dot (dir, plane.plane.xyz)) > 0.99) {
+		// perpendicular to plane, refraction is negliable
+		return worldpos;
+	}
+
+	bool outsideFluid = (plane.plane.z > 0) ^^ (dist > 0);
+	vec3 newPlanePos = planePos;
+	float sinview, sinworld;
+	float worldDist = distToPlane (worldpos, plane.plane);
+	float moveLeft;
+	vec3 moveVec = normalize (viewpos - plane.plane.xyz * dist - planePos);
+	do {
+		vec3 moveLeft = worldpos - plane.plane.xyz * worldDist;
+		newPlanePos += (1 - (1 / plane.refrindex));
+		sinview = cosToSin(abs(dot (normalize (viewpos - newPlanePos), normalize (plane.plane.xyz))));
+		sinworld = cosToSin(abs(dot (normalize (newPlanePos - worldpos), normalize (plane.plane.xyz))));
+
+	} while (abs(sinview * plane.refrindex - sinworld) > 0.01);
+
+	return worldpos;
+}
+
 /*
 mat4 rotationMatrix (vec3 axis, float angle) {
 	axis = normalize (axis);

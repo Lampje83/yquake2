@@ -1,4 +1,4 @@
-#version 430 core
+//#version 430 core
 #ifdef __INTELLISENSE__
 #include "glsl.h"
 #endif
@@ -11,9 +11,6 @@ in vec3 normal;     // GL3_ATTRIB_NORMAL
 in uint lightFlags; // GL3_ATTRIB_LIGHTFLAGS
 in uint surfFlags;	// GL3_ATTRIB_SURFFLAGS
 in int  refIndex;	// GL3_ATTRIB_REFINDEX
-
-#define SURF_FLOWING	0x40
-#define SURF_WARP		0x08
 
 // for UBO shared between all 3D shaders
 #ifndef __INTELLISENSE__

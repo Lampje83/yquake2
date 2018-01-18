@@ -329,6 +329,9 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
     </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\Common.glsl">
+      <FileType>Document</FileType>
+    </ClInclude>
     <None Include="..\src\client\refresh\gl3\shaders\Common3D.geom" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

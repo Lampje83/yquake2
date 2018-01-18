@@ -7,6 +7,7 @@ in VS_OUT {
 	vec3		WorldCoord;
 	vec3		Normal;
 	float		refPlaneDist;
+	flat uint	SurfFlags;
 	flat int	refIndex;
 } gs_in[];
 
@@ -14,47 +15,45 @@ out VS_OUT {
 	vec2		TexCoord;
 	vec3		WorldCoord;
 	vec3		Normal;
+	flat uint	SurfFlags;
 	flat int	refIndex;
 } gs_out;
 
-void outputPrimitive (bool negative, bool reverse) {
-	for (int j = 0; j < count; j++) {
+void writeVertexData (int index) {
+	gs_out.TexCoord = gs_in[index].TexCoord;
+	gs_out.WorldCoord = gs_in[index].WorldCoord;
+	gs_out.Normal = gs_in[index].Normal;
+	gs_out.refIndex = gs_in[index].refIndex;
+	gs_out.SurfFlags = gs_in[index].SurfFlags;
+}
+
+void outputPrimitive (bool clip, bool reverse) {
+	for (int j = 0; j < gl_in.length (); j++) {
 		int i;
 		if (reverse) {
 			// reverse winding. Needed when drawing reflected triangles, for proper culling
-			i = count - 1 - j;
+			i = gl_in.length () - 1 - j;
 		} else {
 			i = j;
 		}
 
-		gs_out.TexCoord = gs_in[i].TexCoord;
-		gs_out.WorldCoord = gs_in[i].WorldCoord;
-		gs_out.Normal = gs_in[i].Normal;
-		gs_out.refIndex = gs_in[i].refIndex;
+		writeVertexData (i);
 
-		gl_Position = gl_in[i].gl_Position;
-
-		if (!negative) 
-		{
-			gl_ClipDistance[0] = 0.0; //gl_in[i].gl_ClipDistance[0];
+		if (!clip) {
+			gl_ClipDistance[0] = 0.0;
 			gl_Position = gl_in[i].gl_Position;
-		}
-		else
-		{
-			if ((gs_in[i].refIndex >= 0) && reverse)
-			{
-				gl_ClipDistance[0] = refPlaneDist[i];
-				gl_Position = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4(gs_in[i].WorldCoord, 1.0);
-			}
-			else
-			{
-				gl_ClipDistance[0] = -refPlaneDist[i];
+		} else {
+			if ((gs_in[i].refIndex >= 0) && reverse) {
+				gl_ClipDistance[0] = gs_in[i].refPlaneDist;
+				gl_Position = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4 (gs_in[i].WorldCoord, 1.0);
+			} else {
+				gl_ClipDistance[0] = -gs_in[i].refPlaneDist;
 				gl_Position = gl_in[i].gl_Position;
 			}
 		}
-		EmitVertex();
+		EmitVertex ();
 	}
-	EndPrimitive();
+	EndPrimitive ();
 }
 
 vec4 transformPlane (vec4 plane, mat4 mat)
@@ -124,18 +123,23 @@ void main() {
 */
 	if (reflectionActive)
 	{
-		for (i = 0; i < count; i++) {
+		k = 0;
+		for (i = 0; i < gl_in.length (); i++) {
+/*
 			refPlaneDist[i] = dot (gs_in[i].WorldCoord.xyz, refData[gs_in[i].refIndex].plane.xyz) - refData[gs_in[i].refIndex].plane.w;
 			if (dot (viewPos, refData[gs_in[i].refIndex].plane.xyz) - refData[gs_in[i].refIndex].plane.w < 0)
 			//if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
 				refPlaneDist[i] = -refPlaneDist[i];
-			if (abs(-dot (gs_in[i].WorldCoord.xyz, refData[gs_in[i].refIndex].plane.xyz) + refData[gs_in[i].refIndex].plane.w) < 1) k++;
+*/
+			// is point on plane?
+			if (abs(gs_in[i].refPlaneDist) < 0.1) k++;
 //			if (abs(newplane.w) < 0.1) k++;
 		}
-		if (k == count)
+
+		if (k == gl_in.length ())
 			// discard
 			return;
-		if (k <= count) {
+		if (k <= gl_in.length ()) {
 			// output reflected triangle
 			gl_Layer = 1 + gs_in[0].refIndex * 2;
 			outputPrimitive (true, true);

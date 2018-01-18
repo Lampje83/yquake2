@@ -30,53 +30,64 @@
 // TODO: remove eprintf() usage
 #define eprintf(...)  R_Printf(PRINT_ALL, __VA_ARGS__)
 
+const char* commonSrc;
 
 static GLuint
-CompileShader(GLenum shaderType, const char* shaderSrc, const char* shaderSrc2)
-{
-	GLuint shader = glCreateShader(shaderType);
+CompileShader (GLenum shaderType, const char* shaderSrc, const char* shaderSrc2) {
+	GLuint shader = glCreateShader (shaderType);
 
-	const char* sources[2] = { shaderSrc, shaderSrc2 };
-	int numSources = shaderSrc2 != NULL ? 2 : 1;
-
-	glShaderSource(shader, numSources, sources, NULL);
-	glCompileShader(shader);
-	GLint status;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-	if(status != GL_TRUE)
-	{
-		char buf[2048];
-		char* bufPtr = buf;
-		int bufLen = sizeof(buf);
-		GLint infoLogLength;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
-		if(infoLogLength >= bufLen)
-		{
-			bufPtr = malloc(infoLogLength+1);
-			bufLen = infoLogLength+1;
-			if(bufPtr == NULL)
-			{
-				bufPtr = buf;
-				bufLen = sizeof(buf);
-				eprintf("WARN: In CompileShader(), malloc(%d) failed!\n", infoLogLength+1);
-			}
+	if (commonSrc == NULL) {
+		int fileSize = ri.FS_LoadFile ("shaders/Common.glsl", (void **) &commonSrc);
+		if (!fileSize || commonSrc == NULL) {
+			commonSrc = NULL;
+			R_Printf (PRINT_ALL, "WARNING: Failed to load common shader library!\n");
 		}
+	}
 
-		glGetShaderInfoLog(shader, bufLen, NULL, bufPtr);
+	const char* sources[3] = { commonSrc, shaderSrc, shaderSrc2 };
+	int numSources = shaderSrc2 != NULL ? 3 : 2;
 
-		const char* shaderTypeStr = "";
-		switch (shaderType) {
+	if (commonSrc != NULL) {
+		glShaderSource (shader, numSources, sources, NULL);
+	} else {
+		// no common shader file found
+		glShaderSource (shader, numSources - 1, sources + 1, NULL);
+	}
+	glCompileShader (shader);
+	GLint status;
+	glGetShaderiv (shader, GL_COMPILE_STATUS, &status);
+
+	char buf[2048];
+	char* bufPtr = buf;
+	int bufLen = sizeof (buf);
+	GLint infoLogLength;
+	glGetShaderiv (shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+	if (infoLogLength >= bufLen) {
+		bufPtr = malloc (infoLogLength + 1);
+		bufLen = infoLogLength + 1;
+		if (bufPtr == NULL) {
+			bufPtr = buf;
+			bufLen = sizeof (buf);
+			eprintf ("WARN: In CompileShader(), malloc(%d) failed!\n", infoLogLength + 1);
+		}
+	}
+
+	glGetShaderInfoLog (shader, bufLen, NULL, bufPtr);
+
+	const char* shaderTypeStr = "";
+	switch (shaderType) {
 		case GL_VERTEX_SHADER:   shaderTypeStr = "Vertex"; break;
 		case GL_FRAGMENT_SHADER: shaderTypeStr = "Fragment"; break;
 		case GL_GEOMETRY_SHADER: shaderTypeStr = "Geometry"; break;
 		case GL_COMPUTE_SHADER:  shaderTypeStr = "Compute"; break;
 		case GL_TESS_CONTROL_SHADER:    shaderTypeStr = "TessControl"; break;
 		case GL_TESS_EVALUATION_SHADER: shaderTypeStr = "TessEvaluation"; break;
-		}
+	}
+	if (status != GL_TRUE) {
 		eprintf ("ERROR: Compiling %s Shader failed: %s\n", shaderTypeStr, bufPtr);
 		glDeleteShader (shader);
 
-		if(bufPtr != buf)  free(bufPtr);
+		if (bufPtr != buf)  free (bufPtr);
 
 		return 0;
 	}
@@ -203,13 +214,13 @@ initShader2D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	shaderInfo->uniLmScales = -1;
 
 	shaders2D[0] = CompileShader(GL_VERTEX_SHADER, vertSrc, NULL);
-	if(shaders2D[0] == 0)  return false;
+	if (shaders2D[0] == 0)  goto err_cleanup;
 
 	shaders2D[1] = CompileShader(GL_FRAGMENT_SHADER, fragSrc, NULL);
 	if(shaders2D[1] == 0)
 	{
 		glDeleteShader(shaders2D[0]);
-		return false;
+		goto err_cleanup;
 	}
 
 	prog = CreateShaderProgram(2, shaders2D);
@@ -220,7 +231,7 @@ initShader2D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 
 	if(prog == 0)
 	{
-		return false;
+		goto err_cleanup;
 	}
 
 	shaderInfo->shaderProgram = prog;
@@ -296,9 +307,15 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	char*	fragSrc;
 	char*	geomSrc;
 	char*	vertCommon, *fragCommon, *geomCommon;
+	char*	glslCommon;		// for global glsl functions
 	int		fileSize = 0;
 
 	// load shader files
+
+	if (!(fileSize = ri.FS_LoadFile ("shaders/Common.glsl", (void **) &glslCommon))) {
+		R_Printf (PRINT_ALL, __FUNCTION__": Failed to load common shader include file!\n");
+		return false;
+	}
 
 	if ( !( fileSize = ri.FS_LoadFile( "shaders/Common3D.frag", (void **) &fragCommon ) ) ) {
 		R_Printf( PRINT_ALL, __FUNCTION__": Failed to load 3D common fragment shader!\n" );
@@ -346,7 +363,7 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	if ( shaders3D[0] == 0 ) {
 		ri.FS_FreeFile( fragCommon );
 		ri.FS_FreeFile( fragSrc );
-		return false;
+		goto err_cleanup;
 	}
 
 	shaders3D[1] = CompileShader(GL_FRAGMENT_SHADER, fragCommon, fragSrc);
@@ -356,14 +373,14 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	if(shaders3D[1] == 0)
 	{
 		glDeleteShader(shaders3D[0]);
-		return false;
+		goto err_cleanup;
 	}
 
 	// Geometry shader is optional
 	if ( geomFilename != NULL ) {
 		if ( strlen ( geomFilename ) > 0 ) {
 			if ( !( fileSize = ri.FS_LoadFile ( geomFilename, (void **) &geomSrc ) ) ) {
-				R_Printf ( PRINT_ALL, __FUNCTION__": Failed to load 3D geometry shader!\n" );
+				R_Printf ( PRINT_ALL, __FUNCTION__": Failed to load 3D geometry shader for %s!\n", shaderDesc );
 				ri.FS_FreeFile ( geomSrc );
 			} else {
 				shaders3D[ 2 ] = shaders3D[ 1 ];
@@ -583,10 +600,10 @@ static void initUBOs(void)
 }
 
 static qboolean createShaders ( void ) {
-	if ( !initShader2D ( &gl3state.si2D,			"shaders/2d.vert",		"shaders/2d.frag",		"textured 2D rendering" ) ) { return false; }
-	if ( !initShader2D ( &gl3state.si2Darray,		"shaders/2d.vert",		"shaders/2darray.frag",	"array-textured 2D rendering" ) ) { return false; }
-	if ( !initShader2D ( &gl3state.si2Dcolor,		"shaders/2Dcolor.vert", "shaders/2Dcolor.frag",	"color-only 2D rendering" ) ) { return false;	}
-	if ( !initShader3D ( &gl3state.si3Dlm,			"shaders/3Dlmflow.vert","shaders/3Dlm.frag",	"shaders/3Dlm.geom", "textured 3D rendering with lightmap" ) ) { return false; }
+	if ( !initShader2D ( &gl3state.si2D,			"shaders/2d.vert",		"shaders/2d.frag",										"textured 2D rendering" ) ) { return false; }
+	if ( !initShader2D ( &gl3state.si2Darray,		"shaders/2d.vert",		"shaders/2darray.frag",									"array-textured 2D rendering" ) ) { return false; }
+	if ( !initShader2D ( &gl3state.si2Dcolor,		"shaders/2Dcolor.vert", "shaders/2Dcolor.frag",									"color-only 2D rendering" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3Dlm,			"shaders/3Dlmflow.vert","shaders/3Dlm.frag",			"shaders/3Dlm.geom",	"textured 3D rendering with lightmap" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3Dtrans,		"shaders/3D.vert",		"shaders/3D.frag",				"shaders/3D.geom",		"rendering translucent 3D things" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3DcolorOnly,	"shaders/3D.vert",		"shaders/3Dcolor.frag",			"shaders/3D.geom",		"flat-colored 3D rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dturb,		"shaders/3D.vert",		"shaders/3Dwater.frag",			"shaders/3D.geom",		"water rendering" ) ) { return false; }
