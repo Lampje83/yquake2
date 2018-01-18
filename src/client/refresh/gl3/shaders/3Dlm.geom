@@ -46,27 +46,21 @@ void outputPrimitive (bool clip, bool reverse) {
 
 		writeVertexData (i);
 
-		if (!clip) 
-		{
+		if (!clip) {
 			gl_ClipDistance[0] = 0.0;
 			gl_Position = gl_in[i].gl_Position;
-		}
-		else
-		{
-			if (reverse)
-			{
+		} else {
+			if (reverse) {
 				gl_ClipDistance[0] = gs_in[i].refPlaneDist;
-				gl_Position = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4(gs_in[i].WorldCoord, 1.0);
-			}
-			else
-			{
+				gl_Position = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4 (gs_in[i].WorldCoord, 1.0);
+			} else {
 				gl_ClipDistance[0] = -gs_in[i].refPlaneDist;
 				gl_Position = gl_in[i].gl_Position;
 			}
 		}
-		EmitVertex();
+		EmitVertex ();
 	}
-	EndPrimitive();
+	EndPrimitive ();
 }
 
 void main() {

@@ -7,6 +7,8 @@ out VS_OUT {
 	vec2		TexCoord;
 	vec4		Color;
 	vec3		WorldCoord;
+	float		refPlaneDist;
+	flat uint	SurfFlags;
 	flat int	refIndex;
 } vs;
 
@@ -20,13 +22,14 @@ void main()
 	vs.WorldCoord = worldCoord.xyz;
 	vs.refIndex = refIndex + gl_InstanceID;
 
+	vec4 plane = refData[refIndex + gl_InstanceID].plane;
+	if (distToPlane (viewPos, plane) < 0) {
+		vs.refPlaneDist = -distToPlane (vs.WorldCoord.xyz, plane);
+		vs.SurfFlags = surfFlags | REFSURF_PLANEBACK;
+	} else {
+		vs.refPlaneDist = distToPlane (vs.WorldCoord.xyz, plane);
+		vs.SurfFlags = surfFlags;
+	}
 	gl_Position = transProj * transView * worldCoord;
-
-	float refPlaneDist;
-
-	refPlaneDist = dot (vs.WorldCoord.xyz, refData[vs.refIndex].plane.xyz) - refData[vs.refIndex].plane.w;
-	if (dot (viewPos, refData[vs.refIndex].plane.xyz)-refData[vs.refIndex].plane.w < 0)
-		//if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
-		refPlaneDist = -refPlaneDist;
-	gl_ClipDistance[0] = -refPlaneDist; // dot ( worldCoord.xyz, refData[ refIndex ].plane.xyz ) + refData[ refIndex ].plane.w;
+	gl_ClipDistance[0] = 0.0;
 }
