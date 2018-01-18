@@ -480,7 +480,6 @@ DrawAliasShadow(gl3_shadowinfo_t* shadowInfo)
 	GL3_BindEBO(gl3state.eboAlias);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, da_count(idxBuf)*sizeof(GLushort), idxBuf.p, GL_STREAM_DRAW);
 	glDrawElements(GL_TRIANGLES, da_count(idxBuf), GL_UNSIGNED_SHORT, NULL);
-
 }
 
 static qboolean
@@ -894,7 +893,7 @@ GL3_DrawAliasModel(entity_t *entity)
 		skin = gl3_notexture; /* fallback... */
 	}
 
-	GL3_Bind(skin->texnum, 0);
+	GL3_Bind(GL_TEXTURE_2D, 0, skin->texnum);
 
 	if (entity->flags & RF_TRANSLUCENT)
 	{

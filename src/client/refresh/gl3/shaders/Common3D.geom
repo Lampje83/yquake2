@@ -53,26 +53,46 @@ layout (std140) uniform refDat {
 };
 #endif
 
+#ifdef __INTELLISENSE__
+typedef
+#endif
+in gl_PerVertex {
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+} gl_in[];
+
+out gl_PerVertex {
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+};
+
 int count;
 
 float refPlaneDist[6];
+/*
+mat4 rotationMatrix (vec3 axis, float angle) {
+	axis = normalize (axis);
+	float s = sin (angle);
+	float c = cos (angle);
+	float oc = 1.0 - c;
 
-#ifndef __INTELLISENSE__
-in gl_PerVertex{
-#endif
-	vec4 gl_Position;
-	float gl_PointSize;
-	float gl_ClipDistance[1];
-#ifndef __INTELLISENSE__
-} gl_in[];
-#endif
+	return mat4 (oc * axis.x * axis.x + c, oc * axis.x * axis.y - axis.z * s, oc * axis.z * axis.x + axis.y * s, 0.0,
+		oc * axis.x * axis.y + axis.z * s, oc * axis.y * axis.y + c, oc * axis.y * axis.z - axis.x * s, 0.0,
+		oc * axis.z * axis.x - axis.y * s, oc * axis.y * axis.z + axis.x * s, oc * axis.z * axis.z + c, 0.0,
+		0.0, 0.0, 0.0, 1.0);
+}
 
-#ifndef __INTELLISENSE__
-out gl_PerVertex{
-#endif
-	vec4 gl_Position;
-	float gl_PointSize;
-	float gl_ClipDistance[1];
-#ifndef __INTELLISENSE__
-};
-#endif
+void OutputNormalPrimitive () {
+
+}
+
+void OutputReflectedPrimitive () {
+
+}
+
+void OutputRefractedPrimitive () {
+
+}
+*/

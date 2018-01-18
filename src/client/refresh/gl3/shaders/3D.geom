@@ -6,6 +6,7 @@ in VS_OUT {
 	vec2		TexCoord;
 	vec3		WorldCoord;
 	vec3		Normal;
+	float		refPlaneDist;
 	flat int	refIndex;
 } gs_in[];
 
@@ -124,11 +125,11 @@ void main() {
 	if (reflectionActive)
 	{
 		for (i = 0; i < count; i++) {
-			refPlaneDist[i] = dot ( gs_in[i].WorldCoord.xyz, refData[ gs_in[i].refIndex ].plane.xyz ) - refData[ gs_in[i].refIndex ].plane.w;
+			refPlaneDist[i] = dot (gs_in[i].WorldCoord.xyz, refData[gs_in[i].refIndex].plane.xyz) - refData[gs_in[i].refIndex].plane.w;
 			if (dot (viewPos, refData[gs_in[i].refIndex].plane.xyz) - refData[gs_in[i].refIndex].plane.w < 0)
 			//if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
 				refPlaneDist[i] = -refPlaneDist[i];
-			if (abs(-dot ( gs_in[i].WorldCoord.xyz, refData[gs_in[i].refIndex].plane.xyz ) + refData[gs_in[i].refIndex].plane.w) < 1) k++;
+			if (abs(-dot (gs_in[i].WorldCoord.xyz, refData[gs_in[i].refIndex].plane.xyz) + refData[gs_in[i].refIndex].plane.w) < 1) k++;
 //			if (abs(newplane.w) < 0.1) k++;
 		}
 		if (k == count)

@@ -212,6 +212,8 @@ typedef struct gl3UniRefdata_s {
 	int			padding[ 2 ];
 } gl3UniRefData_t;
 
+#define MAX_TEXTURE_UNITS 64
+
 typedef struct
 {
 	// TODO: what of this do we need?
@@ -226,7 +228,8 @@ typedef struct
 	// most surfaces only have one really and the remaining for are filled with dummy data
 	GLuint lightmap_textureIDs[MAX_LIGHTMAPS][MAX_LIGHTMAPS_PER_SURFACE]; // instead of lightmap_textures+i use lightmap_textureIDs[i]
 
-	GLuint currenttexture[128]; // bound to GL_TEXTURE0 + index
+	GLenum currenttarget[MAX_TEXTURE_UNITS];
+	GLuint currenttexture[MAX_TEXTURE_UNITS]; // bound to GL_TEXTURE0
 	int currentlightmap; // lightmap_textureIDs[currentlightmap] bound to GL_TEXTURE1
 	GLuint currenttmu; // GL_TEXTURE0 or GL_TEXTURE1
 
@@ -260,7 +263,7 @@ typedef struct
 	// NOTE: make sure siParticle is always the last shaderInfo (or adapt GL3_ShutdownShaders())
 	gl3ShaderInfo_t siParticle; // for particles. surprising, right?
 
-	GLuint vao3D, vbo3D; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
+	GLuint vao3D, vbo3D, ebo3D; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
 	GLuint vboRefData;					// for reflection matrices
 	GLuint vao3Dtrans, vbo3Dtrans; // for brushes etc, using 1 floats as vertex input (x,y,z, s,t, lms,lmt, normX,normY,normZ)
 	GLuint vaoAlias, vboAlias, eboAlias; // for models, using 9 floats as (x,y,z, s,t, r,g,b,a)
@@ -467,7 +470,7 @@ GL3_SelectTMU(GLenum tmu)
 }
 
 extern void GL3_TextureMode(char *string);
-extern void GL3_Bind(GLuint texnum, GLuint texunit);
+extern void GL3_Bind(GLenum target, GLuint texunit, GLuint texnum);
 extern void GL3_BindLightmap(int lightmapnum);
 extern gl3image_t *GL3_LoadPic(char *name, byte *pic, int width, int realwidth,
                                int height, int realheight, imagetype_t type, int bits);
@@ -476,7 +479,6 @@ extern gl3image_t *GL3_RegisterSkin(char *name);
 extern void GL3_ShutdownImages(void);
 extern void GL3_FreeUnusedImages(void);
 extern void GL3_ImageList_f(void);
-extern void cmd_recreate_shaders (void);
 
 // gl3_light.c
 extern void GL3_MarkLights(dlight_t *light, int bit, mnode_t *node);

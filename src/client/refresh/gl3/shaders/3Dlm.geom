@@ -7,6 +7,7 @@ in VS_OUT {
 	vec2		LMcoord;
 	vec3		WorldCoord;
 	vec3		Normal;
+	float		refPlaneDist;
 	flat uint	LightFlags;
 	flat int	refIndex;
 } gs_in[];
@@ -79,7 +80,7 @@ void main() {
 			{
 				if (j == 0)
 				{
-					refPlaneDist[i] = dot ( gs_in[i].WorldCoord.xyz, refData[ gs_in[i].refIndex ].plane.xyz ) - refData[ gs_in[i].refIndex ].plane.w;
+					refPlaneDist[i] = dot (gs_in[i].WorldCoord.xyz, refData[gs_in[i].refIndex].plane.xyz) - refData[gs_in[i].refIndex].plane.w;
 
 					// check on which side of the plane we are
 					if (dot (viewPos, refData[gs_in[i].refIndex].plane.xyz) - refData[gs_in[i].refIndex].plane.w < 0)
@@ -92,7 +93,7 @@ void main() {
 
 				if (j < 4) {
 					// test for view culling
-					if ( (pos[j & 1] * (1.0 - (j & 2))) > (refData[gs_in[i].refIndex].cullDistances[j] * pos.w)) k++;
+					if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[gs_in[i].refIndex].cullDistances[j] * pos.w)) k++;
 				} else {
 					//if ((dot ( pos.xyz, refData[gs_in[i].refIndex].plane.xyz ) - refData[gs_in[i].refIndex].plane.w) < 0) k++;
 					if (refPlaneDist[i] < 0) k++;

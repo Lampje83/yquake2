@@ -576,7 +576,7 @@ Mod_LoadFaces(lump_t *l)
 	// Upload the world to GL. This doesn't change anymore
 	GL3_BindVAO ( gl3state.vao3D );
 	GL3_BindVBO ( gl3state.vbo3D );
-	glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*currentmodel->numglverts, currentmodel->glverts, GL_STATIC_DRAW );
+	//glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*currentmodel->numglverts, currentmodel->glverts, GL_STATIC_DRAW );
 
 }
 

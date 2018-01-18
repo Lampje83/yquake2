@@ -1,10 +1,14 @@
-// it gets attributes and uniforms from vertexCommon3D
+// it gets attributes and uniforms from Common3D.vert
+#ifdef __INTELLISENSE__
+#include "Common3D.vert"
+#endif
 
 out VS_OUT {
 	vec2		TexCoord;
 	vec2		LMcoord;
 	vec3		WorldCoord;
 	vec3		Normal;
+	float		refPlaneDist;	// distance to reflection plane
 	flat uint	LightFlags;
 	flat int	refIndex;
 } vs;
@@ -22,6 +26,7 @@ void main()
 	vs.Normal = normalize(worldNormal.xyz);
 	vs.LightFlags = lightFlags;
 	vs.refIndex = refIndex + gl_InstanceID;
+	vs.refPlaneDist = -dot (worldCoord.xyz, refData[refIndex].plane.xyz) + refData[refIndex].plane.w;
 
 	gl_Position = transProj * transView * worldCoord;
 	// gl_ClipDistance[0] = 0.0;
