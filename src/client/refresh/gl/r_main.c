@@ -330,6 +330,9 @@ R_DrawEntitiesOnList(void)
 	{
 		currententity = &r_newrefdef.entities[i];
 
+		if (currententity->flags & RF_VIEWERMODEL) {
+			continue;	/* don't draw self, only in mirrors */
+		}
 		if (currententity->flags & RF_TRANSLUCENT)
 		{
 			continue; /* solid */

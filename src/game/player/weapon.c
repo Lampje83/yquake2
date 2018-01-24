@@ -1458,7 +1458,7 @@ weapon_shotgun_fire(edict_t *ent)
 	vec3_t forward, right;
 	vec3_t offset;
 	int damage = 4;
-	int kick = 32; // was 8
+	int kick = 8; // was 8
 
 	if (!ent)
 	{

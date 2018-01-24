@@ -996,7 +996,7 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 	if ( addPlane ) {
 		gl3state.uniRefData[ r ].flags = REFSURF_ACTIVE | ( ( surf->flags & SURF_PLANEBACK ) ? REFSURF_PLANEBACK : 0 ) | (surf->flags & SURF_UNDERWATER);
 		gl3state.uniRefData[ r ].plane = HMM_Vec4 ( surf->plane->normal[ 0 ], surf->plane->normal[ 1 ], surf->plane->normal[ 2 ], surf->plane->dist );
-		gl3state.uniRefData[ r ].refrindex = 1.33;
+		gl3state.uniRefData[ r ].refrindex = 1.333;
 		gl3state.uniRefData[ r ].refMatrix = HMM_Householder ( gl3state.uniRefData[ r ].plane, -1 );
 
 		gl3state.refPlanes[ r ].id = r;
@@ -1178,7 +1178,7 @@ RecursiveWorldNode(mnode_t *node)
 
 	if ( gl_cullpvs->value ) {
 		if ( CullBox ( node->minmaxs, node->minmaxs + 3 ) ) {
-			return;
+			//return;
 		}
 	}
 	/* if a leaf node, draw stuff */
@@ -1252,11 +1252,11 @@ RecursiveWorldNode(mnode_t *node)
 	{
 		if (surf->visframe != gl3_framecount)
 		{
-			continue;
+			//continue;
 		}
 
 		if ((surf->flags & SURF_PLANEBACK) != sidebit) {
-			continue; /* wrong side */
+			//continue; /* wrong side */
 		}
 
 		if ((surf->texinfo->flags & SURF_SKY) && (!gl_skycube->value))
