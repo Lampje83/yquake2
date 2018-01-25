@@ -511,6 +511,7 @@ extern cvar_t *filterban;
 
 extern cvar_t *sv_gravity;
 extern cvar_t *sv_maxvelocity;
+extern cvar_t *sv_knockback;
 
 extern cvar_t *gun_x, *gun_y, *gun_z;
 extern cvar_t *sv_rollspeed;

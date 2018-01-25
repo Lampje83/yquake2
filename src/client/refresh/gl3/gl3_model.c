@@ -509,7 +509,7 @@ Mod_LoadFaces(lump_t *l)
 		out->numedges = LittleShort(in->numedges);
 		out->flags = 0;
 		out->polys = NULL;
-
+		
 		planenum = LittleShort(in->planenum);
 		side = LittleShort(in->side);
 

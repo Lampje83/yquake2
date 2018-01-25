@@ -609,11 +609,11 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 			if (targ->client && (attacker == targ))
 			{
 				/* This allows rocket jumps */
-				VectorScale(dir, 1600.0 * (float)knockback / mass, kvel);
+				VectorScale(dir, 1600.0 * sv_knockback->value * (float)knockback / mass, kvel);
 			}
 			else
 			{
-				VectorScale(dir, 500.0 * (float)knockback / mass, kvel);
+				VectorScale(dir, 500.0 * sv_knockback->value * (float)knockback / mass, kvel);
 			}
 
 			VectorAdd(targ->velocity, kvel, targ->velocity);
@@ -679,7 +679,7 @@ T_Damage(edict_t *targ, edict_t *inflictor, edict_t *attacker,
 		{
 			if ((targ->svflags & SVF_MONSTER) || (client))
 			{
-				targ->flags |= FL_NO_KNOCKBACK;
+				//targ->flags |= FL_NO_KNOCKBACK;
 			}
 
 			Killed(targ, inflictor, attacker, take, point);

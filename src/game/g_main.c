@@ -57,6 +57,7 @@ cvar_t *filterban;
 
 cvar_t *sv_maxvelocity;
 cvar_t *sv_gravity;
+cvar_t *sv_knockback;
 
 cvar_t *sv_rollspeed;
 cvar_t *sv_rollangle;

@@ -55,7 +55,7 @@ void outputPrimitive (bool clip, bool reverse) {
 				gl_Position = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4 (gs_in[i].WorldCoord, 1.0);
 			} else {
 				gl_ClipDistance[0] = -gs_in[i].refPlaneDist;
-				gl_Position = gl_in[i].gl_Position;
+				gl_Position = transProj * transView * vec4(findRefractedPos (viewPos, gs_in[i].WorldCoord, refData[gs_in[i].refIndex]), 1.0); // gl_in[i].gl_Position;
 			}
 		}
 		EmitVertex ();
@@ -84,9 +84,9 @@ void main() {
 				}
 			}
 			if (j < 4) {
-				if (k == gl_in.length ())
+				//if (k == gl_in.length ())
 					// discard
-					return;
+					//return;
 			}
 		}
 

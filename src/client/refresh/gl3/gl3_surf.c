@@ -274,6 +274,8 @@ typedef struct {
 	GLuint	baseInstance;
 } DrawArraysIndirectCommand;
 
+DrawArraysIndirectCommand dc[MAX_INDICES];
+
 void GL_MultiDrawArrays ( void ) {
 	if ( numarrays > MAX_INDICES ) {
 		ri.Sys_Error ( ERR_DROP, __FUNCTION__": Array list overrun: %d, max %d\n", numarrays, MAX_INDICES );
@@ -281,17 +283,16 @@ void GL_MultiDrawArrays ( void ) {
 		GL3_BindVAO ( gl3state.vao3D );
 		GL3_BindVBO ( gl3state.vbo3D );
 	
-		DrawArraysIndirectCommand dc[MAX_INDICES];
 		for (int i = 0; i < numarrays; i++)
 		{
 			dc[i].first = arraystart[i];
 			dc[i].count = arraylength[i];
 			dc[i].baseInstance = 0;
 			dc[i].instanceCount = gl3state.instanceCount + 1;
-			glDrawArraysInstanced (GL_TRIANGLE_FAN, dc[i].first, dc[i].count, gl3state.instanceCount + 1);
+			//glDrawArraysInstanced (GL_TRIANGLE_FAN, dc[i].first, dc[i].count, gl3state.instanceCount + 1);
 		}
 //		somehow this doesn't work
-//		glMultiDrawArraysIndirect (GL_TRIANGLE_FAN, 0, numarrays, 0);
+		glMultiDrawArraysIndirect (GL_TRIANGLE_FAN, dc, numarrays, 0);
 	
 		//glMultiDrawArrays ( GL_TRIANGLE_FAN, arraystart, arraylength, numarrays );
 		numarrays = 0;
@@ -436,13 +437,22 @@ static void
 SetAllLightFlags(msurface_t *surf)
 {
 	unsigned int lightFlags = 0xffffffff;
+	qboolean modified = false;
 
 	gl3_3D_vtx_t* verts = surf->polys->vertices;
 
 	int numVerts = surf->polys->numverts;
 	for(int i=0; i<numVerts; ++i)
 	{
+		if (verts[i].lightFlags != lightFlags) {
+			modified = true;
+		}
 		verts[i].lightFlags = lightFlags;
+	}
+
+	if (modified) {
+		// update the light flags in buffer
+		glBufferSubData (GL_ARRAY_BUFFER, (surf->polys->vertices - currentmodel->glverts) * sizeof (gl3_3D_vtx_t), numVerts * sizeof (gl3_3D_vtx_t), surf->polys->vertices);
 	}
 }
 
@@ -996,7 +1006,7 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 	if ( addPlane ) {
 		gl3state.uniRefData[ r ].flags = REFSURF_ACTIVE | ( ( surf->flags & SURF_PLANEBACK ) ? REFSURF_PLANEBACK : 0 ) | (surf->flags & SURF_UNDERWATER);
 		gl3state.uniRefData[ r ].plane = HMM_Vec4 ( surf->plane->normal[ 0 ], surf->plane->normal[ 1 ], surf->plane->normal[ 2 ], surf->plane->dist );
-		gl3state.uniRefData[ r ].refrindex = 1.33;
+		gl3state.uniRefData[ r ].refrindex = 1.333;
 		gl3state.uniRefData[ r ].refMatrix = HMM_Householder ( gl3state.uniRefData[ r ].plane, -1 );
 
 		gl3state.refPlanes[ r ].id = r;
@@ -1178,7 +1188,7 @@ RecursiveWorldNode(mnode_t *node)
 
 	if ( gl_cullpvs->value ) {
 		if ( CullBox ( node->minmaxs, node->minmaxs + 3 ) ) {
-			return;
+			//return;
 		}
 	}
 	/* if a leaf node, draw stuff */
@@ -1252,11 +1262,11 @@ RecursiveWorldNode(mnode_t *node)
 	{
 		if (surf->visframe != gl3_framecount)
 		{
-			continue;
+			//continue;
 		}
 
 		if ((surf->flags & SURF_PLANEBACK) != sidebit) {
-			continue; /* wrong side */
+			//continue; /* wrong side */
 		}
 
 		if ((surf->texinfo->flags & SURF_SKY) && (!gl_skycube->value))

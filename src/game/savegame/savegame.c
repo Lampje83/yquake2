@@ -220,6 +220,7 @@ InitGame(void)
 	sv_rollangle = gi.cvar("sv_rollangle", "2", 0);
 	sv_maxvelocity = gi.cvar("sv_maxvelocity", "2000", 0);
 	sv_gravity = gi.cvar("sv_gravity", "800", 0);
+	sv_knockback = gi.cvar ("sv_knockback", "1", 0);
 
 	/* noset vars */
 	dedicated = gi.cvar("dedicated", "0", CVAR_NOSET);
