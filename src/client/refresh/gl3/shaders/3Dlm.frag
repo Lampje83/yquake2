@@ -31,8 +31,13 @@ in VS_OUT {
 	vec3		WorldCoord;
 	vec3		Normal;
 	flat uint	LightFlags;
+	flat uint	SurfFlags;
 	flat int	refIndex;
 } fs_in;
+
+float cosToSin (float value) {
+	return sqrt (1 - value * value);
+}
 
 void main()
 {
@@ -81,8 +86,11 @@ void main()
 			float fact = max(0, intens - distLightToPos - 52);
 
 			// also factor in angle between light and point on surface
-			fact *= max(0, dot(fs_in.Normal, lightToPos/distLightToPos));
-
+			//if ((fs_in.SurfFlags & SURF_PLANEBACK) == 0) {
+				fact *= max (0, dot (fs_in.Normal, lightToPos / distLightToPos));
+			//} else {
+			//	fact *= max (0, dot (fs_in.Normal, lightToPos / -distLightToPos));
+			//}
 
 			lmTex.rgb += dynLights[i].lightColor.rgb * fact * (1.0/256.0);
 		}

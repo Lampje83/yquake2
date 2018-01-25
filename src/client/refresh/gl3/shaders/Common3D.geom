@@ -88,29 +88,31 @@ void writeVertexData (int index);
 // int QuadCubicRoots (long double *Coeff, int N, long double *RealRoot, long double *ImagRoot);
 //void QuadRoots (double P[3], dvec2 RealPart, dvec2 ImagPart);
 //void CubicRoots (double P[5], dvec4 RealPart, dvec4 ImagPart);
-void BiQuadRoots (double P[5], dvec4 RealPart, dvec4 ImagPart);
-void ReversePoly (double P[5], int N);
-void ReversePoly (double P[4], int N);
-void InvertRoots (int N, dvec4 RealRoot, dvec4 ImagRoot);
+void BiQuadRoots (double P[5], out dvec4 RealPart, out dvec4 ImagPart);
+void ReversePoly (inout double P[5], int N);
+void ReversePoly (inout double P[4], int N);
+void InvertRoots (int N, inout dvec4 RealRoot, inout dvec4 ImagRoot);
 
 float cosToSin (float value) {
 	return sqrt (1 - value * value);
 }
+
 vec3 findRefractedPos (vec3 viewpos, vec3 worldpos, refData_s plane) {
+#if 1
 	vec3 dir		= normalize (worldpos - viewpos);			// original viewing direction
 	float dist		= distToPlane (viewpos, plane.plane);		// distance from view to plane
 	float worldDist = distToPlane (worldpos, plane.plane);		// distance from point to plane
 	float len		= length (worldpos - viewpos);
 	float dotPlane	= dot (plane.plane.xyz, dir);
 	// point where original view ray intersects with the plane
-	vec3 planePos = viewpos + dir * dist / abs (dotPlane);		
+	vec3 planePos = mix (viewpos, worldpos, abs (dist) / len);
 	
 	if (plane.refrindex == 1.0) {
 		// index of refraction is negliable, don't refract
 		return worldpos;
 	}
 
-	if (abs (dot (dir, plane.plane.xyz)) > 0.99) {
+	if (abs (dot (dir, plane.plane.xyz)) > 0.997) {
 		// perpendicular to plane, refraction is negliable
 		return worldpos;
 	}
@@ -120,8 +122,13 @@ vec3 findRefractedPos (vec3 viewpos, vec3 worldpos, refData_s plane) {
 		return worldpos;
 	}
 
+	if (abs (worldDist) < 0.01) {
+		// distance to plane negliable
+		return worldpos;
+	}
+	
 	// check on which side of the fluid interface we are
-	bool outsideFluid = (plane.plane.z > 0) ^^ (dist > 0); // TODO: real detection of under/above water
+	bool outsideFluid = (dist > 0); // TODO: real detection of under/above water
 	vec3 startpos, endpos;
 	if (outsideFluid) {
 		startpos = viewpos; endpos = worldpos;
@@ -130,6 +137,7 @@ vec3 findRefractedPos (vec3 viewpos, vec3 worldpos, refData_s plane) {
 		dist = worldDist;
 		worldDist = tempdist;
 		startpos = worldpos; endpos = viewpos;
+		dir = -dir;
 	}
 
 	// copy original intersection point
@@ -138,11 +146,13 @@ vec3 findRefractedPos (vec3 viewpos, vec3 worldpos, refData_s plane) {
 	int		iteration;
 	float	corrFactor = 0.05 + abs (dot (dir, plane.plane.xyz)) * 1.2;	// start with initial correction factor
 	float	oldCorrFactor;											// found by trial and error
-	startPlanePos = endpos - plane.plane.xyz * worldDist;
+	startPlanePos = endpos + plane.plane.xyz * abs(worldDist);
 	vec3	moveVec = startPlanePos - planePos;
 
-	for (iteration = 1; iteration < 11; iteration ++) {
-		vec3 moveLeft = worldpos - plane.plane.xyz * worldDist;
+	//dist = abs (dist);
+	//worldDist = abs (worldDist);
+
+	for (iteration = 1; iteration < 10; iteration ++) {
 		// newPlanePos += (1 - (1 / plane.refrindex));
 		newPlanePos = startPlanePos - moveVec / plane.refrindex * corrFactor;
 		sinview = cosToSin(abs(dot (normalize (newPlanePos - startpos), normalize (plane.plane.xyz))));
@@ -154,15 +164,62 @@ vec3 findRefractedPos (vec3 viewpos, vec3 worldpos, refData_s plane) {
 		} else {
 			// correct result
 			oldCorrFactor = corrFactor;
-			corrFactor *= pow ((sinview / sinworld) / plane.refrindex, (dist / len) + cosToSin (abs (dotPlane)) * (1.0 - iteration * 0.1));
+			corrFactor *= pow ((sinview / sinworld) / plane.refrindex, (abs(dist) / len) + cosToSin (abs (dotPlane)) * (1.0 - iteration * 0.1));
 		}
 		if (abs (corrFactor - oldCorrFactor) < 0.01) {
 			// no further correction possible
 			break;
 		}
 	}
+#else
+	vec3	newPlanePos;
+	double	height;			// distance from viewpos to worldpos along plane normal
+	double	planedist;		// distance from viewpos to plane
+	double	width;			// distance from viewpos to worldpos perpendicular to plane normal
+	vec3	startPlanePos; 
+	vec3	moveVec;		// vector projected along plane
+	double	ior;
+	double	P[5];			// the factors for quartic function
+	dvec4	real, imag;
+	int		i;
 
+	height = dot (worldpos - viewpos, plane.plane.xyz);
+	planedist = double (distToPlane (viewpos, plane.plane));
+	moveVec = worldpos + (plane.plane.xyz * float(height)) - viewpos;
+	width = length(moveVec);
+	ior = double(plane.refrindex);
+	//if (plane.plane.z < 0) ior = 1.0 / ior;	// assume we are underwater when reflection plane normal has a negative z
+
+	// check if refraction needs to be calculated
+	if ((abs (width) < 0.0001) || (abs (height) < 0.0001) || (abs (ior - 1.0) < 0.001)) {
+		return worldpos;
+	}
+
+	P[0] = 1.0;
+	P[1] = -2.0 * width;
+	P[2] = (2.0 * height * planedist - (height * height)) / ((ior * ior) - 1.0) + (planedist * planedist + width * width);
+	P[3] = -2.0 * ior * ior * planedist * planedist * width / ((ior * ior) - 1.0);
+	P[4] = ior * ior * planedist * planedist * width * width / ((ior * ior) - 1.0);
+
+	BiQuadRoots (P, real, imag);
+
+	for (i = 0; i < 4; i++) {
+		// search for sane solution
+		if (width > 0) {
+			if ((real[i] > 0) && (real[i] < width) && (abs (imag[i]) < 0.001)) { break; }
+		} else {
+			if ((real[i] < 0) && (real[i] > width) && (abs (imag[i]) < 0.001)) { break; }
+		}
+	}
+	if (i == 4) { return worldpos; }	// no sane solution. shouldn't get here
+
+	newPlanePos = viewPos - plane.plane.xyz * float(planedist) + normalize (moveVec) * float(real[i]);
+#endif
 	return newPlanePos + normalize (newPlanePos - viewpos) * length (worldpos - newPlanePos);
+	//vec3 newDir = normalize (newPlanePos - viewPos);
+	//return newPlanePos + newDir * abs(worldDist)*abs (dot (newDir, plane.plane.xyz));
+	// test case
+	//return planePos + normalize (planePos - viewpos) * length (worldpos - planePos);
 }
 
 
@@ -259,7 +316,7 @@ void CubicRoots (double P[4], out dvec4 RealRoot, out dvec4 ImagRoot) {
 
 // This finds the roots of  y = P0x^4 + P1x^3 + P2x^2 + P3x + P4    P[0] = 1
 // This function calls CubicRoots and QuadRoots
-void BiQuadRoots (double P[5], dvec4 RealRoot, dvec4 ImagRoot) {
+void BiQuadRoots (double P[5], out dvec4 RealRoot, out dvec4 ImagRoot) {
 	int j;
 	double a, b, c, d, e, Q3Limit, Scalar, Q[4], MinRoot;
 	bool QuadPolyReversed = false;
@@ -350,7 +407,7 @@ void BiQuadRoots (double P[5], dvec4 RealRoot, dvec4 ImagRoot) {
 //---------------------------------------------------------------------------
 
 // A reversed polynomial has its roots at the same angle, but reflected about the unit circle.
-void ReversePoly (double P[5], int N) {
+void ReversePoly (inout double P[5], int N) {
 	int j;
 	double Temp;
 	for (j = 0; j <= N / 2; j++) {
@@ -363,7 +420,7 @@ void ReversePoly (double P[5], int N) {
 	}
 }
 
-void ReversePoly (double P[4], int N) {
+void ReversePoly (inout double P[4], int N) {
 	int j;
 	double Temp;
 	for (j = 0; j <= N / 2; j++) {
@@ -378,7 +435,7 @@ void ReversePoly (double P[4], int N) {
 
 //---------------------------------------------------------------------------
 // This is used in conjunction with ReversePoly
-void InvertRoots (int N, dvec4 RealRoot, dvec4 ImagRoot) {
+void InvertRoots (int N, inout dvec4 RealRoot, inout dvec4 ImagRoot) {
 	int j;
 	double Mag;
 	for (j = 0; j<N; j++) {

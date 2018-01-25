@@ -40,6 +40,10 @@ float brightness (vec3 color)
 	return (color.r + color.g + color.b);
 }
 
+float cosToSin (float value) {
+	return sqrt (1 - value * value);
+}
+
 void main()
 {
 	vec2 texw;
@@ -52,16 +56,13 @@ void main()
 	texel.rgb *= intensity * 1.0;
 	texel.rgb = pow(texel.rgb, vec3(gamma));
 
-	float newalpha = pow(alpha, 3.0);
+	float newalpha = pow(alpha, 5.0);
 
 	if (alpha < 1)
 	{
 		vec3 viewang = normalize(viewPos - fs_in.WorldCoord.xyz);
 		vec2 delta = 1.0 / textureSize (tex, 0);
-
-		float dp = abs(dot(fs_in.Normal, viewang));
-
-		newalpha += (1.0 - newalpha) * pow (1 - dp, 3.0);
+		vec4 plane = refData[refTexture].plane;
 
 		vec3 bufSize = 1.0 / textureSize(refl, 0);
 
@@ -85,6 +86,18 @@ void main()
 			   +brightness (texture(tex, texw + vec2(-delta.x, delta.y)).rgb) / 3
 				;
 
+		float dp = abs (dot (normalize(fs_in.Normal + vec3(df, 0.0) * 0.15), viewang));
+
+		newalpha += (1.0 - newalpha) * pow (1 - dp, 3.0);
+		if (plane.z < 0) { plane = -plane; }
+		if ((dot (plane.xyz, viewPos) - plane.w) < 0) {
+			// total internal reflection
+			if ((cosToSin (dp) * 1.333) > 0.99) {
+				newalpha = mix(newalpha, 1.0, clamp((cosToSin(dp) * 1.333 - 0.99) * 100.0, 0, 1));
+			}
+		}
+		if (plane.z > 0) { plane = -plane; }
+
 		float intensityX2 = brightness (texture(tex, texw + vec2(delta.x, 0)).rgb);
 		float intensityY1 = brightness (texture(tex, texw - vec2(0, delta.y)).rgb);
 		float intensityY2 = brightness (texture(tex, texw + vec2(0, delta.y)).rgb);
@@ -99,23 +112,22 @@ void main()
 		float refrdepth = 0.002 / (1.0 - texture(reflDepth, vec3(projCoord.zw, 2 + 2 * refTexture)).r);
 		refrdepth -= 0.002 / (1.0 - gl_FragCoord.z);
 
-		projCoord.zw += df * clamp(refrdepth, 0.0, 1.0);
+		projCoord.zw += df * clamp(refrdepth, 0.0, 0.25);
 		projCoord = clamp(projCoord, 0.0, 1.0);
 
 		vec4 refltex = texture(refl, vec3(projCoord.xy, 1 + 2 * refTexture)) * newalpha;
 		vec4 refrtex = texture(refl, vec3(projCoord.zw, 2 + 2 * refTexture)) * (1 - newalpha);
 		//texel.rgb *= vec3(1 - newalpha);
-		vec4 plane = refData[refTexture].plane;
 		if (plane.z < 0) { plane = -plane; }
 		if ((dot(plane.xyz, viewPos) - plane.w) < 0) {
 			// we are under water
 			refrdepth = length(fs_in.WorldCoord - viewPos) / 1000;
 		}
-		texel.rgb *= clamp (1.0 - pow (0.90, refrdepth * 80.0), 0.0, 1.0);
+		texel.rgb *= clamp (1.0 - pow (0.95, refrdepth * 80.0), 0.0, 1.0);
 		// debug
 		// texel += vec3(((refTexture + 1) & 1) / 1, ((refTexture + 1) & 6) / 6.0, ((refTexture + 1) & 8) / 8.0) * 0.25;
 		texel.rgb += refltex.rgb; // * (1.0 - (texel.a * newalpha));
-		texel.rgb += refrtex.rgb * (1 - clamp (refrdepth * 4.0, 0.0, 1.0));
+		texel.rgb += refrtex.rgb * clamp (pow (0.95, refrdepth * 80.0), 0.0, 1.0);
 	}
 	outColor.rgb = texel.rgb;
 	// apply intensity and gamma
