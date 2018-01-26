@@ -72,21 +72,22 @@ void main() {
 		for (j = 0; j < 5; j++) {
 			k = 0;
 			for (i = 0; i < gl_in.length(); i++) {
-			vec4 pos = gl_in[i].gl_Position;
-				if (gs_in[i].refPlaneDist > 0)
+				vec4 pos = gl_in[i].gl_Position;
+				if (gs_in[i].refPlaneDist > 0) {
+					// reflect position
 					pos = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4 (gs_in[i].WorldCoord, 1.0);
-
+				}
 				if (j < 4) {
 					// test for view culling
-					if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[gs_in[i].refIndex].cullDistances[j] * pos.w)) k++;
+					if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[gs_in[i].refIndex].cullDistances[j] * pos.w) && (gs_in[i].refPlaneDist > 0)) k++;
 				} else {
 					if (gs_in[i].refPlaneDist < 0) k++;
 				}
 			}
 			if (j < 4) {
-				//if (k == gl_in.length ())
+				if (k == gl_in.length ())
 					// discard
-					//return;
+					return;
 			}
 		}
 

@@ -98,131 +98,74 @@ float cosToSin (float value) {
 }
 
 vec3 findRefractedPos (vec3 viewpos, vec3 worldpos, refData_s plane) {
-#if 1
-	vec3 dir		= normalize (worldpos - viewpos);			// original viewing direction
-	float dist		= distToPlane (viewpos, plane.plane);		// distance from view to plane
-	float worldDist = distToPlane (worldpos, plane.plane);		// distance from point to plane
-	float len		= length (worldpos - viewpos);
-	float dotPlane	= dot (plane.plane.xyz, dir);
-	// point where original view ray intersects with the plane
-	vec3 planePos = mix (viewpos, worldpos, abs (dist) / len);
-	
-	if (plane.refrindex == 1.0) {
-		// index of refraction is negliable, don't refract
-		return worldpos;
-	}
-
-	if (abs (dot (dir, plane.plane.xyz)) > 0.997) {
-		// perpendicular to plane, refraction is negliable
-		return worldpos;
-	}
-
-	if (dist * worldDist > 0) {
-		// ray from view to world doesn't cross plane
-		return worldpos;
-	}
-
-	if (abs (worldDist) < 0.01) {
-		// distance to plane negliable
-		return worldpos;
-	}
-	
-	// check on which side of the fluid interface we are
-	bool outsideFluid = (dist > 0); // TODO: real detection of under/above water
-	vec3 startpos, endpos;
-	if (outsideFluid) {
-		startpos = viewpos; endpos = worldpos;
-	} else { // swap positions to get the same result
-		float tempdist = dist;
-		dist = worldDist;
-		worldDist = tempdist;
-		startpos = worldpos; endpos = viewpos;
-		dir = -dir;
-	}
-
-	// copy original intersection point
-	vec3	newPlanePos, startPlanePos;
-	float	sinview, sinworld;
-	int		iteration;
-	float	corrFactor = 0.05 + abs (dot (dir, plane.plane.xyz)) * 1.2;	// start with initial correction factor
-	float	oldCorrFactor;											// found by trial and error
-	startPlanePos = endpos + plane.plane.xyz * abs(worldDist);
-	vec3	moveVec = startPlanePos - planePos;
-
-	//dist = abs (dist);
-	//worldDist = abs (worldDist);
-
-	for (iteration = 1; iteration < 10; iteration ++) {
-		// newPlanePos += (1 - (1 / plane.refrindex));
-		newPlanePos = startPlanePos - moveVec / plane.refrindex * corrFactor;
-		sinview = cosToSin(abs(dot (normalize (newPlanePos - startpos), normalize (plane.plane.xyz))));
-		sinworld = cosToSin(abs(dot (normalize (endpos - newPlanePos), normalize (plane.plane.xyz))));
-
-		if (abs (sinview * plane.refrindex - sinworld) < 0.01) {
-			// result is good enough, quit
-			break;
-		} else {
-			// correct result
-			oldCorrFactor = corrFactor;
-			corrFactor *= pow ((sinview / sinworld) / plane.refrindex, (abs(dist) / len) + cosToSin (abs (dotPlane)) * (1.0 - iteration * 0.1));
-		}
-		if (abs (corrFactor - oldCorrFactor) < 0.01) {
-			// no further correction possible
-			break;
-		}
-	}
-#else
-	vec3	newPlanePos;
-	double	height;			// distance from viewpos to worldpos along plane normal
-	double	planedist;		// distance from viewpos to plane
-	double	width;			// distance from viewpos to worldpos perpendicular to plane normal
-	vec3	startPlanePos; 
-	vec3	moveVec;		// vector projected along plane
-	double	ior;
-	double	P[5];			// the factors for quartic function
-	dvec4	real, imag;
+	vec3	planepos[3];		/*	0 is for the view position projected on the refraction plane
+									1 is for the world position projected on the refraction plane
+									2 is our test case and will eventually be used
+									0 and 1 are also used as buffer for the bisection method */
+	float	sinV, sinW;			//	storage for our test case
+	float	ior;				//	index of refraction, this gets inverted when inside the fluid
 	int		i;
+	float	distV, distW;
+	float	start, end;
 
-	height = dot (worldpos - viewpos, plane.plane.xyz);
-	planedist = double (distToPlane (viewpos, plane.plane));
-	moveVec = worldpos + (plane.plane.xyz * float(height)) - viewpos;
-	width = length(moveVec);
-	ior = double(plane.refrindex);
-	//if (plane.plane.z < 0) ior = 1.0 / ior;	// assume we are underwater when reflection plane normal has a negative z
-
-	// check if refraction needs to be calculated
-	if ((abs (width) < 0.0001) || (abs (height) < 0.0001) || (abs (ior - 1.0) < 0.001)) {
+	distV = distToPlane (viewpos, plane.plane);
+	distW = distToPlane (worldpos, plane.plane);
+	
+	if ((distV * distW) > 0) {
+		// line doesn't cross the plane
 		return worldpos;
 	}
 
-	P[0] = 1.0;
-	P[1] = -2.0 * width;
-	P[2] = (2.0 * height * planedist - (height * height)) / ((ior * ior) - 1.0) + (planedist * planedist + width * width);
-	P[3] = -2.0 * ior * ior * planedist * planedist * width / ((ior * ior) - 1.0);
-	P[4] = ior * ior * planedist * planedist * width * width / ((ior * ior) - 1.0);
+	ior = plane.refrindex;
+	if ((ior == 1.0) || ior == 0.0) {
+		// no refraction at all, quit
+		return worldpos;
+	}
 
-	BiQuadRoots (P, real, imag);
+	if (distW > 0) {
+		// inside fluid
+		ior = 1.0 / ior;
+	}
 
-	for (i = 0; i < 4; i++) {
-		// search for sane solution
-		if (width > 0) {
-			if ((real[i] > 0) && (real[i] < width) && (abs (imag[i]) < 0.001)) { break; }
+	// project viewpos to plane
+	planepos[0] = viewpos - distV * plane.plane.xyz;
+	// project worldpos to plane
+	planepos[1] = worldpos - distW * plane.plane.xyz;
+
+	start = 0; end = 1;
+
+	for (i = 0; i < 20; i++) {
+		planepos[2] = mix (planepos[0], planepos[1], (start + end) * 0.5);
+		// calculate angles
+		sinV = cosToSin (abs (dot (normalize (viewpos - planepos[2]), plane.plane.xyz)));
+		sinW = cosToSin (abs (dot (normalize (worldpos - planepos[2]), plane.plane.xyz)));
+
+		if (abs (sinV - sinW * ior) < 0.001) {
+			// our result is good enough
+			break;
 		} else {
-			if ((real[i] < 0) && (real[i] > width) && (abs (imag[i]) < 0.001)) { break; }
+			if ((sinV - sinW * ior) > 0) {
+				// our point is too far from view position
+				end = (start + end) * 0.5;
+			} else {
+				// our point is too far from world position
+				start = (start + end) * 0.5;
+			}
 		}
 	}
-	if (i == 4) { return worldpos; }	// no sane solution. shouldn't get here
 
-	newPlanePos = viewPos - plane.plane.xyz * float(planedist) + normalize (moveVec) * float(real[i]);
-#endif
-	return newPlanePos + normalize (newPlanePos - viewpos) * length (worldpos - newPlanePos);
-	//vec3 newDir = normalize (newPlanePos - viewPos);
-	//return newPlanePos + newDir * abs(worldDist)*abs (dot (newDir, plane.plane.xyz));
-	// test case
-	//return planePos + normalize (planePos - viewpos) * length (worldpos - planePos);
+	// calculate new distances
+	distV = length (viewpos - planepos[2]);
+	distW = length (worldpos - planepos[2]);
+
+	if (abs (distToPlane (planepos[2], plane.plane)) > 1)
+		return worldpos;
+
+	// now project our point beyond the newly calculated vector
+	return viewpos + ((planepos[2] - viewpos) / distV) * (distV + distW);
 }
 
-
+#if 0
 // This function is the quadratic formula with P[0] = 1
 // y = P[0]*x^2 + P[1]*x + P[2]
 // Normally, we don't allow P[2] = 0, but this can happen in a call from BiQuadRoots.
@@ -448,29 +391,4 @@ void InvertRoots (int N, inout dvec4 RealRoot, inout dvec4 ImagRoot) {
 	}
 }
 //---------------------------------------------------------------------------
-
-/*
-mat4 rotationMatrix (vec3 axis, float angle) {
-	axis = normalize (axis);
-	float s = sin (angle);
-	float c = cos (angle);
-	float oc = 1.0 - c;
-
-	return mat4 (oc * axis.x * axis.x + c, oc * axis.x * axis.y - axis.z * s, oc * axis.z * axis.x + axis.y * s, 0.0,
-		oc * axis.x * axis.y + axis.z * s, oc * axis.y * axis.y + c, oc * axis.y * axis.z - axis.x * s, 0.0,
-		oc * axis.z * axis.x - axis.y * s, oc * axis.y * axis.z + axis.x * s, oc * axis.z * axis.z + c, 0.0,
-		0.0, 0.0, 0.0, 1.0);
-}
-
-void OutputNormalPrimitive () {
-
-}
-
-void OutputReflectedPrimitive () {
-
-}
-
-void OutputRefractedPrimitive () {
-
-}
-*/
+#endif
