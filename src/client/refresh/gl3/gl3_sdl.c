@@ -133,7 +133,7 @@ enum {
 	QGL_DEBUG_SEVERITY_NOTIFICATION = 0x826B
 };
 
-static void
+static void APIENTRY
 DebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
               const GLchar *message, const void *userParam)
 {
@@ -254,13 +254,14 @@ int GL3_InitContext(void* win)
 
 	if(gl3_debugcontext && gl3_debugcontext->value && gl3config.debug_output)
 	{
-		glDebugMessageCallbackARB((void *(__stdcall *)(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar *, const void*))DebugCallback, NULL);
+		glDebugMessageCallback((void *(__stdcall *)(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar *, const void*))DebugCallback, NULL);
 		// call GL3_DebugCallback() synchronously, i.e. directly when and where the error happens
 		// (so we can get the cause in a backtrace)
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB); // TODO: only do this if gl3_debugcontext->value >= 2 ?
+		glEnable (GL_DEBUG_OUTPUT);
+		glEnable (GL_DEBUG_OUTPUT_SYNCHRONOUS); // TODO: only do this if gl3_debugcontext->value >= 2 ?
 
 		// TODO: the following line could control verboseness (in that case we'd get all the low prio messages)
-		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_ARB, 0, NULL, true);
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_ARB, 0, NULL, true);
 	}
 
 	/* Window title - set here so we can display renderer name in it */
@@ -298,7 +299,7 @@ qboolean GL3_IsVsyncActive(void)
 void GL3_EndFrame(void)
 {
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-#ifdef WIN32kkl
+#ifdef WIN32kg
 	/*
 	SDL_SysWMinfo info;
 	SDL_GetWindowWMInfo ( window, &info );

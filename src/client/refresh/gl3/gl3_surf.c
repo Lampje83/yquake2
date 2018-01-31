@@ -227,6 +227,10 @@ void GL3_SurfInit(void)
 	if ( glCheckFramebufferStatus ( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE ) {
 		R_Printf ( PRINT_ALERT, "Failed to create reflection framebuffers\n" );
 	}
+	glPatchParameteri (GL_PATCH_VERTICES, 3);
+	GLfloat patchlevels[6] = { 3, 3, 3, 3, 1, 1 };
+	glPatchParameterfv (GL_PATCH_DEFAULT_OUTER_LEVEL, patchlevels);
+	glPatchParameterfv (GL_PATCH_DEFAULT_INNER_LEVEL, patchlevels + 4);
 
 	// Set framebuffer target to default output
 	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
@@ -305,6 +309,8 @@ void GL_DrawElements ( void ) {
 		return;
 	}
 
+	int primitivemode;
+
 	if ( numelements > MAX_INDICES ) {
 		ri.Sys_Error ( ERR_DROP, __FUNCTION__": Element list overrun: %d, max %d\n", numelements, MAX_INDICES );
 	} else if ( numelements ) {
@@ -314,7 +320,13 @@ void GL_DrawElements ( void ) {
 
 		GL3_BindEBO (gl3state.ebo3D);
 		glBufferData (GL_ELEMENT_ARRAY_BUFFER, numelements * sizeof (GLuint), elementlist, GL_STREAM_DRAW);
-		glDrawElementsInstanced ( GL_TRIANGLE_FAN, numelements, GL_UNSIGNED_INT, NULL, gl3state.instanceCount + 1);
+
+		if (gl_tessellation->value != 0) {
+			primitivemode = GL_PATCHES;
+		} else {
+			primitivemode = GL_TRIANGLE_FAN;
+		}
+		glDrawElementsInstanced ( primitivemode, numelements, GL_UNSIGNED_INT, NULL, gl3state.instanceCount + 1);
 		numelements = 0;
 	}
 }
@@ -480,11 +492,23 @@ GL3_DrawGLPoly ( msurface_t *fa ) {
 		arraystart[ numarrays ] = p->vertices - gl3_worldmodel->glverts;
 		arraylength[ numarrays++ ] = p->numverts;
 	} else {
-		if ( numelements > 0 ) {
-			elementlist[ numelements++ ] = -1;	// add primitive restart to list
-		}
-		for ( short i = 0; i < p->numverts; i++, numelements++ ) {
-			elementlist[ numelements ] = ( p->vertices - gl3_worldmodel->glverts ) + i;
+		if (gl_tessellation->value) {
+			// set up for GL_TRIANGLES or GL_PATCHES
+			for (short i = 0; i < p->numverts; i++) {
+				if (i > 2) {
+					elementlist[numelements++] = (p->vertices - gl3_worldmodel->glverts);
+					elementlist[numelements++] = (p->vertices - gl3_worldmodel->glverts) + i - 1;
+				}
+				elementlist[numelements++] = (p->vertices - gl3_worldmodel->glverts) + i;
+			}
+		} else {
+			if (numelements > 0) {
+				elementlist[numelements++] = -1;	// add primitive restart to list
+			}
+			// set up for GL_TRIANGLE_FAN
+			for (short i = 0; i < p->numverts; i++, numelements++) {
+				elementlist[numelements] = (p->vertices - gl3_worldmodel->glverts) + i;
+			}
 		}
 	}
 

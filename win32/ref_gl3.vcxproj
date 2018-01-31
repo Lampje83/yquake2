@@ -332,6 +332,7 @@
     <ClInclude Include="..\src\client\refresh\gl3\shaders\Common.glsl">
       <FileType>Document</FileType>
     </ClInclude>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.tese" />
     <None Include="..\src\client\refresh\gl3\shaders\Common3D.geom" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

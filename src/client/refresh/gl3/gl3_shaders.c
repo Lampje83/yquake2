@@ -299,13 +299,15 @@ err_cleanup:
 static qboolean
 initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* fragFilename, const char* geomFilename, const char* shaderDesc)
 {
-	GLuint shaders3D[3] = {0};
+	GLuint shaders3D[5] = {0};
 	GLuint prog = 0;
 	int i=0;
 
 	char*	vertSrc;
 	char*	fragSrc;
 	char*	geomSrc;
+	char*	tescSrc;
+	char*	teseSrc;
 	char*	vertCommon, *fragCommon, *geomCommon;
 	char*	glslCommon;		// for global glsl functions
 	int		fileSize = 0;
@@ -376,6 +378,8 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		goto err_cleanup;
 	}
 
+	GLuint numshaders = 2;
+
 	// Geometry shader is optional
 	if ( geomFilename != NULL ) {
 		if ( strlen ( geomFilename ) > 0 ) {
@@ -385,6 +389,7 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 			} else {
 				shaders3D[ 2 ] = shaders3D[ 1 ];
 				shaders3D[ 1 ] = CompileShader ( GL_GEOMETRY_SHADER, geomCommon, geomSrc );
+				numshaders++;
 			} 
 		}
 	}
@@ -394,8 +399,29 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		R_Printf (PRINT_ALL, __FUNCTION__": Failed to compile 3D geometry shader!\n");
 		shaders3D[1] = shaders3D[2];
 		shaders3D[2] = 0;
+		numshaders = 2;
 	}
-	prog = CreateShaderProgram ( shaders3D[2] != 0 ? 3 : 2, shaders3D );
+
+
+	// hack
+	if (geomFilename != NULL) {
+		if (strcmp (geomFilename, "shaders/3Dlm.geom") == 0) {
+			if (!(fileSize = ri.FS_LoadFile ("shaders/3Dlm.tese", (void **) &teseSrc))) {
+				R_Printf (PRINT_ALL, __FUNCTION__": Failed to load 3D tessellation evaluation shader!\n");
+			}
+
+			GLuint shadernum = 0;// CompileShader (GL_TESS_EVALUATION_SHADER, teseSrc, NULL);
+			if (shadernum > 0) {
+				// insert tessellation evaluation shader
+				shaders3D[3] = shaders3D[2];
+				shaders3D[2] = shaders3D[1];
+				shaders3D[1] = shadernum;
+				numshaders++;
+			}
+		}
+	}
+	//prog = CreateShaderProgram ( shaders3D[2] != 0 ? 3 : 2, shaders3D );
+	prog = CreateShaderProgram ( numshaders, shaders3D );
 
 	if(prog == 0)
 	{

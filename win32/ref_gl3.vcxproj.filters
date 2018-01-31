@@ -224,5 +224,8 @@
     <None Include="..\src\client\refresh\gl3\shaders\Common3D.geom">
       <Filter>Shader Files\Common</Filter>
     </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.tese">
+      <Filter>Shader Files\Brush</Filter>
+    </None>
   </ItemGroup>
 </Project>
