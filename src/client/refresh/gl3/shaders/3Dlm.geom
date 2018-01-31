@@ -34,7 +34,63 @@ void writeVertexData (int index) {
 	gs_out.refIndex = gs_in[index].refIndex;
 }
 
+void mixVertexData (int index1, int index2, float x) {
+	gs_out.LMcoord = mix(gs_in[index1].LMcoord, gs_in[index2].LMcoord, x);
+	gs_out.TexCoord = mix(gs_in[index1].TexCoord, gs_in[index2].TexCoord, x);
+	gs_out.WorldCoord = mix(gs_in[index1].WorldCoord, gs_in[index2].WorldCoord, x);
+	gs_out.Normal = mix(gs_in[index1].Normal, gs_in[index2].Normal, x);
+	gs_out.LightFlags = gs_in[index1].LightFlags;
+	gs_out.SurfFlags = gs_in[index1].SurfFlags;
+	gs_out.refIndex = gs_in[index1].refIndex;
+}
+/*
+4 primitives:
+A - AB - AC
+AB - B - BC
+AB - BC - C
+AB - BC - AC
+*/
+void outputRefractedPrimitive (bool reverse) {
+	int i, i2;
+	for (int j = 0; j < gl_in.length (); j++) {
+
+		if (reverse) {
+			// reverse winding. Needed when drawing reflected triangles, for proper culling
+			i = gl_in.length () - 1 - j;
+		} else {
+			i = j;
+		}
+
+		if (gl_InvocationID < 3) {
+			i2 = gl_InvocationID;
+		} else {
+			i2 = i + 1;
+			if (i2 >= gl_in.length ()) i2 -= gl_in.length ();
+		}
+
+		if (gl_InvocationID == i) {
+			writeVertexData (i);
+		} else {
+			mixVertexData (i, i2, 0.5);
+		}
+
+		if (gl_InvocationID == i) {
+			gl_ClipDistance[0] = -gs_in[i].refPlaneDist;
+			gl_Position = transProj * transView * vec4 (findRefractedPos (viewPos, gs_in[i].WorldCoord, refData[gs_in[i].refIndex]), 1.0);
+		} else {
+			gl_ClipDistance[0] = mix (-gs_in[i].refPlaneDist, -gs_in[i2].refPlaneDist, 0.5);
+			gl_Position = transProj * transView * vec4 (findRefractedPos (viewPos, mix (gs_in[i].WorldCoord, gs_in[i2].WorldCoord, 0.5), refData[gs_in[i].refIndex]), 1.0);
+		}
+		EmitVertex ();
+	}
+	EndPrimitive ();
+}
+
 void outputPrimitive (bool clip, bool reverse) {
+	if (gl_InvocationID > 0) {
+		return;
+	}
+
 	for (int j = 0; j < gl_in.length (); j++) {
 		int i;
 		if (reverse) {
@@ -48,7 +104,7 @@ void outputPrimitive (bool clip, bool reverse) {
 
 		if (!clip) {
 			gl_ClipDistance[0] = 0.0;
-			gl_Position = gl_in[i].gl_Position;
+			gl_Position = transProj * transView * vec4 (gs_in[i].WorldCoord, 1.0);
 		} else {
 			if (reverse) {
 				gl_ClipDistance[0] = gs_in[i].refPlaneDist;
@@ -99,7 +155,7 @@ void main() {
 		if (k > 0) {
 			// output refracted triangle
 			gl_Layer = 2 + gs_in[0].refIndex * 2;
-			outputPrimitive (true, false);
+			outputRefractedPrimitive (false);
 		}
 	} else {
 		gl_Layer = 0;

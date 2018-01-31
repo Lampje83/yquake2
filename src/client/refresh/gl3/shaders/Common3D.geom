@@ -4,7 +4,7 @@
 #include "Common.glsl"
 #endif
 
-layout (triangles) in;
+layout (triangles, invocations = 4) in;
 layout (triangle_strip, max_vertices = 6) out;
 
 // for UBO shared between all 3D shaders

@@ -582,6 +582,7 @@ extern cvar_t *gl_refraction;
 extern cvar_t *gl_multiarray;
 
 extern cvar_t *gl_cullpvs;
+extern cvar_t *gl_tessellation;
 
 extern cvar_t *gl3_debugcontext;
 

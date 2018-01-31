@@ -133,6 +133,7 @@ cvar_t *gl_refraction;
 cvar_t *gl_multiarray;
 
 cvar_t *gl_cullpvs;
+cvar_t *gl_tessellation;
 
 cvar_t *gl3_debugcontext;
 
@@ -260,8 +261,10 @@ GL3_Register(void)
 	gl_skycube = ri.Cvar_Get ( "gl_skycube", "0", CVAR_ARCHIVE ); // TODO: not used right now
 	gl_reflection = ri.Cvar_Get ( "gl_reflection", "1", CVAR_ARCHIVE );
 	gl_refraction = ri.Cvar_Get ( "gl_refraction", "1", CVAR_ARCHIVE );
-	gl_multiarray = ri.Cvar_Get ( "gl_multiarray", "1", CVAR_ARCHIVE );
+	gl_multiarray = ri.Cvar_Get ( "gl_multiarray", "0", CVAR_ARCHIVE );
 	gl_cullpvs = ri.Cvar_Get ( "gl_cullpvs", "1", CVAR_ARCHIVE );
+
+	gl_tessellation = ri.Cvar_Get ("gl_tessellation", "0", CVAR_ARCHIVE);
 
 #if 0 // TODO!
 	//gl_lefthand = ri.Cvar_Get("hand", "0", CVAR_USERINFO | CVAR_ARCHIVE);
@@ -570,12 +573,9 @@ GL3_Init(void)
 
 	GL3_SetDefaultState();
 
-	if(GL3_InitShaders())
-	{
+	if(GL3_InitShaders()) {
 		R_Printf(PRINT_ALL, "Loading shaders succeeded!\n");
-	}
-	else
-	{
+	} else {
 		R_Printf(PRINT_ALL, "Loading shaders failed!\n");
 		return false;
 	}
@@ -583,14 +583,11 @@ GL3_Init(void)
 	registration_sequence = 1; // from R_InitImages() (everything else from there shouldn't be needed anymore)
 
 	GL3_Mod_Init();
-
 	GL3_InitParticleTexture();
-
 	GL3_Draw_InitLocal();
-
 	GL3_SurfInit();
-
 	R_Printf(PRINT_ALL, "\n");
+
 	return true;
 }
 
