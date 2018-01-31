@@ -264,11 +264,24 @@ GL3_EmitWaterPolys(msurface_t *fa)
 			arraystart[ numarrays ] = bp->vertices - gl3_worldmodel->glverts;
 			arraylength[ numarrays++ ] = bp->numverts;
 		} else {
-			if ( numelements > 0 ) {
-				elementlist[ numelements++ ] = -1;	// add primitive restart to list
+			if (gl_tessellation->value) {
+				// set up for GL_TRIANGLES or GL_PATCHES
+				for (short i = 0; i < bp->numverts; i++) {
+					if (i > 2) {
+						elementlist[numelements++] = (bp->vertices - gl3_worldmodel->glverts);
+						elementlist[numelements++] = (bp->vertices - gl3_worldmodel->glverts) + i - 1;
+					}
+					elementlist[numelements++] = (bp->vertices - gl3_worldmodel->glverts) + i;
+				}
 			}
-			for ( short i = 0; i < bp->numverts; i++, numelements++ ) {
-				elementlist[ numelements ] = ( bp->vertices - gl3_worldmodel->glverts ) + i;
+			else {
+				if (numelements > 0) {
+					elementlist[numelements++] = -1;	// add primitive restart to list
+				}
+				// set up for GL_TRIANGLE_FAN
+				for (short i = 0; i < bp->numverts; i++, numelements++) {
+					elementlist[numelements] = (bp->vertices - gl3_worldmodel->glverts) + i;
+				}
 			}
 		}
 	}

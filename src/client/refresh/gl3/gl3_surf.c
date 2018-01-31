@@ -322,7 +322,12 @@ void GL_DrawElements ( void ) {
 		glBufferData (GL_ELEMENT_ARRAY_BUFFER, numelements * sizeof (GLuint), elementlist, GL_STREAM_DRAW);
 
 		if (gl_tessellation->value != 0) {
-			primitivemode = GL_PATCHES;
+			if (gl3state.currentShaderProgram == gl3state.si3Dlm.shaderProgram || gl3state.currentShaderProgram == gl3state.si3DlmFlow.shaderProgram) {
+				primitivemode = GL_PATCHES;
+			}
+			else {
+				primitivemode = GL_TRIANGLES;
+			}
 		} else {
 			primitivemode = GL_TRIANGLE_FAN;
 		}

@@ -132,7 +132,6 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 
 	GLint status;
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
-	if(status != GL_TRUE)
 	{
 		char buf[2048];
 		char* bufPtr = buf;
@@ -153,13 +152,20 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 
 		glGetProgramInfoLog(shaderProgram, bufLen, NULL, bufPtr);
 
-		eprintf("ERROR: Linking shader program failed: %s\n", bufPtr);
+		if (status != GL_TRUE) {
+			eprintf ("ERROR: Linking shader program failed: %s\n", bufPtr);
 
-		glDeleteProgram(shaderProgram);
+			glDeleteProgram (shaderProgram);
 
-		if(bufPtr != buf)  free(bufPtr);
+			if (bufPtr != buf)  free (bufPtr);
 
-		return 0;
+			return 0;
+		}
+		else {
+			if (infoLogLength > 0) {
+				R_Printf (PRINT_ALL, "Linking shader program succeeded: %s\n", bufPtr);
+			}
+		}
 	}
 
 	for(i=0; i<numShaders; ++i)
@@ -410,7 +416,7 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 				R_Printf (PRINT_ALL, __FUNCTION__": Failed to load 3D tessellation evaluation shader!\n");
 			}
 
-			GLuint shadernum = 0;// CompileShader (GL_TESS_EVALUATION_SHADER, teseSrc, NULL);
+			GLuint shadernum = CompileShader (GL_TESS_EVALUATION_SHADER, teseSrc, NULL);
 			if (shadernum > 0) {
 				// insert tessellation evaluation shader
 				shaders3D[3] = shaders3D[2];
@@ -558,6 +564,15 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	glDeleteShader ( shaders3D[ 0 ] );
 	glDeleteShader ( shaders3D[ 1 ] );
 	glDeleteShader ( shaders3D[ 2 ] );
+
+	char buf[8192];
+	GLsizei infoLen;
+
+	glGetProgramInfoLog (prog, 8192, &infoLen, &buf);
+
+	if (infoLen > 0) {
+		R_Printf (PRINT_ALL, "%s: %s\n", shaderDesc, buf);
+	}
 	return true;
 
 err_cleanup:

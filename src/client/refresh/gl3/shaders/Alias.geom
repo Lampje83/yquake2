@@ -7,7 +7,7 @@ in VS_OUT {
 	vec4		Color;
 	vec3		WorldCoord;
 	float		refPlaneDist;
-	flat int	SurfFlags;
+	flat uint	SurfFlags;
 	flat int	refIndex;
 } gs_in[];
 
@@ -16,7 +16,7 @@ out VS_OUT {
 	vec4		Color;
 	vec3		WorldCoord;
 	float		refPlaneDist;
-	flat int	SurfFlags;
+	flat uint	SurfFlags;
 	flat int	refIndex;
 } gs_out;
 

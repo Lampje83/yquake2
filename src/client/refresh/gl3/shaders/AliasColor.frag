@@ -4,7 +4,7 @@ in VS_OUT {
 	vec2		TexCoord;
 	vec4		Color;
 	vec3		WorldCoord;
-	flat int	refIndex;
+	// flat int	refIndex;
 } fs_in;
 
 void main()
