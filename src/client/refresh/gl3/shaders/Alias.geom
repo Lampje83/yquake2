@@ -18,8 +18,8 @@ out VS_OUT {
 	vec2		TexCoord;
 	vec4		Color;
 	vec3		WorldCoord;
-	float		refPlaneDist;
-	flat uint	SurfFlags;
+	//float		refPlaneDist;
+	//flat uint	SurfFlags;
 	flat int	refIndex;
 } gs_out;
 

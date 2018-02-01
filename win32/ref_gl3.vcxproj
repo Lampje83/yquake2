@@ -99,7 +99,6 @@
       <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -124,7 +123,6 @@
       <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -151,7 +149,6 @@
       <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -181,7 +178,6 @@
       <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

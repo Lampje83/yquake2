@@ -419,6 +419,8 @@ GL3_LoadPic(char *name, byte *pic, int width, int realwidth,
 
 	image->texnum = texNum;
 
+	glObjectLabel (GL_TEXTURE, texNum, strlen (name), name);
+
 	GL3_Bind(GL_TEXTURE_2D, 0, texNum);
 
 	if (bits == 8)
