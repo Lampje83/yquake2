@@ -117,12 +117,22 @@ drawTexturedRectangle(float x, float y, float w, float h,
 	//glMultiDrawArrays(mode, first, count, drawcount) ??
 }
 
+void GL3_DrawCroppedTexture (float x, float y, float w, float h) {
+
+	for (byte i = 0; i < 4; ++i)  gl3state.uniCommonData.color.Elements[i] = 1.0;
+	GL3_UpdateUBOCommon ();
+	//glDisable ( GL_BLEND );
+
+	//drawTexturedRectangle (x, vid.height - y, w, -h, x / vid.width, y / vid.height,                    (x + w) / vid.width, (y + h) / vid.height);
+	drawTexturedRectangle (x, y + h, w, -h,            x / vid.width, (vid.height - h - y) / vid.height, (x + w) / vid.width, (vid.height - y) / vid.height);
+}
+
 void GL3_DrawTexture ( float x, float y, float w, float h ) 	{
 
 	for ( byte i = 0; i < 4; ++i )  gl3state.uniCommonData.color.Elements[ i ] = 1.0;
 	GL3_UpdateUBOCommon ();
-	glDisable ( GL_BLEND );
-
+	//glDisable ( GL_BLEND );
+	
 	drawTexturedRectangle ( x, y, w, h, 0, 0, 1, 1 );
 }
 

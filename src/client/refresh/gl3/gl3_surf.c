@@ -204,7 +204,7 @@ void GL3_SurfInit(void)
 	// Setup buffer textures
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
 //	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_R11F_G11F_B10F, vid.width, vid.height, 32, 0, GL_RGBA, GL_FLOAT, 0 );
-	glTexImage3D (GL_TEXTURE_2D_ARRAY, 0, GL_RGB, vid.width, vid.height, 32, 0, GL_RGBA, GL_BYTE, 0);
+	glTexImage3D (GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, vid.width, vid.height, 32, 0, GL_RGBA, GL_BYTE, 0);
 //	glTexImage3D (GL_TEXTURE_2D_ARRAY, 0, GL_RGB, 1024, 1024, 32, 0, GL_RGBA, GL_BYTE, 0);
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -228,7 +228,7 @@ void GL3_SurfInit(void)
 		R_Printf ( PRINT_ALERT, "Failed to create reflection framebuffers\n" );
 	}
 	glPatchParameteri (GL_PATCH_VERTICES, 3);
-	GLfloat patchlevels[6] = { 3, 3, 3, 3, 1, 1 };
+	GLfloat patchlevels[6] = { 3, 3, 3, 3, 4, 4 };
 	glPatchParameterfv (GL_PATCH_DEFAULT_OUTER_LEVEL, patchlevels);
 	glPatchParameterfv (GL_PATCH_DEFAULT_INNER_LEVEL, patchlevels + 4);
 

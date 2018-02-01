@@ -3,6 +3,9 @@
 #define VS_OUT struct VS_OUT
 #endif
 
+layout (triangles) in;
+layout (triangle_strip, max_vertices = 6) out;
+
 in VS_OUT {
 	vec2		TexCoord;
 	vec2		LMcoord;
@@ -133,7 +136,10 @@ void main() {
 					// reflect position
 					pos = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4 (gs_in[i].WorldCoord, 1.0);
 				}
-				if (j < 4) {
+/*				if (gs_in[i].refPlaneDist < 0) {
+					pos = transProj * transView * vec4 (findRefractedPos (viewPos, gs_in[i].WorldCoord, refData[gs_in[i].refIndex]), 1.0);
+				}
+*/				if (j < 4) {
 					// test for view culling
 					if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[gs_in[i].refIndex].cullDistances[j] * pos.w) && (gs_in[i].refPlaneDist > 0)) k++;
 				} else {
@@ -155,7 +161,8 @@ void main() {
 		if (k > 0) {
 			// output refracted triangle
 			gl_Layer = 2 + gs_in[0].refIndex * 2;
-			outputRefractedPrimitive (false);
+			//outputRefractedPrimitive (false);
+			outputPrimitive (true, false);
 		}
 	} else {
 		gl_Layer = 0;

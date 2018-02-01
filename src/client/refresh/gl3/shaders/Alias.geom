@@ -2,6 +2,9 @@
 #include "common3d.geom"
 #endif
 
+layout (triangles) in;
+layout (triangle_strip, max_vertices = 6) out;
+
 in VS_OUT {
 	vec2		TexCoord;
 	vec4		Color;
@@ -79,9 +82,9 @@ void main() {
 				}
 			}
 			if (j < 4) {
-				//if (k == gl_in.length ())
+				if (k == gl_in.length ())
 					// discard
-					//return;
+					return;
 			}
 		}
 

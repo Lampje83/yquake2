@@ -4,9 +4,6 @@
 #include "Common.glsl"
 #endif
 
-layout (triangles, invocations = 4) in;
-layout (triangle_strip, max_vertices = 6) out;
-
 // for UBO shared between all 3D shaders
 #ifndef __INTELLISENSE__
 layout (std140) uniform uni3D {

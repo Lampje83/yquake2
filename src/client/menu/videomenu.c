@@ -231,7 +231,7 @@ VID_MenuInit(void)
 
 	static const char *renderers[] = {
 			"[OpenGL 1.4]",
-			"[OpenGL 3.2]",
+			"[OpenGL 4.3]",
 			"[Custom    ]",
 			0
 	};

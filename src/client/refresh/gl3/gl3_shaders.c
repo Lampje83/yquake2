@@ -106,6 +106,8 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 		return 0;
 	}
 
+	//glProgramParameteri (shaderProgram, GL_PROGRAM_SEPARABLE, GL_TRUE);
+
 	for(i=0; i<numShaders; ++i) {
 		glAttachShader(shaderProgram, shaders[i]);
 		int err = glGetError ();
@@ -128,6 +130,7 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 	// the following line is not necessary/implicit (as there's only one output)
 	// glBindFragDataLocation(shaderProgram, 0, "outColor"); XXX would this even be here?
 
+	//glProgramParameteri (shaderProgram, GL_PROGRAM_SEPARABLE, GL_TRUE);
 	glLinkProgram(shaderProgram);
 
 	GLint status;
@@ -162,7 +165,7 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 			return 0;
 		}
 		else {
-			if (infoLogLength > 0) {
+			if (infoLogLength > 3) {
 				R_Printf (PRINT_ALL, "Linking shader program succeeded: %s\n", bufPtr);
 			}
 		}
@@ -416,7 +419,13 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 				R_Printf (PRINT_ALL, __FUNCTION__": Failed to load 3D tessellation evaluation shader!\n");
 			}
 
-			GLuint shadernum = CompileShader (GL_TESS_EVALUATION_SHADER, teseSrc, NULL);
+			GLuint shadernum;
+			if (gl_tessellation->value) {
+				shadernum = CompileShader (GL_TESS_EVALUATION_SHADER, teseSrc, NULL);
+			} else {
+				shadernum = 0;
+			}
+
 			if (shadernum > 0) {
 				// insert tessellation evaluation shader
 				shaders3D[3] = shaders3D[2];
@@ -660,7 +669,7 @@ static qboolean createShaders ( void ) {
 	if ( gl3_particle_square->value != 0.0f ) {
 		particleFrag = "shaders/ParticlesSquare.frag";
 	}
-	if ( !initShader3D ( &gl3state.siParticle, "shaders/Particles.vert", particleFrag, NULL, "rendering particles" ) ) { return false; }
+	if ( !initShader3D ( &gl3state.siParticle, "shaders/Particles.vert", particleFrag, "shaders/Particles.geom", "rendering particles" ) ) { return false; }
 
 	gl3state.currentShaderProgram = 0;
 

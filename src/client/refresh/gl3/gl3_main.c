@@ -883,7 +883,7 @@ GL3_DrawParticles(void)
 		GL3_BindVAO(gl3state.vaoParticle);
 		GL3_BindVBO(gl3state.vboParticle);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(part_vtx)*numParticles, buf, GL_STREAM_DRAW);
-		glDrawArrays(GL_POINTS, 0, numParticles);
+		glDrawArraysInstanced(GL_POINTS, 0, numParticles, gl3state.instanceCount + 1);
 
 
 		glDisable(GL_BLEND);
@@ -1471,7 +1471,7 @@ GL3_RenderView(refdef_t *fd)
 	GL3_MarkLeafs(); /* done here so we know if we're in water */
 	GL3_DrawWorld();
 	GL3_DrawEntitiesOnList();
-	GL3_DrawParticles();
+
 
 	// render alpha surfaces into reflection buffers first
 	if (gl3state.instanceCount > 0)
@@ -1480,12 +1480,16 @@ GL3_RenderView(refdef_t *fd)
 		glVertexAttribI1i (GL3_ATTRIB_REFINDEX, 0);
 		glDepthMask (0);
 		GL3_DrawAlphaSurfaces ();
+		GL3_DrawParticles ();
 		glDepthMask (1);
 		glVertexAttribI1i (GL3_ATTRIB_REFINDEX, -1);
 	}
 	gl3state.instanceCount = 0;
 
 	GL3_DrawAlphaSurfaces();
+	glDepthMask (0);
+	GL3_DrawParticles ();
+	glDepthMask (1);
 	glDisable (GL_CLIP_DISTANCE0);
 
 	// Note: R_Flash() is now GL3_Draw_Flash() and called from GL3_RenderFrame()
@@ -1575,6 +1579,7 @@ GL3_SetLightLevel(void)
 }
 
 extern GLuint vao2D, vbo2D;
+extern void GL3_DrawCroppedTexture (float x, float y, float w, float h);
 
 static void
 GL3_RenderFrame(refdef_t *fd)
@@ -1603,7 +1608,8 @@ GL3_RenderFrame(refdef_t *fd)
 		GL3_Bind (GL_TEXTURE_2D_ARRAY, 0, gl3state.reflectTexture );
 
 		GL3_UseProgram ( gl3state.si2Darray.shaderProgram );
-		GL3_DrawTexture ( 0, vid.height, vid.width, -vid.height );
+		//GL3_DrawTexture ( 0, vid.height, vid.width, -vid.height );
+		GL3_DrawCroppedTexture (fd->x, fd->y, fd->width, fd->height);
 	//}
 
 	if(v_blend[3] != 0.0f)

@@ -2,6 +2,9 @@
 #include "common3d.geom"
 #endif
 
+layout (triangles) in;
+layout (triangle_strip, max_vertices = 6) out;
+
 in VS_OUT {
 	vec2		TexCoord;
 	vec3		WorldCoord;
@@ -43,12 +46,12 @@ void outputPrimitive (bool clip, bool reverse) {
 			gl_ClipDistance[0] = 0.0;
 			gl_Position = gl_in[i].gl_Position;
 		} else {
-			if ((gs_in[i].refIndex >= 0) && reverse) {
+			if (reverse) {
 				gl_ClipDistance[0] = gs_in[i].refPlaneDist;
 				gl_Position = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4 (gs_in[i].WorldCoord, 1.0);
 			} else {
 				gl_ClipDistance[0] = -gs_in[i].refPlaneDist;
-				gl_Position = gl_in[i].gl_Position;
+				gl_Position = transProj * transView * vec4 (findRefractedPos (viewPos, gs_in[i].WorldCoord, refData[gs_in[i].refIndex]), 1.0);
 			}
 		}
 		EmitVertex ();

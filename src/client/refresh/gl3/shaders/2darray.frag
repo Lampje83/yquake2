@@ -15,6 +15,7 @@ layout (std140) uniform uniCommon
 };
 
 uniform sampler2DArray tex;
+uniform uint texLayer;
 
 out vec4 outColor;
 
@@ -22,7 +23,7 @@ void main()
 {
 	vec3 coord;
 	coord.xy = passTexCoord.xy;
-	coord.z = 0;
+	coord.z = texLayer;
 
 	vec4 texel = texture(tex, coord);
 
