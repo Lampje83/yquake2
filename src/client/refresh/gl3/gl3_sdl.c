@@ -261,7 +261,7 @@ int GL3_InitContext(void* win)
 		glEnable (GL_DEBUG_OUTPUT_SYNCHRONOUS); // TODO: only do this if gl3_debugcontext->value >= 2 ?
 
 		// TODO: the following line could control verboseness (in that case we'd get all the low prio messages)
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_ARB, 0, NULL, true);
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW, 0, NULL, true);
 	}
 
 	/* Window title - set here so we can display renderer name in it */

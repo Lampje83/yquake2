@@ -31,5 +31,5 @@ void main()
 		vs.SurfFlags = surfFlags;
 	}
 	gl_Position = transProj * transView * worldCoord;
-	gl_ClipDistance[0] = 0.0;
+	//gl_ClipDistance[0] = 0.0;
 }

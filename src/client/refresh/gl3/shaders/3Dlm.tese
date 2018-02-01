@@ -63,6 +63,6 @@ void main (void) {
 	tes_out.SurfFlags = tes_in[2].SurfFlags;
 	tes_out.refIndex = tes_in[2].refIndex;
 	gl_Position = transProj * transView * vec4 (tes_in[0].WorldCoord * gl_TessCoord.x + tes_in[1].WorldCoord * gl_TessCoord.y + tes_in[2].WorldCoord * gl_TessCoord.z, 1);
-	gl_ClipDistance[0] = 0.0; //gl_in[0].gl_ClipDistance[0] * gl_TessCoord.x + gl_in[1].gl_ClipDistance[0] * gl_TessCoord.y + gl_in[2].gl_ClipDistance[0] * gl_TessCoord.z;
+	//gl_ClipDistance[0] = 0.0; //gl_in[0].gl_ClipDistance[0] * gl_TessCoord.x + gl_in[1].gl_ClipDistance[0] * gl_TessCoord.y + gl_in[2].gl_ClipDistance[0] * gl_TessCoord.z;
 
 }

@@ -443,6 +443,8 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		goto err_cleanup;
 	}
 
+	glObjectLabel (GL_PROGRAM, prog, strlen (shaderDesc), shaderDesc);
+
 	GL3_UseProgram(prog);
 
 	// Bind the buffer object to the uniform blocks
@@ -580,7 +582,7 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	glGetProgramInfoLog (prog, 8192, &infoLen, &buf);
 
 	if (infoLen > 0) {
-		R_Printf (PRINT_ALL, "%s: %s\n", shaderDesc, buf);
+		R_Printf (PRINT_DEVELOPER, "%s: %s ", shaderDesc, buf);
 	}
 	return true;
 
@@ -657,8 +659,8 @@ static qboolean createShaders ( void ) {
 	if ( !initShader3D ( &gl3state.si3Dtrans,		"shaders/3D.vert",		"shaders/3D.frag",				"shaders/3D.geom",		"rendering translucent 3D things" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3DcolorOnly,	"shaders/3D.vert",		"shaders/3Dcolor.frag",			"shaders/3D.geom",		"flat-colored 3D rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dturb,		"shaders/3D.vert",		"shaders/3Dwater.frag",			"shaders/3D.geom",		"water rendering" ) ) { return false; }
-	if ( !initShader3D ( &gl3state.si3DlmFlow,		"shaders/3DlmFlow.vert","shaders/3Dlm.frag",			"shaders/3Dlm.geom",	"scrolling textured 3D rendering with lightmap" ) ) {	return false; }
-	if ( !initShader3D ( &gl3state.si3DtransFlow,	"shaders/3D.vert",		"shaders/3D.frag",				"shaders/3d.geom",		"scrolling textured translucent 3D rendering" ) ) { return false; }
+	//if ( !initShader3D ( &gl3state.si3DlmFlow,		"shaders/3DlmFlow.vert","shaders/3Dlm.frag",			"shaders/3Dlm.geom",	"scrolling textured 3D rendering with lightmap" ) ) {	return false; }
+	//if ( !initShader3D ( &gl3state.si3DtransFlow,	"shaders/3D.vert",		"shaders/3D.frag",				"shaders/3d.geom",		"scrolling textured translucent 3D rendering" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3Dsky,			"shaders/3D.vert",		"shaders/3Dsky.frag",			"shaders/3d.geom",		"sky rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dsprite,		"shaders/3D.vert",		"shaders/3Dsprite.frag",		"shaders/3d.geom",		"sprite rendering" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3DspriteAlpha, "shaders/3D.vert",		"shaders/3DspriteAlpha.frag",	"shaders/3d.geom",		"alpha-tested sprite rendering" ) ) { return false;	}

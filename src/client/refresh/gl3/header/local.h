@@ -251,8 +251,10 @@ typedef struct
 	gl3ShaderInfo_t si3Dtrans;     // transparent is always w/o lightmap
 	gl3ShaderInfo_t si3DcolorOnly; // used for beams - no lightmaps
 	gl3ShaderInfo_t si3Dturb;      // for water etc - always without lightmap
+#if 0 
 	gl3ShaderInfo_t si3DlmFlow;    // for flowing/scrolling things with lightmap (conveyor, ..?)
 	gl3ShaderInfo_t si3DtransFlow; // for transparent flowing/scrolling things (=> no lightmap)
+#endif
 	gl3ShaderInfo_t si3Dsky;       // guess what..
 	gl3ShaderInfo_t si3Dsprite;    // for sprites
 	gl3ShaderInfo_t si3DspriteAlpha; // for sprites with alpha-testing

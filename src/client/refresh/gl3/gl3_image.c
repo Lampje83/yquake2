@@ -124,6 +124,7 @@ GL3_Bind(GLenum target, GLuint texunit, GLuint texnum)
 		return;
 	}
 
+	gl3state.currenttarget[texunit] = target;
 	gl3state.currenttexture[texunit] = texnum;
 	GL3_SelectTMU (GL_TEXTURE0 + texunit);
 	glBindTexture(target, texnum);

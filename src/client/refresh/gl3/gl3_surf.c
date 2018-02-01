@@ -322,7 +322,11 @@ void GL_DrawElements ( void ) {
 		glBufferData (GL_ELEMENT_ARRAY_BUFFER, numelements * sizeof (GLuint), elementlist, GL_STREAM_DRAW);
 
 		if (gl_tessellation->value != 0) {
-			if (gl3state.currentShaderProgram == gl3state.si3Dlm.shaderProgram || gl3state.currentShaderProgram == gl3state.si3DlmFlow.shaderProgram) {
+			if (gl3state.currentShaderProgram == gl3state.si3Dlm.shaderProgram
+#if 0
+				|| gl3state.currentShaderProgram == gl3state.si3DlmFlow.shaderProgram
+#endif
+				) {
 				primitivemode = GL_PATCHES;
 			}
 			else {
@@ -613,17 +617,13 @@ RenderBrushPoly(msurface_t *fa)
 
 	image = TextureAnimation(fa->texinfo);
 
+	GL3_Bind (GL_TEXTURE_2D, 0, image->texnum);
+
 	if (fa->flags & SURF_DRAWTURB)
 	{
-		GL3_Bind(GL_TEXTURE_2D, 0, image->texnum);
-
 		GL3_EmitWaterPolys(fa);
 
 		return;
-	}
-	else
-	{
-		GL3_Bind(GL_TEXTURE_2D, 0, image->texnum);
 	}
 
 	hmm_vec4 lmScales[MAX_LIGHTMAPS_PER_SURFACE] = {0};
@@ -639,7 +639,7 @@ RenderBrushPoly(msurface_t *fa)
 		lmScales[map].B = gl3_newrefdef.lightstyles[fa->styles[map]].rgb[2];
 		lmScales[map].A = 1.0f;
 	}
-
+#if 0 // removing redundant shaders
 	if (fa->texinfo->flags & SURF_FLOWING)
 	{
 		GL3_UseProgram(gl3state.si3DlmFlow.shaderProgram);
@@ -647,9 +647,10 @@ RenderBrushPoly(msurface_t *fa)
 		GL3_DrawGLPoly(fa);
 	}
 	else
+#endif
 	{
-		GL3_UseProgram(gl3state.si3DlmFlow.shaderProgram);
-		UpdateLMscales(lmScales, &gl3state.si3DlmFlow);
+		GL3_UseProgram(gl3state.si3Dlm.shaderProgram);
+		UpdateLMscales(lmScales, &gl3state.si3Dlm);
 		GL3_DrawGLPoly(fa);
 	}
 
@@ -788,9 +789,11 @@ void GL3_DrawAlphaSurfaces ( void ) {
 
 		if ( s->flags & SURF_DRAWTURB ) {
 			GL3_EmitWaterPolys ( s );
+#if 0	// removing redundant shaders
 		} else if ( s->texinfo->flags & SURF_FLOWING ) {
 			GL3_UseProgram ( gl3state.si3DtransFlow.shaderProgram );
 			GL3_DrawGLPoly ( s );
+#endif
 		} else {
 			GL3_UseProgram ( gl3state.si3Dtrans.shaderProgram );
 			GL3_DrawGLPoly ( s );
@@ -957,13 +960,14 @@ RenderLightmappedPoly(msurface_t *surf)
 
 	GL3_Bind(GL_TEXTURE_2D, 0, image->texnum);
 	GL3_BindLightmap(surf->lightmaptexturenum);
-
+#if 0 // removing redundant shaders
 	if (surf->texinfo->flags & SURF_FLOWING)
 	{
 		GL3_UseProgram(gl3state.si3DlmFlow.shaderProgram);
 		UpdateLMscales(lmScales, &gl3state.si3DlmFlow);
 	}
 	else
+#endif
 	{
 		GL3_UseProgram(gl3state.si3Dlm.shaderProgram);
 		UpdateLMscales(lmScales, &gl3state.si3Dlm);
