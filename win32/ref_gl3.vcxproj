@@ -256,15 +256,19 @@
     </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3D.frag">
       <FileType>Document</FileType>
+      <DeploymentContent>true</DeploymentContent>
     </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3D.vert">
       <FileType>Document</FileType>
+      <DeploymentContent>true</DeploymentContent>
     </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dcolor.frag">
       <FileType>Document</FileType>
+      <DeploymentContent>true</DeploymentContent>
     </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.frag">
       <FileType>Document</FileType>
+      <DeploymentContent>true</DeploymentContent>
     </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.geom">
       <FileType>Document</FileType>
@@ -272,15 +276,19 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <DeploymentContent>true</DeploymentContent>
     </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlmflow.vert">
       <FileType>Document</FileType>
+      <DeploymentContent>true</DeploymentContent>
     </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Drefract.vert">
       <FileType>Document</FileType>
+      <DeploymentContent>true</DeploymentContent>
     </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dsky.frag">
       <FileType>Document</FileType>
+      <DeploymentContent>true</DeploymentContent>
     </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dsprite.frag">
       <FileType>Document</FileType>
@@ -294,6 +302,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <DeploymentContent>true</DeploymentContent>
     </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\Alias.frag">
       <FileType>Document</FileType>
@@ -319,7 +328,9 @@
     <ClInclude Include="..\src\client\refresh\gl3\shaders\ParticlesSquare.frag">
       <FileType>Document</FileType>
     </ClInclude>
-    <None Include="..\src\client\refresh\gl3\shaders\3D.geom" />
+    <None Include="..\src\client\refresh\gl3\shaders\3D.geom">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\Alias.geom">
       <FileType>Document</FileType>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
@@ -328,9 +339,29 @@
     <ClInclude Include="..\src\client\refresh\gl3\shaders\Common.glsl">
       <FileType>Document</FileType>
     </ClInclude>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.tese" />
+    <ClCompile Include="..\src\client\refresh\gl3\shaders\3Dlm.tesc">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">glsl.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">glsl.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glsl.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glsl.h</ForcedIncludeFiles>
+    </ClCompile>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.tese">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\src\client\refresh\gl3\shaders\Common3D.geom" />
     <None Include="..\src\client\refresh\gl3\shaders\Particles.geom" />
+    <None Include="..\src\OpenGL.dgml">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

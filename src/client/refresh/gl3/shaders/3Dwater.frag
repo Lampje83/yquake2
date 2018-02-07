@@ -8,17 +8,6 @@ uniform sampler2D tex;
 uniform	sampler2DArray refl;
 uniform sampler2DArray reflDepth;
 
-struct refData_s {
-	mat4	refMatrix;
-	vec4	color;
-	vec4	plane;
-	vec4	cullDistances;
-	int		flags;
-	float	refrindex;
-	float	_pad_1;
-	float	_pad_2;
-};
-
 #ifndef __INTELLISENSE__
 layout (std140) uniform refDat {
 #endif
@@ -40,10 +29,6 @@ float brightness (vec3 color)
 	return (color.r + color.g + color.b);
 }
 
-float cosToSin (float value) {
-	return sqrt (1 - value * value);
-}
-
 void main()
 {
 	vec2 texw;
@@ -56,7 +41,7 @@ void main()
 	texel.rgb *= intensity * 1.0;
 	texel.rgb = pow(texel.rgb, vec3(gamma));
 
-	float newalpha = pow(alpha, 5.0);
+	float newalpha = pow(alpha, 2.0);
 
 	if (alpha < 1)
 	{

@@ -498,6 +498,11 @@ Mod_LoadFaces(lump_t *l)
 	if (loadmodel->glverts) {
 		Hunk_Free (loadmodel->glverts);
 	}
+	
+	GL3_BindVAO (gl3state.vao3D);
+	GL3_BindVBO (gl3state.vbo3D);
+	glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*currentmodel->maxglverts, NULL, GL_DYNAMIC_DRAW );
+	//loadmodel->glverts = glMapBuffer (GL_ARRAY_BUFFER, GL_READ_WRITE);
 	loadmodel->glverts = Hunk_Alloc ( loadmodel->maxglverts * sizeof ( gl3_3D_vtx_t ) );
 	loadmodel->numglverts = 0;
 
@@ -576,7 +581,12 @@ Mod_LoadFaces(lump_t *l)
 	// Upload the world to GL. This doesn't change anymore
 	GL3_BindVAO ( gl3state.vao3D );
 	GL3_BindVBO ( gl3state.vbo3D );
-	glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*currentmodel->numglverts, currentmodel->glverts, GL_STATIC_DRAW );
+	
+	glObjectLabel (GL_BUFFER, gl3state.vbo3D, 5, "World");
+
+	//glUnmapBuffer (GL_ARRAY_BUFFER);
+	//glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*currentmodel->numglverts, currentmodel->glverts, GL_DYNAMIC_COPY );
+	glBufferSubData (GL_ARRAY_BUFFER, 0, sizeof (gl3_3D_vtx_t)*currentmodel->numglverts, currentmodel->glverts);
 
 }
 

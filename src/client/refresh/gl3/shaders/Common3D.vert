@@ -38,17 +38,6 @@ layout (std140) uniform uni3D
 
 #define REFSURF_PLANEBACK	2
 
-struct refData_s {
-	mat4	refMatrix;
-	vec4	color;
-	vec4	plane;
-	vec4	cullDistances;
-	int		flags;
-	float	refrindex;
-	float	_pad_1;
-	float	_pad_2;
-};
-
 #ifndef __INTELLISENSE__
 layout ( std140 ) uniform refDat {
 #endif

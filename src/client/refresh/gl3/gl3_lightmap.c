@@ -57,9 +57,12 @@ GL3_LM_UploadBlock(void)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		gl3_lms.internal_format = GL_LIGHTMAP_FORMAT;
+/*		
 		glTexImage2D(GL_TEXTURE_2D, 0, gl3_lms.internal_format,
 		             BLOCK_WIDTH, BLOCK_HEIGHT, 0, GL_LIGHTMAP_FORMAT,
 		             GL_UNSIGNED_BYTE, gl3_lms.lightmap_buffers[map]);
+*/					 
+		glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, GL_LIGHTMAP_FORMAT, GL_UNSIGNED_BYTE, gl3_lms.lightmap_buffers[map]);
 	}
 
 	if (++gl3_lms.current_lightmap_texture == MAX_LIGHTMAPS)

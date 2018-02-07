@@ -97,6 +97,7 @@
     <ClCompile Include="..\src\backends\windows\shared\mem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\client\refresh\gl3\shaders\3Dlm.tesc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\common\header\shared.h">
@@ -229,6 +230,9 @@
     </None>
     <None Include="..\src\client\refresh\gl3\shaders\Particles.geom">
       <Filter>Shader Files\Effects</Filter>
+    </None>
+    <None Include="..\src\OpenGL.dgml">
+      <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
 </Project>

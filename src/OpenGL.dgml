@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph GraphDirection="LeftToRight" Layout="Sugiyama" ZoomLevel="-1" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="Attributes" Bounds="81.6325754412931,-208.582525704739,178.613333333333,149.8802" Group="Expanded" LayoutSettings="List" UseManualLocation="True" />
+    <Node Id="Color" Bounds="87.6325754412931,-154.622425704739,73.5133333333334,25.96" Label="LightFlags" />
+    <Node Id="Color1" Bounds="87.6325754412931,-182.582425704739,50,25.96" Label="Color" />
+    <Node Id="FragmentShader" Bounds="828.333850623675,-81.01589831562,110.75,25.96" Label="Fragment Shader" />
+    <Node Id="GeometryShader" Bounds="687.340517290342,-81.01589831562,110.993333333333,25.96" Label="Geometry shader" />
+    <Node Id="LMCoord" Bounds="87.6325754412931,-126.662425704738,69.1566666666667,25.96" Label="LMCoord" />
+    <Node Id="Normal" Bounds="87.6325754412931,-98.7024257047385,59.53,25.96" Label="Normal" />
+    <Node Id="Position" Category="Category1" Bounds="163.145908774626,-98.7024257047385,91.1,34" Label="Position" />
+    <Node Id="RefIndex" Bounds="163.145908774626,-182.582425704739,65.6933333333333,25.96" />
+    <Node Id="Shaders" Bounds="384.277183957009,-121.01599831562,574.806666666666,85.9602" Group="Expanded" LayoutSettings="LeftToRight" UseManualLocation="True" />
+    <Node Id="SurfFlags" Bounds="163.145908774626,-154.622425704739,68.1266666666667,25.96" />
+    <Node Id="TES" Bounds="607.340517290342,-81.01589831562,50,25.96" />
+    <Node Id="TessellationControlShader" Bounds="527.340517290342,-81.01589831562,50,25.96" Label="TCS" />
+    <Node Id="TexCoord" Bounds="163.145908774626,-126.662425704738,69.63,25.96" />
+    <Node Id="Uniforms" Bounds="639.027404359444,-226.015928291759,68.33,25.96" Label="Uniforms" UseManualLocation="True" />
+    <Node Id="VertexShader" Bounds="404.277183957009,-81.0158983156199,93.0633333333333,25.96" Label="Vertex Shader" />
+  </Nodes>
+  <Links>
+    <Link Source="Attributes" Target="Color" Category="Contains" />
+    <Link Source="Attributes" Target="Color1" Category="Contains" />
+    <Link Source="Attributes" Target="LMCoord" Category="Contains" />
+    <Link Source="Attributes" Target="Normal" Category="Contains" />
+    <Link Source="Attributes" Target="Position" Category="Contains" />
+    <Link Source="Attributes" Target="RefIndex" Category="Contains" />
+    <Link Source="Attributes" Target="SurfFlags" Category="Contains" />
+    <Link Source="Attributes" Target="TexCoord" Category="Contains" />
+    <Link Source="GeometryShader" Target="FragmentShader" Bounds="798.333862304688,-68.0358963012695,21,0" />
+    <Link Source="Shaders" Target="FragmentShader" Category="Contains" Bounds="59.351863861084,208.903106689453,466.635074615479,10.1962280273438" />
+    <Link Source="Shaders" Target="GeometryShader" Category="Contains" Bounds="59.351863861084,206.174011230469,306.703067779541,12.9231414794922" />
+    <Link Source="Shaders" Target="TES" Category="Contains" Bounds="59.4052810668945,172.843978881836,232.94310760498,10.1828155517578" />
+    <Link Source="Shaders" Target="TessellationControlShader" Category="Contains" Bounds="59.351863861084,204.043029785156,146.83865737915,15.0593719482422" />
+    <Link Source="Shaders" Target="VertexShader" Category="Contains" Bounds="61.8800000000003,195.96901941723,21.0001003448426,0.00581333927900118" />
+    <Link Source="TES" Target="GeometryShader" Bounds="657.340515136719,-68.0358963012695,21,0" />
+    <Link Source="TessellationControlShader" Target="TES" Bounds="577.340515136719,-68.0358963012695,21,0" />
+    <Link Source="VertexShader" Target="TessellationControlShader" Bounds="497.340515136719,-68.0358963012695,21,0" />
+  </Links>
+  <Categories>
+    <Category Id="Category1" Label="Category 1" Background="#FFE51400" IsTag="True" />
+    <Category Id="Contains" Label="Contains" Description="Whether the source of the link contains the target object" CanBeDataDriven="False" CanLinkedNodesBeDataDriven="True" IncomingActionLabel="Contained By" IsContainment="True" OutgoingActionLabel="Contains" />
+  </Categories>
+  <Properties>
+    <Property Id="Background" Label="Background" Description="The background color" DataType="System.Windows.Media.Brush" />
+    <Property Id="Bounds" DataType="System.Windows.Rect" />
+    <Property Id="CanBeDataDriven" Label="CanBeDataDriven" Description="CanBeDataDriven" DataType="System.Boolean" />
+    <Property Id="CanLinkedNodesBeDataDriven" Label="CanLinkedNodesBeDataDriven" Description="CanLinkedNodesBeDataDriven" DataType="System.Boolean" />
+    <Property Id="Expression" DataType="System.String" />
+    <Property Id="GraphDirection" DataType="Microsoft.VisualStudio.Diagrams.Layout.LayoutOrientation" />
+    <Property Id="Group" Label="Group" Description="Display the node as a group" DataType="Microsoft.VisualStudio.GraphModel.GraphGroupStyle" />
+    <Property Id="GroupLabel" DataType="System.String" />
+    <Property Id="IncomingActionLabel" Label="IncomingActionLabel" Description="IncomingActionLabel" DataType="System.String" />
+    <Property Id="IsContainment" DataType="System.Boolean" />
+    <Property Id="IsEnabled" DataType="System.Boolean" />
+    <Property Id="IsTag" DataType="System.Boolean" />
+    <Property Id="Label" Label="Label" Description="Displayable label of an Annotatable object" DataType="System.String" />
+    <Property Id="Layout" DataType="System.String" />
+    <Property Id="LayoutSettings" DataType="Microsoft.VisualStudio.Diagrams.View.GroupLayoutStyle" />
+    <Property Id="OutgoingActionLabel" Label="OutgoingActionLabel" Description="OutgoingActionLabel" DataType="System.String" />
+    <Property Id="TargetType" DataType="System.Type" />
+    <Property Id="UseManualLocation" DataType="System.Boolean" />
+    <Property Id="Value" DataType="System.String" />
+    <Property Id="ValueLabel" DataType="System.String" />
+    <Property Id="ZoomLevel" DataType="System.String" />
+  </Properties>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Category 1" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category1')" />
+      <Setter Property="Background" Value="#FFE51400" />
+      <Setter Property="Icon" Value="pack://application:,,,/Microsoft.VisualStudio.Progression.GraphControl;component/Icons/kpi_green_cat1_large.png" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Group" ValueLabel="Expanded">
+      <Condition Expression="Group = 'Expanded'" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="vec2" ValueLabel="vec2" />
+    <Style TargetType="Node" GroupLabel="vec3" ValueLabel="vec3" />
+    <Style TargetType="Node" GroupLabel="vec4" ValueLabel="vec4" />
+  </Styles>
+</DirectedGraph>

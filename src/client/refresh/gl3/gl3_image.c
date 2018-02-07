@@ -182,9 +182,16 @@ GL3_Upload32(unsigned *data, int width, int height, qboolean mipmap)
 		}
 	}
 
+	int tw = width;
+	int th = height;
+	for (i = 0; tw > 1 || th > 1; i++, tw >>= 1, th >>= 1);
+
+	glTexStorage2D (GL_TEXTURE_2D, mipmap ? i : 1, comp, width, height);
+	glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+/*
 	glTexImage2D(GL_TEXTURE_2D, 0, comp, width, height,
 	             0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
+*/
 	res = (samples == gl3_alpha_format);
 
 	if (mipmap)

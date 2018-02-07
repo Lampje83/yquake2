@@ -59,7 +59,7 @@ static int console_textlen;
 
 char findbase[MAX_OSPATH];
 char findpath[MAX_OSPATH];
-int findhandle;
+intptr_t findhandle;
 
 int argc;
 char *argv[MAX_NUM_ARGVS];

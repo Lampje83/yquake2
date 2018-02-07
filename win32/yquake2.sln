@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yquake2", "yquake2.vcxproj", "{846FFA24-F2B6-49DB-90E8-9B19D4F97FC4}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -40,6 +40,7 @@ Global
 		{846FFA24-F2B6-49DB-90E8-9B19D4F97FC4}.Debug|x64.Build.0 = Debug|x64
 		{846FFA24-F2B6-49DB-90E8-9B19D4F97FC4}.Debug|x86.ActiveCfg = Debug|Win32
 		{846FFA24-F2B6-49DB-90E8-9B19D4F97FC4}.Debug|x86.Build.0 = Debug|Win32
+		{846FFA24-F2B6-49DB-90E8-9B19D4F97FC4}.Debug|x86.Deploy.0 = Debug|Win32
 		{846FFA24-F2B6-49DB-90E8-9B19D4F97FC4}.Release|Itanium.ActiveCfg = Release|Win32
 		{846FFA24-F2B6-49DB-90E8-9B19D4F97FC4}.Release|x64.ActiveCfg = Release|x64
 		{846FFA24-F2B6-49DB-90E8-9B19D4F97FC4}.Release|x64.Build.0 = Release|x64
@@ -74,6 +75,7 @@ Global
 		{A6861DEC-4E60-44A4-98A8-F03DEC75BE6B}.Debug|x64.Build.0 = Debug|x64
 		{A6861DEC-4E60-44A4-98A8-F03DEC75BE6B}.Debug|x86.ActiveCfg = Debug|Win32
 		{A6861DEC-4E60-44A4-98A8-F03DEC75BE6B}.Debug|x86.Build.0 = Debug|Win32
+		{A6861DEC-4E60-44A4-98A8-F03DEC75BE6B}.Debug|x86.Deploy.0 = Debug|Win32
 		{A6861DEC-4E60-44A4-98A8-F03DEC75BE6B}.Release|Itanium.ActiveCfg = Release|Win32
 		{A6861DEC-4E60-44A4-98A8-F03DEC75BE6B}.Release|x64.ActiveCfg = Release|x64
 		{A6861DEC-4E60-44A4-98A8-F03DEC75BE6B}.Release|x64.Build.0 = Release|x64
@@ -138,6 +140,7 @@ Global
 		{DB528B4F-776F-4C5F-91FD-C0D478FE3349}.Debug|x64.Build.0 = Debug|x64
 		{DB528B4F-776F-4C5F-91FD-C0D478FE3349}.Debug|x86.ActiveCfg = Debug|Win32
 		{DB528B4F-776F-4C5F-91FD-C0D478FE3349}.Debug|x86.Build.0 = Debug|Win32
+		{DB528B4F-776F-4C5F-91FD-C0D478FE3349}.Debug|x86.Deploy.0 = Debug|Win32
 		{DB528B4F-776F-4C5F-91FD-C0D478FE3349}.Release|Itanium.ActiveCfg = Release|Win32
 		{DB528B4F-776F-4C5F-91FD-C0D478FE3349}.Release|x64.ActiveCfg = Release|x64
 		{DB528B4F-776F-4C5F-91FD-C0D478FE3349}.Release|x64.Build.0 = Release|x64
@@ -154,6 +157,7 @@ Global
 		{527DDA59-DBAA-4BBE-825A-1F3D5DD3FD92}.Debug|x64.Build.0 = Debug|x64
 		{527DDA59-DBAA-4BBE-825A-1F3D5DD3FD92}.Debug|x86.ActiveCfg = Debug|Win32
 		{527DDA59-DBAA-4BBE-825A-1F3D5DD3FD92}.Debug|x86.Build.0 = Debug|Win32
+		{527DDA59-DBAA-4BBE-825A-1F3D5DD3FD92}.Debug|x86.Deploy.0 = Debug|Win32
 		{527DDA59-DBAA-4BBE-825A-1F3D5DD3FD92}.Release|Itanium.ActiveCfg = Release|Win32
 		{527DDA59-DBAA-4BBE-825A-1F3D5DD3FD92}.Release|x64.ActiveCfg = Release|x64
 		{527DDA59-DBAA-4BBE-825A-1F3D5DD3FD92}.Release|x64.Build.0 = Release|x64

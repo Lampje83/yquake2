@@ -86,8 +86,8 @@ enum {
 // TODO: do we need the following configurable?
 static const int gl3_solid_format = GL_RGB;
 static const int gl3_alpha_format = GL_RGBA;
-static const int gl3_tex_solid_format = GL_RGB;
-static const int gl3_tex_alpha_format = GL_RGBA;
+static const int gl3_tex_solid_format = GL_RGB8;
+static const int gl3_tex_alpha_format = GL_RGBA8;
 
 extern unsigned gl3_rawpalette[256];
 extern unsigned d_8to24table[256];

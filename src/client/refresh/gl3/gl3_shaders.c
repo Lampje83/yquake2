@@ -264,7 +264,7 @@ initShader2D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	}
 	else
 	{
-		R_Printf(PRINT_ALL, "WARNING: Couldn't find uniform block index 'uniCommon'\n");
+		R_Printf(PRINT_ALL, "WARNING: Couldn't find uniform block index 'uniCommon' in program %s\n", shaderDesc);
 		// TODO: clean up?
 		return false;
 	}
@@ -376,6 +376,7 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		ri.FS_FreeFile( fragSrc );
 		goto err_cleanup;
 	}
+	glObjectLabel (GL_SHADER, shaders3D[0], strlen (vertFilename), vertFilename);
 
 	shaders3D[1] = CompileShader(GL_FRAGMENT_SHADER, fragCommon, fragSrc);
 	ri.FS_FreeFile( fragCommon );
@@ -386,6 +387,7 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		glDeleteShader(shaders3D[0]);
 		goto err_cleanup;
 	}
+	glObjectLabel (GL_SHADER, shaders3D[1], strlen (fragFilename), fragFilename);
 
 	GLuint numshaders = 2;
 
@@ -419,18 +421,34 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 				R_Printf (PRINT_ALL, __FUNCTION__": Failed to load 3D tessellation evaluation shader!\n");
 			}
 
-			GLuint shadernum;
+			GLuint tessshadernum[2];
 			if (gl_tessellation->value) {
-				shadernum = CompileShader (GL_TESS_EVALUATION_SHADER, teseSrc, NULL);
+				tessshadernum[0] = CompileShader (GL_TESS_EVALUATION_SHADER, teseSrc, NULL);
+
+				if (!(fileSize = ri.FS_LoadFile ("shaders/3Dlm.tesc", (void **) &tescSrc))) {
+					R_Printf (PRINT_ALL, __FUNCTION__": Failed to load 3D tessellation control shader!\n");
+					tessshadernum[1] = 0;
+				} else {
+					tessshadernum[1] = CompileShader (GL_TESS_CONTROL_SHADER, tescSrc, NULL);
+				}
 			} else {
-				shadernum = 0;
+				tessshadernum[0] = tessshadernum[1] = 0;
 			}
 
-			if (shadernum > 0) {
+			if (tessshadernum[0] > 0) {
 				// insert tessellation evaluation shader
 				shaders3D[3] = shaders3D[2];
 				shaders3D[2] = shaders3D[1];
-				shaders3D[1] = shadernum;
+				shaders3D[1] = tessshadernum[0];
+				numshaders++;
+			}
+
+			if (tessshadernum[1] > 0) {
+				// insert tessellation control shader
+				shaders3D[4] = shaders3D[3];
+				shaders3D[3] = shaders3D[2];
+				shaders3D[2] = shaders3D[1];
+				shaders3D[1] = tessshadernum[1];
 				numshaders++;
 			}
 		}

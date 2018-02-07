@@ -451,6 +451,8 @@ GL3_SetMode(void)
 // only needed (and allowed!) if using OpenGL compatibility profile, it's not in 3.2 core
 enum { QGL_POINT_SPRITE = 0x8861 };
 
+extern gl3lightmapstate_t gl3_lms;
+
 static qboolean
 GL3_Init(void)
 {
@@ -570,7 +572,15 @@ GL3_Init(void)
 
 	// generate texture handles for all possible lightmaps
 	glGenTextures(MAX_LIGHTMAPS*MAX_LIGHTMAPS_PER_SURFACE, gl3state.lightmap_textureIDs[0]);
-
+	char lmname[16];
+	for (int i = 0; i < MAX_LIGHTMAPS; i++) {
+		for (int j = 0; j < MAX_LIGHTMAPS_PER_SURFACE; j++) {
+			glBindTexture (GL_TEXTURE_2D, gl3state.lightmap_textureIDs[i][j]);
+			glTexStorage2D (GL_TEXTURE_2D, 1, GL_RGBA8, BLOCK_WIDTH, BLOCK_HEIGHT);
+			sprintf (lmname, "lightmap%u_%u", i, j);
+			glObjectLabel (GL_TEXTURE, gl3state.lightmap_textureIDs[i][j], strlen (lmname), lmname);
+		}
+	}
 	GL3_SetDefaultState();
 
 	if(GL3_InitShaders()) {

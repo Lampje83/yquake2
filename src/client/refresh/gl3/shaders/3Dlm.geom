@@ -22,6 +22,7 @@ out VS_OUT {
 	vec2		LMcoord;
 	vec3		WorldCoord;
 	vec3		Normal;
+	float		refPlaneDist;
 	flat uint	LightFlags;
 	flat uint	SurfFlags;
 	flat int	refIndex;
@@ -32,6 +33,7 @@ void writeVertexData (int index) {
 	gs_out.TexCoord = gs_in[index].TexCoord;
 	gs_out.WorldCoord = gs_in[index].WorldCoord;
 	gs_out.Normal = gs_in[index].Normal;
+	gs_out.refPlaneDist = gs_in[index].refPlaneDist;
 	gs_out.LightFlags = gs_in[index].LightFlags;
 	gs_out.SurfFlags = gs_in[index].SurfFlags;
 	gs_out.refIndex = gs_in[index].refIndex;

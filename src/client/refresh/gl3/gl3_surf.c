@@ -34,7 +34,7 @@ int c_visible_textures;
 static vec3_t modelorg; /* relative to viewpoint */
 static msurface_t *gl3_alpha_surfaces;
 
-#define MAX_INDICES	8192
+#define MAX_INDICES	32768
 GLuint elementlist[ MAX_INDICES ], numelements = 0; // for glDrawElements
 GLuint arraystart[ MAX_INDICES ], arraylength[ MAX_INDICES ], numarrays = 0; // for glMultiDrawArrays
 
@@ -204,7 +204,8 @@ void GL3_SurfInit(void)
 	// Setup buffer textures
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
 //	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_R11F_G11F_B10F, vid.width, vid.height, 32, 0, GL_RGBA, GL_FLOAT, 0 );
-	glTexImage3D (GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, vid.width, vid.height, 32, 0, GL_RGBA, GL_BYTE, 0);
+	//glTexImage3D (GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, vid.width, vid.height, 32, 0, GL_RGBA, GL_BYTE, 0);
+	glTexStorage3D (GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, vid.width, vid.height, 32);
 //	glTexImage3D (GL_TEXTURE_2D_ARRAY, 0, GL_RGB, 1024, 1024, 32, 0, GL_RGBA, GL_BYTE, 0);
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -212,7 +213,8 @@ void GL3_SurfInit(void)
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTextureDepth );
-	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 32, 0, GL_DEPTH_COMPONENT, GL_BYTE, 0 );
+	//glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 32, 0, GL_DEPTH_COMPONENT, GL_BYTE, 0 );
+	glTexStorage3D (GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT24, vid.width, vid.height, 32);
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -1039,7 +1041,7 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 	if ( addPlane ) {
 		gl3state.uniRefData[ r ].flags = REFSURF_ACTIVE | ( ( surf->flags & SURF_PLANEBACK ) ? REFSURF_PLANEBACK : 0 ) | (surf->flags & SURF_UNDERWATER);
 		gl3state.uniRefData[ r ].plane = HMM_Vec4 ( surf->plane->normal[ 0 ], surf->plane->normal[ 1 ], surf->plane->normal[ 2 ], surf->plane->dist );
-		gl3state.uniRefData[ r ].refrindex = 1.333;
+		gl3state.uniRefData[r].refrindex = 1.0; // .333;
 		gl3state.uniRefData[ r ].refMatrix = HMM_Householder ( gl3state.uniRefData[ r ].plane, -1 );
 
 		gl3state.refPlanes[ r ].id = r;
