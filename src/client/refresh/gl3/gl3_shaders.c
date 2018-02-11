@@ -25,6 +25,36 @@
  * =======================================================================
  */
 
+/* TODO: Reorganize shaders
+
+Global pipelines needed:
+- 2D
+- 3D brush
+- 3D alias
+  - Sprites could be realized with a (different) geometry shader
+- Particles
+Effects like:
+- Laser beams
+- Rail spiral
+- etc
+
+Reflected / refracted positions should be calculated in vertex shader,
+	in case of refraction, a flag should be set in uniform buffer.
+	and tessellation can happen appropiately
+If a shockwave effect is to be introduced, this can happen in tessellation stage also
+Tesselation stage is also responsible for culling of triangles outside of
+	reflection/refraction window
+
+Geometry shader will only be used to generate quads for 2D triangles, or sprites
+Its PRIMARY function will be to select the appropiate framebuffer layer for rendering
+Consider using extension GL_AMD_VERTEX_SHADER_LAYER extension to skip GS altogether
+
+The fragment shader should be as pluggable as possible, like a universal
+appliable material.
+Texture coordinate attribute should be one vec4, which can be used as color for
+textureless objects
+*/
+
 #include "header/local.h"
 
 // TODO: remove eprintf() usage
@@ -99,6 +129,7 @@ static GLuint
 CreateShaderProgram(int numShaders, const GLuint* shaders)
 {
 	int i=0;
+
 	GLuint shaderProgram = glCreateProgram();
 
 	if(shaderProgram == 0) {
@@ -106,13 +137,19 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 		return 0;
 	}
 
-	//glProgramParameteri (shaderProgram, GL_PROGRAM_SEPARABLE, GL_TRUE);
-
 	for(i=0; i<numShaders; ++i) {
 		glAttachShader(shaderProgram, shaders[i]);
 		int err = glGetError ();
 		if (err != GL_NO_ERROR) {
-			R_Printf (PRINT_ALL, __FUNCTION__": Error %i while attaching shader. Program #%i, shader #%i\n", err, shaderProgram, shaders[i]);
+			R_Printf (PRINT_ALL, __FUNCTION__": Error %i while attaching shader. Program #%i, shader #%i at index %i\n", err, shaderProgram, shaders[i], i);
+
+			char message[8192];
+			int msglen;
+			glGetShaderInfoLog (shaders[i], sizeof (message), &msglen, message);
+
+			R_Printf (PRINT_ALL, "%s\n", message);
+			if (glIsShader (shaders[i]) == false)
+				R_Printf (PRINT_ALL, "#%i is not a valid shader object\n", shaders[i]);
 		}
 	}
 
@@ -130,7 +167,7 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 	// the following line is not necessary/implicit (as there's only one output)
 	// glBindFragDataLocation(shaderProgram, 0, "outColor"); XXX would this even be here?
 
-	//glProgramParameteri (shaderProgram, GL_PROGRAM_SEPARABLE, GL_TRUE);
+	glProgramParameteri (shaderProgram, GL_PROGRAM_SEPARABLE, GL_TRUE);
 	glLinkProgram(shaderProgram);
 
 	GLint status;
@@ -181,7 +218,7 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 	return shaderProgram;
 }
 
-enum {
+enum UniformBlocks {
 	GL3_BINDINGPOINT_UNICOMMON,
 	GL3_BINDINGPOINT_UNI2D,
 	GL3_BINDINGPOINT_UNI3D,
@@ -244,6 +281,15 @@ initShader2D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	}
 
 	shaderInfo->shaderProgram = prog;
+
+	// Create program pipeline
+	glGenProgramPipelines (1, &shaderInfo->shaderProgramPipeline);
+	if (shaderInfo->shaderProgramPipeline == 0) {
+		R_Printf (PRINT_ALL, "Failed to create program pipeline for %s\n", shaderDesc);
+		goto err_cleanup;
+	}
+	glUseProgramStages (shaderInfo->shaderProgramPipeline, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, prog);
+
 	GL3_UseProgram(prog);
 
 	// Bind the buffer object to the uniform blocks
@@ -294,6 +340,7 @@ initShader2D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 
 err_cleanup:
 
+	if (shaderInfo->shaderProgramPipeline != 0) glDeleteProgramPipelines (1, &shaderInfo->shaderProgramPipeline);
 	if(shaders2D[0] != 0)  glDeleteShader(shaders2D[0]);
 	if(shaders2D[1] != 0)  glDeleteShader(shaders2D[1]);
 
@@ -463,6 +510,20 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 
 	glObjectLabel (GL_PROGRAM, prog, strlen (shaderDesc), shaderDesc);
 
+	// Create program pipeline
+	glGenProgramPipelines (1, &shaderInfo->shaderProgramPipeline);
+	if (shaderInfo->shaderProgramPipeline == 0) {
+		R_Printf (PRINT_ALL, "Failed to create program pipeline for %s\n", shaderDesc);
+		goto err_cleanup;
+	}
+	glUseProgramStages (shaderInfo->shaderProgramPipeline,
+		GL_VERTEX_SHADER_BIT |
+		GL_TESS_CONTROL_SHADER_BIT |
+		GL_TESS_EVALUATION_SHADER_BIT |
+		GL_GEOMETRY_SHADER_BIT |
+		GL_FRAGMENT_SHADER_BIT, prog);
+	glObjectLabel (GL_PROGRAM_PIPELINE, shaderInfo->shaderProgramPipeline, strlen (shaderDesc), shaderDesc);
+
 	GL3_UseProgram(prog);
 
 	// Bind the buffer object to the uniform blocks
@@ -552,7 +613,7 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	GLint texLoc = glGetUniformLocation(prog, "tex");
 	if(texLoc != -1)
 	{
-		glUniform1i(texLoc, 0);
+		glProgramUniform1i(prog, texLoc, 0);
 	}
 
 	// ..  and the 4 lightmap texture use GL_TEXTURE1..4
@@ -563,17 +624,17 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		GLint lmLoc = glGetUniformLocation(prog, lmName);
 		if(lmLoc != -1)
 		{
-			glUniform1i(lmLoc, i+1); // lightmap0 belongs to GL_TEXTURE1, lightmap1 to GL_TEXTURE2 etc
+			glProgramUniform1i (prog, lmLoc, i+1); // lightmap0 belongs to GL_TEXTURE1, lightmap1 to GL_TEXTURE2 etc
 		}
 	}
 	GLint reflLoc = glGetUniformLocation ( prog, "refl" );
 	if ( reflLoc != -1 ) {
-		glUniform1i ( reflLoc, 5 );
+		glProgramUniform1i ( prog, reflLoc, 5 );
 	}
 
 	GLint reflDLoc = glGetUniformLocation (prog, "reflDepth");
 	if (reflDLoc != -1) {
-		glUniform1i (reflDLoc, 6);
+		glProgramUniform1i ( prog, reflDLoc, 6);
 	}
 
 	GLint lmScalesLoc = glGetUniformLocation(prog, "lmScales");
@@ -584,19 +645,18 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 
 		for(i=1; i<4; ++i)  shaderInfo->lmScales[i] = HMM_Vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
-		glUniform4fv(lmScalesLoc, 4, shaderInfo->lmScales[0].Elements);
+		glProgramUniform4fv(prog, lmScalesLoc, 4, shaderInfo->lmScales[0].Elements);
 	}
 
 	shaderInfo->shaderProgram = prog;
 
 	// I think the shaders aren't needed anymore once they're linked into the program
-	glDeleteShader ( shaders3D[ 0 ] );
-	glDeleteShader ( shaders3D[ 1 ] );
-	glDeleteShader ( shaders3D[ 2 ] );
+	for (i = 0; i < numshaders; i++) {
+		glDeleteShader (shaders3D[i]);
+	}
 
 	char buf[8192];
 	GLsizei infoLen;
-
 	glGetProgramInfoLog (prog, 8192, &infoLen, &buf);
 
 	if (infoLen > 0) {
@@ -661,10 +721,7 @@ static void initUBOs(void)
 	glBindBuffer ( GL_UNIFORM_BUFFER, gl3state.uniRefDataUBO );
 	glBindBufferBase ( GL_UNIFORM_BUFFER, GL3_BINDINGPOINT_REFDATA, gl3state.uniRefDataUBO );
 	glBufferData ( GL_UNIFORM_BUFFER, sizeof ( gl3state.uniRefData ), &gl3state.uniRefData, GL_DYNAMIC_DRAW );
-/*
-	int blockSize;
-	glGetActiveUniformBlockiv ( gl3state.si3Dlm.shaderProgram, glGetUniformBlockIndex ( gl3state.si3Dlm.shaderProgram, "refDat" ), GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize );
-*/	
+
 	gl3state.currentUBO = gl3state.uniRefDataUBO;
 
 }
@@ -673,12 +730,10 @@ static qboolean createShaders ( void ) {
 	if ( !initShader2D ( &gl3state.si2D,			"shaders/2d.vert",		"shaders/2d.frag",										"textured 2D rendering" ) ) { return false; }
 	if ( !initShader2D ( &gl3state.si2Darray,		"shaders/2d.vert",		"shaders/2darray.frag",									"array-textured 2D rendering" ) ) { return false; }
 	if ( !initShader2D ( &gl3state.si2Dcolor,		"shaders/2Dcolor.vert", "shaders/2Dcolor.frag",									"color-only 2D rendering" ) ) { return false;	}
-	if ( !initShader3D ( &gl3state.si3Dlm,			"shaders/3Dlmflow.vert","shaders/3Dlm.frag",			"shaders/3Dlm.geom",	"textured 3D rendering with lightmap" ) ) { return false; }
+	if ( !initShader3D ( &gl3state.si3Dlm,			"shaders/3Dlm.vert",	"shaders/3Dlm.frag",			"shaders/3Dlm.geom",	"textured 3D rendering with lightmap" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3Dtrans,		"shaders/3D.vert",		"shaders/3D.frag",				"shaders/3D.geom",		"rendering translucent 3D things" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3DcolorOnly,	"shaders/3D.vert",		"shaders/3Dcolor.frag",			"shaders/3D.geom",		"flat-colored 3D rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dturb,		"shaders/3D.vert",		"shaders/3Dwater.frag",			"shaders/3D.geom",		"water rendering" ) ) { return false; }
-	//if ( !initShader3D ( &gl3state.si3DlmFlow,		"shaders/3DlmFlow.vert","shaders/3Dlm.frag",			"shaders/3Dlm.geom",	"scrolling textured 3D rendering with lightmap" ) ) {	return false; }
-	//if ( !initShader3D ( &gl3state.si3DtransFlow,	"shaders/3D.vert",		"shaders/3D.frag",				"shaders/3d.geom",		"scrolling textured translucent 3D rendering" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3Dsky,			"shaders/3D.vert",		"shaders/3Dsky.frag",			"shaders/3d.geom",		"sky rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dsprite,		"shaders/3D.vert",		"shaders/3Dsprite.frag",		"shaders/3d.geom",		"sprite rendering" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3DspriteAlpha, "shaders/3D.vert",		"shaders/3DspriteAlpha.frag",	"shaders/3d.geom",		"alpha-tested sprite rendering" ) ) { return false;	}
@@ -708,6 +763,7 @@ static void deleteShaders(void)
 	const gl3ShaderInfo_t siZero = {0};
 	for(gl3ShaderInfo_t* si = &gl3state.si2D; si <= &gl3state.siParticle; ++si)
 	{
+		if (si->shaderProgramPipeline != 0) glDeleteProgramPipelines (1, &si->shaderProgramPipeline);
 		if(si->shaderProgram != 0)  glDeleteProgram(si->shaderProgram);
 		*si = siZero;
 	}
@@ -719,8 +775,8 @@ void GL3_ShutdownShaders(void)
 
 	// let's (ab)use the fact that all 4 UBO handles are consecutive fields
 	// of the gl3state struct
-	glDeleteBuffers(4, &gl3state.uniCommonUBO);
-	gl3state.uniCommonUBO = gl3state.uni2DUBO = gl3state.uni3DUBO = gl3state.uniLightsUBO = 0;
+	glDeleteBuffers(5, &gl3state.uniCommonUBO);
+	gl3state.uniCommonUBO = gl3state.uni2DUBO = gl3state.uni3DUBO = gl3state.uniLightsUBO = gl3state.uniRefDataUBO = 0;
 }
 
 qboolean GL3_RecreateShaders(void)

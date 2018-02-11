@@ -123,6 +123,7 @@
       <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -138,6 +139,9 @@
     <PostBuildEvent>
       <Message>Copying shaders</Message>
     </PostBuildEvent>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -278,7 +282,7 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <DeploymentContent>true</DeploymentContent>
     </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlmflow.vert">
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.vert">
       <FileType>Document</FileType>
       <DeploymentContent>true</DeploymentContent>
     </ClInclude>
@@ -359,9 +363,6 @@
     </None>
     <None Include="..\src\client\refresh\gl3\shaders\Common3D.geom" />
     <None Include="..\src\client\refresh\gl3\shaders\Particles.geom" />
-    <None Include="..\src\OpenGL.dgml">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

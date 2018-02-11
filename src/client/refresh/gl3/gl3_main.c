@@ -205,6 +205,28 @@ void cmd_recreate_shaders () {
 	GL3_RecreateShaders ();
 }
 
+qboolean customLightState = true;
+
+void cmd_LightsOff (void) {
+	for (int i = 65; i < MAX_LIGHTSTYLES; i++) {
+		gl3_newrefdef.lightstyles[i].rgb[0] = 0;
+		gl3_newrefdef.lightstyles[i].rgb[1] = 0;
+		gl3_newrefdef.lightstyles[i].rgb[2] = 0;
+		gl3_newrefdef.lightstyles[i].white = 0;
+	}
+	customLightState = false;
+}
+
+void cmd_LightsOn (void) {
+	for (int i = 65; i < MAX_LIGHTSTYLES; i++) {
+		gl3_newrefdef.lightstyles[i].rgb[0] = 1;
+		gl3_newrefdef.lightstyles[i].rgb[1] = 1;
+		gl3_newrefdef.lightstyles[i].rgb[2] = 1;
+		gl3_newrefdef.lightstyles[i].white = 3;
+	}
+	customLightState = true;
+}
+
 static void
 GL3_Register(void)
 {
@@ -266,6 +288,8 @@ GL3_Register(void)
 
 	gl_tessellation = ri.Cvar_Get ("gl_tessellation", "0", CVAR_ARCHIVE);
 
+	ri.Cmd_AddCommand ("lightsoff", cmd_LightsOff);
+	ri.Cmd_AddCommand ("lightson", cmd_LightsOn);
 #if 0 // TODO!
 	//gl_lefthand = ri.Cvar_Get("hand", "0", CVAR_USERINFO | CVAR_ARCHIVE);
 	//gl_farsee = ri.Cvar_Get("gl_farsee", "0", CVAR_LATCH | CVAR_ARCHIVE);
@@ -609,6 +633,9 @@ GL3_Shutdown(void)
 	ri.Cmd_RemoveCommand("imagelist");
 	ri.Cmd_RemoveCommand("gl_strings");
 	ri.Cmd_RemoveCommand ("reloadshaders");
+
+	ri.Cmd_RemoveCommand ("lightsoff");
+	ri.Cmd_RemoveCommand ("lightson");
 	// only call all these if we have an OpenGL context and the gl function pointers
 	// randomly chose one function that should always be there to test..
 	if(glDeleteBuffers != NULL)
@@ -1457,6 +1484,12 @@ GL3_RenderView(refdef_t *fd)
 
 	gl3_newrefdef = *fd;
 
+	if (customLightState == false) {
+		cmd_LightsOff ();
+	} else {
+		cmd_LightsOn ();
+	}
+
 	if (!gl3_worldmodel && !(gl3_newrefdef.rdflags & RDF_NOWORLDMODEL)) {
 		ri.Sys_Error(ERR_DROP, "R_RenderView: NULL worldmodel");
 	}
@@ -1594,6 +1627,8 @@ extern void GL3_DrawCroppedTexture (float x, float y, float w, float h);
 static void
 GL3_RenderFrame(refdef_t *fd)
 {	
+	static int oldRefs = 0;
+
 	glVertexAttribI1i ( GL3_ATTRIB_REFINDEX, -1 ); // -1
 	glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX );
 	gl3state.refActive = false;
@@ -1613,7 +1648,7 @@ GL3_RenderFrame(refdef_t *fd)
 	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
 	GL3_SetGL2D ();
 	//glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
-
+	glEnable (GL_BLEND);
 	//if ( gl3state.numRefPlanes > 0 && gl_reflection->value ) {
 		GL3_Bind (GL_TEXTURE_2D_ARRAY, 0, gl3state.reflectTexture );
 
@@ -1630,7 +1665,8 @@ GL3_RenderFrame(refdef_t *fd)
 		GL3_Draw_Flash(v_blend, x, y, gl3_newrefdef.width, gl3_newrefdef.height);
 	}
 
-	if ( gl3state.numRefPlanes > 0 ) {
+	if ( gl3state.numRefPlanes != oldRefs) {
+		oldRefs = gl3state.numRefPlanes;
 		R_Printf ( PRINT_DEVELOPER, "Reflection planes: %d\n", gl3state.numRefPlanes );
 	}
 }
@@ -1757,7 +1793,14 @@ GL3_BeginFrame(float camera_separation)
 		GL3_RecreateShaders();
 	}
 
-
+	if (gl_tessellation->modified) {
+		gl_tessellation->modified = false;
+		if (gl_tessellation->value == 0) {
+			glUseProgramStages (gl3state.si3Dlm.shaderProgramPipeline, GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT, 0);
+		} else {
+			glUseProgramStages (gl3state.si3Dlm.shaderProgramPipeline, GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT, gl3state.si3Dlm.shaderProgram);
+		}
+	}
 	/* go into 2D mode */
 
 	GL3_SetGL2D();

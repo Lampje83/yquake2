@@ -117,6 +117,7 @@ typedef struct
 typedef struct
 {
 	GLuint shaderProgram;
+	GLuint shaderProgramPipeline;
 	GLint uniLmScales;
 	hmm_vec4 lmScales[4];
 } gl3ShaderInfo_t;
@@ -241,6 +242,7 @@ typedef struct
 	GLuint currentEBO;
 	GLuint currentShaderProgram;
 	GLuint currentUBO;
+	GLuint currentShaderProgramPipeline;
 
 	// NOTE: make sure si2D is always the first shaderInfo (or adapt GL3_ShutdownShaders())
 	gl3ShaderInfo_t si2D;      // shader for rendering 2D with textures
@@ -380,6 +382,22 @@ GL3_UseProgram(GLuint shaderProgram)
 	{
 		gl3state.currentShaderProgram = shaderProgram;
 		glUseProgram(shaderProgram);
+
+		if (gl3state.currentShaderProgramPipeline != 0)
+			glActiveShaderProgram (gl3state.currentShaderProgramPipeline, shaderProgram);
+	}
+}
+
+static inline void
+GL3_BindProgramPipeline (gl3ShaderInfo_t si) {
+	if (si.shaderProgramPipeline != 0) {
+		// Release program as this is needed to use pipelines
+		GL3_UseProgram (0);
+	}
+	if (si.shaderProgramPipeline != gl3state.currentShaderProgramPipeline) {
+		gl3state.currentShaderProgramPipeline = si.shaderProgramPipeline;
+		glBindProgramPipeline (si.shaderProgramPipeline);
+		glActiveShaderProgram (gl3state.currentShaderProgramPipeline, si.shaderProgram);
 	}
 }
 

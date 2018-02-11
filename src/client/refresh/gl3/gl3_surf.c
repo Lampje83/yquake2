@@ -324,7 +324,14 @@ void GL_DrawElements ( void ) {
 		glBufferData (GL_ELEMENT_ARRAY_BUFFER, numelements * sizeof (GLuint), elementlist, GL_STREAM_DRAW);
 
 		if (gl_tessellation->value != 0) {
-			if (gl3state.currentShaderProgram == gl3state.si3Dlm.shaderProgram
+			qboolean compare;
+			if (gl3state.currentShaderProgram == 0) {
+				compare = gl3state.currentShaderProgramPipeline == gl3state.si3Dlm.shaderProgramPipeline;
+			} else {
+				compare = gl3state.currentShaderProgram == gl3state.si3Dlm.shaderProgram;
+			}
+
+			if (compare
 #if 0
 				|| gl3state.currentShaderProgram == gl3state.si3DlmFlow.shaderProgram
 #endif
@@ -605,7 +612,7 @@ UpdateLMscales(const hmm_vec4 lmScales[MAX_LIGHTMAPS_PER_SURFACE], gl3ShaderInfo
 	if(hasChanged)
 	{
 		GL_DrawElements (); // render display list as state is being changed
-		glUniform4fv(si->uniLmScales, MAX_LIGHTMAPS_PER_SURFACE, si->lmScales[0].Elements);
+		glProgramUniform4fv(si->shaderProgram, si->uniLmScales, MAX_LIGHTMAPS_PER_SURFACE, si->lmScales[0].Elements);
 	}
 }
 
@@ -651,7 +658,8 @@ RenderBrushPoly(msurface_t *fa)
 	else
 #endif
 	{
-		GL3_UseProgram(gl3state.si3Dlm.shaderProgram);
+		GL3_BindProgramPipeline (gl3state.si3Dlm);
+		//GL3_UseProgram(gl3state.si3Dlm.shaderProgram);
 		UpdateLMscales(lmScales, &gl3state.si3Dlm);
 		GL3_DrawGLPoly(fa);
 	}
@@ -971,7 +979,8 @@ RenderLightmappedPoly(msurface_t *surf)
 	else
 #endif
 	{
-		GL3_UseProgram(gl3state.si3Dlm.shaderProgram);
+		//GL3_UseProgram(gl3state.si3Dlm.shaderProgram);
+		GL3_BindProgramPipeline (gl3state.si3Dlm);
 		UpdateLMscales(lmScales, &gl3state.si3Dlm);
 	}
 	GL3_DrawGLPoly ( surf );
@@ -1042,6 +1051,9 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 		gl3state.uniRefData[ r ].flags = REFSURF_ACTIVE | ( ( surf->flags & SURF_PLANEBACK ) ? REFSURF_PLANEBACK : 0 ) | (surf->flags & SURF_UNDERWATER);
 		gl3state.uniRefData[ r ].plane = HMM_Vec4 ( surf->plane->normal[ 0 ], surf->plane->normal[ 1 ], surf->plane->normal[ 2 ], surf->plane->dist );
 		gl3state.uniRefData[r].refrindex = 1.0; // .333;
+		if (strstr (surf->texinfo->image->name, "bluwter")) {
+			gl3state.uniRefData[r].refrindex = 1.333;
+		}
 		gl3state.uniRefData[ r ].refMatrix = HMM_Householder ( gl3state.uniRefData[ r ].plane, -1 );
 
 		gl3state.refPlanes[ r ].id = r;

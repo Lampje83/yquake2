@@ -1120,7 +1120,7 @@ CL_ParseConfigString(void)
 			}
 		}
 	}
-	else if ((i >= CS_SOUNDS) && (i < CS_SOUNDS + MAX_MODELS))
+	else if ((i >= CS_SOUNDS) && (i < CS_SOUNDS + MAX_SOUNDS))
 	{
 		if (cl.refresh_prepped)
 		{
@@ -1128,7 +1128,7 @@ CL_ParseConfigString(void)
 				S_RegisterSound(cl.configstrings[i]);
 		}
 	}
-	else if ((i >= CS_IMAGES) && (i < CS_IMAGES + MAX_MODELS))
+	else if ((i >= CS_IMAGES) && (i < CS_IMAGES + MAX_IMAGES))
 	{
 		if (cl.refresh_prepped)
 		{

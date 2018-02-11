@@ -1,22 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <DirectedGraph GraphDirection="LeftToRight" Layout="Sugiyama" ZoomLevel="-1" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
   <Nodes>
-    <Node Id="Attributes" Bounds="81.6325754412931,-208.582525704739,178.613333333333,149.8802" Group="Expanded" LayoutSettings="List" UseManualLocation="True" />
-    <Node Id="Color" Bounds="87.6325754412931,-154.622425704739,73.5133333333334,25.96" Label="LightFlags" />
-    <Node Id="Color1" Bounds="87.6325754412931,-182.582425704739,50,25.96" Label="Color" />
-    <Node Id="FragmentShader" Bounds="828.333850623675,-81.01589831562,110.75,25.96" Label="Fragment Shader" />
-    <Node Id="GeometryShader" Bounds="687.340517290342,-81.01589831562,110.993333333333,25.96" Label="Geometry shader" />
-    <Node Id="LMCoord" Bounds="87.6325754412931,-126.662425704738,69.1566666666667,25.96" Label="LMCoord" />
-    <Node Id="Normal" Bounds="87.6325754412931,-98.7024257047385,59.53,25.96" Label="Normal" />
-    <Node Id="Position" Category="Category1" Bounds="163.145908774626,-98.7024257047385,91.1,34" Label="Position" />
-    <Node Id="RefIndex" Bounds="163.145908774626,-182.582425704739,65.6933333333333,25.96" />
-    <Node Id="Shaders" Bounds="384.277183957009,-121.01599831562,574.806666666666,85.9602" Group="Expanded" LayoutSettings="LeftToRight" UseManualLocation="True" />
-    <Node Id="SurfFlags" Bounds="163.145908774626,-154.622425704739,68.1266666666667,25.96" />
-    <Node Id="TES" Bounds="607.340517290342,-81.01589831562,50,25.96" />
-    <Node Id="TessellationControlShader" Bounds="527.340517290342,-81.01589831562,50,25.96" Label="TCS" />
-    <Node Id="TexCoord" Bounds="163.145908774626,-126.662425704738,69.63,25.96" />
-    <Node Id="Uniforms" Bounds="639.027404359444,-226.015928291759,68.33,25.96" Label="Uniforms" UseManualLocation="True" />
-    <Node Id="VertexShader" Bounds="404.277183957009,-81.0158983156199,93.0633333333333,25.96" Label="Vertex Shader" />
+    <Node Id="Attributes" Bounds="78.367575441293,-215.122675704739,212.64,171.0005" Group="Expanded" LayoutSettings="List" UseManualLocation="True" />
+    <Node Id="Color" Bounds="84.3675754412929,-154.122475704739,102.513333333333,34" Label="LightFlags" />
+    <Node Id="Color1" Bounds="96.8392421079596,-189.122575704739,77.57,34" Label="Color" />
+    <Node Id="FragmentShader" Bounds="875.385183989142,-81.01589831562,139.75,34" Label="Fragment Shader" />
+    <Node Id="GeometryShader" Bounds="705.391850655809,-81.01589831562,139.993333333333,34" Label="Geometry shader" />
+    <Node Id="LMCoord" Bounds="86.5459087746263,-119.122375704739,98.1566666666667,34" Label="LMCoord" />
+    <Node Id="Normal" Bounds="91.3592421079596,-84.1222757047389,88.53,34" Label="Normal" />
+    <Node Id="Position" Category="vec3" Bounds="180.88924210796,-84.1222757047389,91.1,34" Label="Position" />
+    <Node Id="RefIndex" Bounds="175.40924210796,-189.122575704739,94.6933333333333,34" />
+    <Node Id="Shaders" Bounds="337.065183989142,-121.01599831562,698.07,94.0002000000001" Group="Expanded" LayoutSettings="LeftToRight" UseManualLocation="True" />
+    <Node Id="SurfFlags" Bounds="187.880908774626,-154.122475704739,97.1266666666667,34" />
+    <Node Id="TES" Bounds="607.661850655809,-81.01589831562,67.73,34" />
+    <Node Id="TessellationControlShader" Bounds="509.128517322475,-81.01589831562,68.5333333333333,34" Label="TCS" />
+    <Node Id="TexCoord" Bounds="185.702575441293,-119.122375704739,98.63,34" />
+    <Node Id="Uniforms" Bounds="639.027404359444,-226.015928291759,97.33,34" Label="Uniforms" UseManualLocation="True" />
+    <Node Id="VertexShader" Category="Shader" Bounds="357.065183989142,-81.0158983156199,122.063333333333,34" Label="Vertex Shader" />
   </Nodes>
   <Links>
     <Link Source="Attributes" Target="Color" Category="Contains" />
@@ -27,19 +27,20 @@
     <Link Source="Attributes" Target="RefIndex" Category="Contains" />
     <Link Source="Attributes" Target="SurfFlags" Category="Contains" />
     <Link Source="Attributes" Target="TexCoord" Category="Contains" />
-    <Link Source="GeometryShader" Target="FragmentShader" Bounds="798.333862304688,-68.0358963012695,21,0" />
+    <Link Source="GeometryShader" Target="FragmentShader" Bounds="845.385183989142,-64.01589831562,20.9999999999998,0" />
     <Link Source="Shaders" Target="FragmentShader" Category="Contains" Bounds="59.351863861084,208.903106689453,466.635074615479,10.1962280273438" />
     <Link Source="Shaders" Target="GeometryShader" Category="Contains" Bounds="59.351863861084,206.174011230469,306.703067779541,12.9231414794922" />
     <Link Source="Shaders" Target="TES" Category="Contains" Bounds="59.4052810668945,172.843978881836,232.94310760498,10.1828155517578" />
     <Link Source="Shaders" Target="TessellationControlShader" Category="Contains" Bounds="59.351863861084,204.043029785156,146.83865737915,15.0593719482422" />
     <Link Source="Shaders" Target="VertexShader" Category="Contains" Bounds="61.8800000000003,195.96901941723,21.0001003448426,0.00581333927900118" />
-    <Link Source="TES" Target="GeometryShader" Bounds="657.340515136719,-68.0358963012695,21,0" />
-    <Link Source="TessellationControlShader" Target="TES" Bounds="577.340515136719,-68.0358963012695,21,0" />
-    <Link Source="VertexShader" Target="TessellationControlShader" Bounds="497.340515136719,-68.0358963012695,21,0" />
+    <Link Source="TES" Target="GeometryShader" Bounds="675.391850655809,-64.01589831562,21,0" />
+    <Link Source="TessellationControlShader" Target="TES" Bounds="577.661850655809,-64.01589831562,21,0" />
+    <Link Source="VertexShader" Target="TessellationControlShader" Bounds="479.128517322475,-64.01589831562,21,1.4210854715202E-14" />
   </Links>
   <Categories>
-    <Category Id="Category1" Label="Category 1" Background="#FFE51400" IsTag="True" />
     <Category Id="Contains" Label="Contains" Description="Whether the source of the link contains the target object" CanBeDataDriven="False" CanLinkedNodesBeDataDriven="True" IncomingActionLabel="Contained By" IsContainment="True" OutgoingActionLabel="Contains" />
+    <Category Id="Shader" Label="Shader" />
+    <Category Id="vec3" Label="3-Component Vector" Background="#FFE51400" IsTag="True" />
   </Categories>
   <Properties>
     <Property Id="Background" Label="Background" Description="The background color" DataType="System.Windows.Media.Brush" />
@@ -74,7 +75,9 @@
       <Condition Expression="Group = 'Expanded'" />
     </Style>
     <Style TargetType="Node" GroupLabel="vec2" ValueLabel="vec2" />
-    <Style TargetType="Node" GroupLabel="vec3" ValueLabel="vec3" />
+    <Style TargetType="Node" GroupLabel="vec3" ValueLabel="vec3">
+      <Setter Property="Icon" Value="pack://application:,,,/Microsoft.VisualStudio.Progression.GraphControl;component/Icons/kpi_red_cat1_large.png" />
+    </Style>
     <Style TargetType="Node" GroupLabel="vec4" ValueLabel="vec4" />
   </Styles>
 </DirectedGraph>

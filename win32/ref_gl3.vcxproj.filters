@@ -97,7 +97,9 @@
     <ClCompile Include="..\src\backends\windows\shared\mem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\client\refresh\gl3\shaders\3Dlm.tesc" />
+    <ClCompile Include="..\src\client\refresh\gl3\shaders\3Dlm.tesc">
+      <Filter>Shader Files\Brush</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\common\header\shared.h">
@@ -163,9 +165,6 @@
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.geom">
       <Filter>Shader Files\Brush</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlmflow.vert">
-      <Filter>Shader Files\Brush</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Drefract.vert">
       <Filter>Shader Files\Brush</Filter>
     </ClInclude>
@@ -214,6 +213,9 @@
     <ClInclude Include="..\src\client\refresh\gl3\shaders\Common.glsl">
       <Filter>Shader Files\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.vert">
+      <Filter>Shader Files\Brush</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\client\refresh\gl3\shaders\2d.frag">
@@ -230,9 +232,6 @@
     </None>
     <None Include="..\src\client\refresh\gl3\shaders\Particles.geom">
       <Filter>Shader Files\Effects</Filter>
-    </None>
-    <None Include="..\src\OpenGL.dgml">
-      <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
 </Project>

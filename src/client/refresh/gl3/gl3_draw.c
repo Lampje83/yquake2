@@ -46,9 +46,10 @@ GL3_Draw_InitLocal(void)
 	glGenBuffers(1, &vbo2D);
 	GL3_BindVBO(vbo2D);
 
-	GL3_UseProgram(gl3state.si2D.shaderProgram);
+	//GL3_UseProgram(gl3state.si2D.shaderProgram);
+	GL3_BindProgramPipeline (gl3state.si2D);
 
-	glEnableVertexAttribArray(GL3_ATTRIB_POSITION);
+	glEnableVertexAttribArray (GL3_ATTRIB_POSITION);
 	// Note: the glVertexAttribPointer() configuration is stored in the VAO, not the shader or sth
 	//       (that's why I use one VAO per 2D shader)
 	qglVertexAttribPointer(GL3_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
@@ -63,7 +64,8 @@ GL3_Draw_InitLocal(void)
 
 	GL3_BindVBO(vbo2D); // yes, both VAOs share the same VBO
 
-	GL3_UseProgram(gl3state.si2Dcolor.shaderProgram);
+	//GL3_UseProgram(gl3state.si2Dcolor.shaderProgram);
+	GL3_BindProgramPipeline (gl3state.si2Dcolor);
 
 	glEnableVertexAttribArray(GL3_ATTRIB_POSITION);
 	qglVertexAttribPointer(GL3_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), 0);
@@ -123,7 +125,6 @@ void GL3_DrawCroppedTexture (float x, float y, float w, float h) {
 	GL3_UpdateUBOCommon ();
 	//glDisable ( GL_BLEND );
 
-	//drawTexturedRectangle (x, vid.height - y, w, -h, x / vid.width, y / vid.height,                    (x + w) / vid.width, (y + h) / vid.height);
 	drawTexturedRectangle (x, y + h, w, -h,            x / vid.width, (vid.height - h - y) / vid.height, (x + w) / vid.width, (vid.height - y) / vid.height);
 }
 
@@ -168,8 +169,8 @@ GL3_Draw_CharScaled(int x, int y, int num, float scale)
 	scaledSize = 8*scale;
 
 	// TODO: batchen?
-
-	GL3_UseProgram(gl3state.si2D.shaderProgram);
+	GL3_BindProgramPipeline (gl3state.si2D);
+	//GL3_UseProgram(gl3state.si2D.shaderProgram);
 	GL3_Bind(GL_TEXTURE_2D, 0, draw_chars->texnum);
 	drawTexturedRectangle(x, y, scaledSize, scaledSize, fcol, frow, fcol+size, frow+size);
 }
@@ -221,7 +222,8 @@ GL3_Draw_StretchPic(int x, int y, int w, int h, char *pic)
 		return;
 	}
 
-	GL3_UseProgram(gl3state.si2D.shaderProgram);
+	//GL3_UseProgram(gl3state.si2D.shaderProgram);
+	GL3_BindProgramPipeline (gl3state.si2D);
 	GL3_Bind(GL_TEXTURE_2D, 0, gl->texnum);
 
 	drawTexturedRectangle(x, y, w, h, gl->sl, gl->tl, gl->sh, gl->th);
@@ -237,7 +239,8 @@ GL3_Draw_PicScaled(int x, int y, char *pic, float factor)
 		return;
 	}
 
-	GL3_UseProgram(gl3state.si2D.shaderProgram);
+	//GL3_UseProgram(gl3state.si2D.shaderProgram);
+	GL3_BindProgramPipeline (gl3state.si2D);
 	GL3_Bind(GL_TEXTURE_2D, 0, gl->texnum);
 
 	drawTexturedRectangle(x, y, gl->width*factor, gl->height*factor, gl->sl, gl->tl, gl->sh, gl->th);
@@ -258,7 +261,8 @@ GL3_Draw_TileClear(int x, int y, int w, int h, char *pic)
 		return;
 	}
 
-	GL3_UseProgram(gl3state.si2D.shaderProgram);
+	//GL3_UseProgram(gl3state.si2D.shaderProgram);
+	GL3_BindProgramPipeline (gl3state.si2D);
 	GL3_Bind(GL_TEXTURE_2D, 0, image->texnum);
 
 	drawTexturedRectangle(x, y, w, h, x/64.0f, y/64.0f, (x+w)/64.0f, (y+h)/64.0f);
@@ -300,7 +304,8 @@ GL3_Draw_Fill(int x, int y, int w, int h, int c)
 
 	GL3_UpdateUBOCommon();
 
-	GL3_UseProgram(gl3state.si2Dcolor.shaderProgram);
+	//GL3_UseProgram(gl3state.si2Dcolor.shaderProgram);
+	GL3_BindProgramPipeline (gl3state.si2Dcolor);
 	GL3_BindVAO(vao2Dcolor);
 
 	GL3_BindVBO(vbo2D);
@@ -331,7 +336,8 @@ GL3_Draw_Flash(const float color[4], float x, float y, float w, float h)
 
 	GL3_UpdateUBOCommon();
 
-	GL3_UseProgram(gl3state.si2Dcolor.shaderProgram);
+	GL3_BindProgramPipeline (gl3state.si2Dcolor);
+	//GL3_UseProgram(gl3state.si2Dcolor.shaderProgram);
 
 	GL3_BindVAO(vao2Dcolor);
 
@@ -379,6 +385,7 @@ GL3_Draw_StretchRaw(int x, int y, int w, int h, int cols, int rows, byte *data)
 	}
 
 	GL3_UseProgram(gl3state.si2D.shaderProgram);
+	//GL3_BindProgramPipeline (gl3state.si2D);
 
 	GLuint glTex;
 	glGenTextures(1, &glTex);

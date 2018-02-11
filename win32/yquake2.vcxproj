@@ -114,6 +114,7 @@
       <PreprocessorDefinitions>_MBCS;YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;USE_OPENAL;AL_NO_PROTOTYPES;DEFAULT_OPENAL_DRIVER="openal32.dll";OGG</PreprocessorDefinitions>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -121,6 +122,9 @@
       <ShowProgress>LinkVerboseLib</ShowProgress>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
