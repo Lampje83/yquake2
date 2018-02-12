@@ -361,7 +361,9 @@
     <None Include="..\src\client\refresh\gl3\shaders\3Dlm.tese">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\src\client\refresh\gl3\shaders\Common3D.geom" />
+    <None Include="..\src\client\refresh\gl3\shaders\Common3D.geom">
+      <DeploymentContent>false</DeploymentContent>
+    </None>
     <None Include="..\src\client\refresh\gl3\shaders\Particles.geom" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

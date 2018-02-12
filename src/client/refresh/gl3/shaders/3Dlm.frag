@@ -18,10 +18,7 @@ layout (std140) uniform uniLights
 
 uniform sampler2D tex;
 
-uniform sampler2D lightmap0;
-uniform sampler2D lightmap1;
-uniform sampler2D lightmap2;
-uniform sampler2D lightmap3;
+uniform sampler2DArray lightmap;
 
 uniform vec4 lmScales[4];
 
@@ -41,27 +38,24 @@ void main()
 	vec4 texel = texture(tex, fs_in.TexCoord);
 	vec4 lmTex;
 
-	// apply intensity
-	texel.rgb *= intensity;
-
 	// apply lightmap
 	if (flags != 3u)
 	{
-		lmTex  = texture(lightmap0, fs_in.LMcoord) * lmScales[0];
-		lmTex += texture(lightmap1, fs_in.LMcoord) * lmScales[1];
-		lmTex += texture(lightmap2, fs_in.LMcoord) * lmScales[2];
-		lmTex += texture(lightmap3, fs_in.LMcoord) * lmScales[3];
+		lmTex  = texture(lightmap, vec3(fs_in.LMcoord, 0 + lightmapindex)) * lmScales[0];
+		lmTex += texture(lightmap, vec3(fs_in.LMcoord, 1 + lightmapindex)) * lmScales[1];
+		lmTex += texture(lightmap, vec3(fs_in.LMcoord, 2 + lightmapindex)) * lmScales[2];
+		lmTex += texture(lightmap, vec3(fs_in.LMcoord, 3 + lightmapindex)) * lmScales[3];
 	}
 	else
 	{
 		// assume all lightmaps are the same size
-		ivec2 lmSize = textureSize (lightmap0, 0);
+		ivec2 lmSize = textureSize (lightmap, 0).xy;
 		ivec2 LMcoord = ivec2(fs_in.LMcoord * lmSize);
 		
-		lmTex  = texelFetch(lightmap0, LMcoord, 0) * lmScales[0];
-		lmTex += texelFetch(lightmap1, LMcoord, 0) * lmScales[1];
-		lmTex += texelFetch(lightmap2, LMcoord, 0) * lmScales[2];
-		lmTex += texelFetch(lightmap3, LMcoord, 0) * lmScales[3];
+		lmTex  = texelFetch(lightmap, ivec3(LMcoord, 0 + lightmapindex), 0) * lmScales[0];
+		lmTex += texelFetch(lightmap, ivec3(LMcoord, 1 + lightmapindex), 0) * lmScales[1];
+		lmTex += texelFetch(lightmap, ivec3(LMcoord, 2 + lightmapindex), 0) * lmScales[2];
+		lmTex += texelFetch(lightmap, ivec3(LMcoord, 3 + lightmapindex), 0) * lmScales[3];
 	}
 
 	if(fs_in.LightFlags != 0u)
@@ -83,11 +77,7 @@ void main()
 			float fact = max(0, intens - distLightToPos - 52);
 
 			// also factor in angle between light and point on surface
-			//if ((fs_in.SurfFlags & SURF_PLANEBACK) == 0) {
-				fact *= max (0, dot (fs_in.Normal, lightToPos / distLightToPos));
-			//} else {
-			//	fact *= max (0, dot (fs_in.Normal, lightToPos / -distLightToPos));
-			//}
+			fact *= max (0, dot (fs_in.Normal, lightToPos / distLightToPos));
 
 			lmTex.rgb += dynLights[i].lightColor.rgb * fact * (1.0/256.0);
 		}
@@ -102,7 +92,6 @@ void main()
 	}
 	lmTex.rgb *= overbrightbits;
 	outColor = lmTex*texel;
-	outColor.rgb = pow(outColor.rgb, vec3(gamma)); // apply gamma correction to result
 
 	outColor.a = 1; // lightmaps aren't used with translucent surfaces
 }

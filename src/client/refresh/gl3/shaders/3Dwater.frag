@@ -38,8 +38,7 @@ void main()
 	texw.t = (fs_in.TexCoord.t + sin( fs_in.TexCoord.s * 4 + time ) * 0.0625) ;
 	vec4 texel = texture(tex, texw);
 
-	texel.rgb *= intensity * 1.0;
-	texel.rgb = pow(texel.rgb, vec3(gamma));
+	texel.rgb /= intensity;
 
 	float newalpha = pow(alpha, 2.0);
 
@@ -115,6 +114,5 @@ void main()
 		texel.rgb += refrtex.rgb * clamp (pow (0.95, refrdepth * 80.0), 0.0, 1.0);
 	}
 	outColor.rgb = texel.rgb;
-	// apply intensity and gamma
 	outColor.a = 1;//newalpha; // I think alpha shouldn't be modified by gamma and intensity
 }

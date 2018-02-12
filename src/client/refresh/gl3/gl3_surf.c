@@ -289,7 +289,7 @@ void GL_MultiDrawArrays ( void ) {
 		GL3_BindVAO ( gl3state.vao3D );
 		GL3_BindVBO ( gl3state.vbo3D );
 	
-		for (int i = 0; i < numarrays; i++)
+		for (GLuint i = 0; i < numarrays; i++)
 		{
 			dc[i].first = arraystart[i];
 			dc[i].count = arraylength[i];
@@ -501,23 +501,18 @@ GL3_DrawGLPoly ( msurface_t *fa ) {
 		scroll = 0.0f;
 	}
 
-	if ( gl3state.uni3DData.scroll != scroll ) {
-		gl3state.uni3DData.scroll = scroll;
-		GL3_UpdateUBO3D ();
-	}
-
 	if ( gl_multiarray->value ) {
-		arraystart[ numarrays ] = p->vertices - gl3_worldmodel->glverts;
+		arraystart[ numarrays ] = (GLuint) p->vertices - (GLuint) gl3_worldmodel->glverts;
 		arraylength[ numarrays++ ] = p->numverts;
 	} else {
 		if (gl_tessellation->value) {
 			// set up for GL_TRIANGLES or GL_PATCHES
 			for (short i = 0; i < p->numverts; i++) {
 				if (i > 2) {
-					elementlist[numelements++] = (p->vertices - gl3_worldmodel->glverts);
-					elementlist[numelements++] = (p->vertices - gl3_worldmodel->glverts) + i - 1;
+					elementlist[numelements++] = (GLuint) (p->vertices - gl3_worldmodel->glverts);
+					elementlist[numelements++] = (GLuint) (p->vertices - gl3_worldmodel->glverts) + i - 1;
 				}
-				elementlist[numelements++] = (p->vertices - gl3_worldmodel->glverts) + i;
+				elementlist[numelements++] = (GLuint) (p->vertices - gl3_worldmodel->glverts) + i;
 			}
 		} else {
 			if (numelements > 0) {
@@ -525,7 +520,7 @@ GL3_DrawGLPoly ( msurface_t *fa ) {
 			}
 			// set up for GL_TRIANGLE_FAN
 			for (short i = 0; i < p->numverts; i++, numelements++) {
-				elementlist[numelements] = (p->vertices - gl3_worldmodel->glverts) + i;
+				elementlist[numelements] = (GLuint) (p->vertices - gl3_worldmodel->glverts) + i;
 			}
 		}
 	}
@@ -638,6 +633,8 @@ RenderBrushPoly(msurface_t *fa)
 	hmm_vec4 lmScales[MAX_LIGHTMAPS_PER_SURFACE] = {0};
 	lmScales[0] = HMM_Vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
+	// TODO: Change this into an uniform, selecting the correct texure layer
+	// However, testing shows only the first 4 layers are used
 	GL3_BindLightmap(fa->lightmaptexturenum);
 
 	// Any dynamic lights on this surface?
@@ -703,13 +700,6 @@ void GL3_RenderReflection ( int refp ) {
 	gl3state.refPlanes[ refp ].frameCount = gl3_framecount;
 
 	hmm_mat4 oldViewMat = gl3state.uni3DData.transModelMat4;
-	hmm_vec4 plane = HMM_Vec4 (
-		gl3state.refPlanes[ refp ].plane->normal[ 0 ],
-		gl3state.refPlanes[ refp ].plane->normal[ 1 ],
-		gl3state.refPlanes[ refp ].plane->normal[ 2 ],
-		-gl3state.refPlanes[ refp ].plane->dist );
-
-	//gl3state.uniRefData[ 0 ].refMatrix = gl3state.refPlanes[ refp ].modMatrix = HMM_Householder ( plane, -1 );
 
 	glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vbo3D );
 	glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX );
@@ -759,8 +749,6 @@ void GL3_DrawAlphaSurfaces ( void ) {
 	if (gl3state.numRefPlanes > 0 )
 		R_Printf ( PRINT_ALL, "refplanes: %i ", gl3state.numRefPlanes );
 #endif
-
-	int currentref;
 
 	for ( s = gl3_alpha_surfaces; s != NULL; s = s->texturechain ) {
 
@@ -1025,7 +1013,7 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 		if ( viewvec.Z <= 0 ) {
 			// behind viewpoint: calculate a point on the view plane, but outside the frustum
 			viewvec = HMM_MultiplyMat4ByVec4 ( MV, tempvec );
-			viewvec.W = ( fabs ( viewvec.X ) < fabs ( viewvec.Y ) ) ? fabs ( viewvec.X ) : fabs ( viewvec.Y );
+			viewvec.W = ( fabsf ( viewvec.X ) < fabsf ( viewvec.Y ) ) ? fabsf ( viewvec.X ) : fabsf ( viewvec.Y );
 			if ( viewvec.W == 0 )
 				viewvec.W = 1;
 		}
@@ -1052,7 +1040,7 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 		gl3state.uniRefData[ r ].plane = HMM_Vec4 ( surf->plane->normal[ 0 ], surf->plane->normal[ 1 ], surf->plane->normal[ 2 ], surf->plane->dist );
 		gl3state.uniRefData[r].refrindex = 1.0; // .333;
 		if (strstr (surf->texinfo->image->name, "bluwter")) {
-			gl3state.uniRefData[r].refrindex = 1.333;
+			gl3state.uniRefData[r].refrindex = 1.333f;
 		}
 		gl3state.uniRefData[ r ].refMatrix = HMM_Householder ( gl3state.uniRefData[ r ].plane, -1 );
 

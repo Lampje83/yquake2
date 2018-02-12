@@ -29,7 +29,7 @@ layout (std140) uniform uni3D
 	vec3 viewPos;
 
 	int		refTexture;	// which texture to draw on reflecting surface
-	float scroll; // for SURF_FLOWING
+	int		lightmapindex;
 	float time;
 	float alpha;
 	float overbrightbits;

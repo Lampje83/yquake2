@@ -616,17 +616,14 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		glProgramUniform1i(prog, texLoc, 0);
 	}
 
-	// ..  and the 4 lightmap texture use GL_TEXTURE1..4
-	char lmName[10] = "lightmapX";
-	for(i=0; i<4; ++i)
+	// ..  and the lightmap texture uses GL_TEXTURE1
+	char lmName[10] = "lightmap";
+	GLint lmLoc = glGetUniformLocation(prog, lmName);
+	if(lmLoc != -1)
 	{
-		lmName[8] = '0'+i;
-		GLint lmLoc = glGetUniformLocation(prog, lmName);
-		if(lmLoc != -1)
-		{
-			glProgramUniform1i (prog, lmLoc, i+1); // lightmap0 belongs to GL_TEXTURE1, lightmap1 to GL_TEXTURE2 etc
-		}
+		glProgramUniform1i (prog, lmLoc, 1);
 	}
+
 	GLint reflLoc = glGetUniformLocation ( prog, "refl" );
 	if ( reflLoc != -1 ) {
 		glProgramUniform1i ( prog, reflLoc, 5 );
@@ -657,7 +654,7 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 
 	char buf[8192];
 	GLsizei infoLen;
-	glGetProgramInfoLog (prog, 8192, &infoLen, &buf);
+	glGetProgramInfoLog (prog, 8192, &infoLen, buf);
 
 	if (infoLen > 0) {
 		R_Printf (PRINT_DEVELOPER, "%s: %s ", shaderDesc, buf);
@@ -700,7 +697,7 @@ static void initUBOs(void)
 	gl3state.uni3DData.transProjMat4 = HMM_Mat4();
 	gl3state.uni3DData.transViewMat4 = HMM_Mat4();
 	gl3state.uni3DData.transModelMat4 = gl3_identityMat4;
-	gl3state.uni3DData.scroll = 0.0f;
+	gl3state.uni3DData.lightmapindex = 0;
 	gl3state.uni3DData.time = 0.0f;
 	gl3state.uni3DData.alpha = 1.0f;
 	// gl_overbrightbits 0 means "no scaling" which is equivalent to multiplying with 1

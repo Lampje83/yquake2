@@ -16,7 +16,7 @@ layout (std140) uniform uni3D {
 	vec3 viewPos;
 
 	int		refTexture;
-	float scroll; // for SURF_FLOWING
+	int		lightmapindex; // for SURF_FLOWING
 	float time;
 	float alpha;
 	float overbrightbits;

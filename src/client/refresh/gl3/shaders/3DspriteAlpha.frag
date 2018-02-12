@@ -15,7 +15,6 @@ void main()
 		discard;
 
 	// apply gamma correction and intensity
-	texel.rgb *= intensity;
-	outColor.rgb = pow(texel.rgb, vec3(gamma));
+	outColor.rgb = texel.rgb;
 	outColor.a = texel.a*alpha; // I think alpha shouldn't be modified by gamma and intensity
 }

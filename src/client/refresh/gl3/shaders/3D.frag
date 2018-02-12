@@ -14,9 +14,7 @@ void main()
 {
 	vec4 texel = texture(tex, fs_in.TexCoord);
 
-	// apply intensity and gamma
-	texel.rgb *= intensity * alpha;
-	texel.rgb = pow(texel.rgb, vec3(gamma));
+	texel.rgb /= intensity;
 
 	float newalpha = alpha;
 	if (alpha < 1)

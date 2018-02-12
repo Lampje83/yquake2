@@ -18,10 +18,8 @@ void main()
 		discard;
 */
 	// apply gamma correction and intensity
-	texel.rgb *= intensity;
 	texel.a *= alpha; // is alpha even used here?
 	texel *= min(vec4(3.0), fs_in.Color);
 
-	outColor.rgb = pow(texel.rgb, vec3(gamma));
-	outColor.a = texel.a; // I think alpha shouldn't be modified by gamma and intensity
+	outColor = texel;
 }
