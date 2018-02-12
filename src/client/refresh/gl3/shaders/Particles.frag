@@ -9,14 +9,6 @@ void main()
 	if(distSquared > 1.0) // this makes sure the particle is round
 		discard;
 
-	vec4 texel = passColor;
-
-	// apply gamma correction and intensity
-	//texel.rgb *= intensity; TODO: intensity? Probably not?
-	outColor.rgb = pow(texel.rgb, vec3(gamma));
-
-	// I want the particles to fade out towards the edge, the following seems to look nice
-	texel.a *= min(1.0, particleFadeFactor*(1.0 - distSquared));
-
-	outColor.a = texel.a; // I think alpha shouldn't be modified by gamma and intensity
+	outColor.rgb = passColor.rgb / intensity;
+	outColor.a = passColor.a * min (1.0, particleFadeFactor*(1.0 - distSquared));
 }

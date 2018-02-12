@@ -595,16 +595,13 @@ GL3_Init(void)
 	}
 
 	// generate texture handles for all possible lightmaps
-	glGenTextures(MAX_LIGHTMAPS*MAX_LIGHTMAPS_PER_SURFACE, gl3state.lightmap_textureIDs[0]);
+	glGenTextures(1, &gl3state.lightmap_textureID);
 	char lmname[16];
-	for (int i = 0; i < MAX_LIGHTMAPS; i++) {
-		for (int j = 0; j < MAX_LIGHTMAPS_PER_SURFACE; j++) {
-			glBindTexture (GL_TEXTURE_2D, gl3state.lightmap_textureIDs[i][j]);
-			glTexStorage2D (GL_TEXTURE_2D, 1, GL_RGBA8, BLOCK_WIDTH, BLOCK_HEIGHT);
-			sprintf (lmname, "lightmap%u_%u", i, j);
-			glObjectLabel (GL_TEXTURE, gl3state.lightmap_textureIDs[i][j], strlen (lmname), lmname);
-		}
-	}
+	glBindTexture (GL_TEXTURE_2D_ARRAY, gl3state.lightmap_textureID);
+	glTexStorage3D (GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, BLOCK_WIDTH, BLOCK_HEIGHT, MAX_LIGHTMAPS * MAX_LIGHTMAPS_PER_SURFACE);
+	sprintf (lmname, "lightmap");
+	glObjectLabel (GL_TEXTURE, gl3state.lightmap_textureID, strlen (lmname), lmname);
+
 	GL3_SetDefaultState();
 
 	if(GL3_InitShaders()) {

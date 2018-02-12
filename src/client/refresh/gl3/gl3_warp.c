@@ -247,12 +247,6 @@ GL3_EmitWaterPolys(msurface_t *fa)
 		}
 	}
 */
-	if(gl3state.uni3DData.scroll != scroll)
-	{
-		gl3state.uni3DData.scroll = scroll;
-		GL3_UpdateUBO3D();
-	}
-
 	GL3_UseProgram(gl3state.si3Dturb.shaderProgram);
 
 	GL3_BindVAO(gl3state.vao3D);
@@ -261,17 +255,17 @@ GL3_EmitWaterPolys(msurface_t *fa)
 	for (bp = fa->polys; bp != NULL; bp = bp->next)
 	{
 		if ( gl_multiarray->value ) {
-			arraystart[ numarrays ] = bp->vertices - gl3_worldmodel->glverts;
+			arraystart[ numarrays ] = (GLuint) bp->vertices - (GLuint) gl3_worldmodel->glverts;
 			arraylength[ numarrays++ ] = bp->numverts;
 		} else {
 			if (gl_tessellation->value) {
 				// set up for GL_TRIANGLES or GL_PATCHES
 				for (short i = 0; i < bp->numverts; i++) {
 					if (i > 2) {
-						elementlist[numelements++] = (bp->vertices - gl3_worldmodel->glverts);
-						elementlist[numelements++] = (bp->vertices - gl3_worldmodel->glverts) + i - 1;
+						elementlist[numelements++] = (GLuint)(bp->vertices - gl3_worldmodel->glverts);
+						elementlist[numelements++] = (GLuint)(bp->vertices - gl3_worldmodel->glverts) + i - 1;
 					}
-					elementlist[numelements++] = (bp->vertices - gl3_worldmodel->glverts) + i;
+					elementlist[numelements++] = (GLuint)(bp->vertices - gl3_worldmodel->glverts) + i;
 				}
 			}
 			else {
@@ -280,7 +274,7 @@ GL3_EmitWaterPolys(msurface_t *fa)
 				}
 				// set up for GL_TRIANGLE_FAN
 				for (short i = 0; i < bp->numverts; i++, numelements++) {
-					elementlist[numelements] = (bp->vertices - gl3_worldmodel->glverts) + i;
+					elementlist[numelements] = (GLuint)(bp->vertices - gl3_worldmodel->glverts) + i;
 				}
 			}
 		}
@@ -385,10 +379,10 @@ DrawSkyPolygon(int nump, vec3_t vecs)
 	{
 		VectorAdd(vp, v, v);
 	}
-
-	av[0] = fabs(v[0]);
-	av[1] = fabs(v[1]);
-	av[2] = fabs(v[2]);
+	
+	av[0] = fabsf(v[0]);
+	av[1] = fabsf(v[1]);
+	av[2] = fabsf(v[2]);
 
 	if ((av[0] > av[1]) && (av[0] > av[2]))
 	{
@@ -653,8 +647,8 @@ MakeSkyVec(float s, float t, int axis, gl3_3D_vtx_t* vert)
 	}
 
 	/* avoid bilerp seam */
-	s = (s + 1) * 0.5;
-	t = (t + 1) * 0.5;
+	s = (s + 1) * 0.5f;
+	t = (t + 1) * 0.5f;
 
 	if (s < sky_min)
 	{
@@ -674,7 +668,7 @@ MakeSkyVec(float s, float t, int axis, gl3_3D_vtx_t* vert)
 		t = sky_max;
 	}
 
-	t = 1.0 - t;
+	t = 1.0f - t;
 
 	VectorCopy(v, vert->pos);
 

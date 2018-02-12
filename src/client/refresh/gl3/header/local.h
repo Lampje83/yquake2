@@ -152,7 +152,7 @@ typedef struct
 	hmm_vec3 viewPos;
 
 	GLint	refTexture;		// reflection texture index
-	GLfloat scroll; // for SURF_FLOWING
+	GLint	lightmapindex;
 	GLfloat time; // for warping surfaces like water & possibly other things
 	GLfloat alpha; // for translucent surfaces (water, glass, ..)
 	GLfloat overbrightbits; // gl3_overbrightbits, applied to lightmaps (and elsewhere to models)
@@ -227,7 +227,7 @@ typedef struct
 	// each lightmap consists of 4 sub-lightmaps allowing changing shadows on the same surface
 	// used for switching on/off light and stuff like that.
 	// most surfaces only have one really and the remaining for are filled with dummy data
-	GLuint lightmap_textureIDs[MAX_LIGHTMAPS][MAX_LIGHTMAPS_PER_SURFACE]; // instead of lightmap_textures+i use lightmap_textureIDs[i]
+	GLuint lightmap_textureID; // instead of lightmap_textures+i use lightmap_textureID array texture
 
 	GLenum currenttarget[MAX_TEXTURE_UNITS];
 	GLuint currenttexture[MAX_TEXTURE_UNITS]; // bound to GL_TEXTURE0

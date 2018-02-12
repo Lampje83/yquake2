@@ -52,7 +52,7 @@ GL3_LM_UploadBlock(void)
 	// upload all 4 lightmaps
 	for(map=0; map < MAX_LIGHTMAPS_PER_SURFACE; ++map)
 	{
-		GL3_SelectTMU(GL_TEXTURE1+map); // this relies on GL_TEXTURE2 being GL_TEXTURE1+1 etc
+		GL3_SelectTMU(GL_TEXTURE1); 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -62,7 +62,7 @@ GL3_LM_UploadBlock(void)
 		             BLOCK_WIDTH, BLOCK_HEIGHT, 0, GL_LIGHTMAP_FORMAT,
 		             GL_UNSIGNED_BYTE, gl3_lms.lightmap_buffers[map]);
 */					 
-		glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, GL_LIGHTMAP_FORMAT, GL_UNSIGNED_BYTE, gl3_lms.lightmap_buffers[map]);
+		glTexSubImage3D (GL_TEXTURE_2D_ARRAY, 0, 0, 0, gl3state.currentlightmap * MAX_LIGHTMAPS_PER_SURFACE + map, BLOCK_WIDTH, BLOCK_HEIGHT, 1, GL_LIGHTMAP_FORMAT, GL_UNSIGNED_BYTE, gl3_lms.lightmap_buffers[map]);
 	}
 
 	if (++gl3_lms.current_lightmap_texture == MAX_LIGHTMAPS)

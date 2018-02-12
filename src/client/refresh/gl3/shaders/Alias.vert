@@ -15,7 +15,7 @@ out VS_OUT {
 void main()
 {
 	vs.TexCoord = texCoord;
-	vs.Color = vertColor*overbrightbits;
+	vs.Color = vertColor;
 
 	vec4 worldCoord = transModel * vec4 ( position, 1.0 );
 

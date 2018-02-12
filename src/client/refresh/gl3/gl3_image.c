@@ -102,7 +102,7 @@ GL3_TextureMode(char *string)
 			/* Set anisotropic filter if supported and enabled */
 			if (gl3config.anisotropic && gl_anisotropic->value)
 			{
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, gl_anisotropic->value);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, (int) gl_anisotropic->value);
 			}
 		}
 	}
@@ -144,14 +144,13 @@ GL3_BindLightmap(int lightmapnum)
 	{
 		return;
 	}
-
+	
 	gl3state.currentlightmap = lightmapnum;
-	for(i=0; i<MAX_LIGHTMAPS_PER_SURFACE; ++i)
-	{
-		// this assumes that GL_TEXTURE<i+1> = GL_TEXTURE<i> + 1
-		// at least for GL_TEXTURE0 .. GL_TEXTURE31 that's true
-		GL3_Bind(GL_TEXTURE_2D, 1 + i, gl3state.lightmap_textureIDs[lightmapnum][i]);
-	}
+
+	gl3state.uni3DData.lightmapindex = lightmapnum * MAX_LIGHTMAPS_PER_SURFACE;
+	GL3_UpdateUBO3D ();
+
+	GL3_Bind(GL_TEXTURE_2D_ARRAY, 1, gl3state.lightmap_textureID);
 }
 
 /*
@@ -209,7 +208,7 @@ GL3_Upload32(unsigned *data, int width, int height, qboolean mipmap)
 
 	if (mipmap && gl3config.anisotropic && gl_anisotropic->value)
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, gl_anisotropic->value);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, (int) gl_anisotropic->value);
 	}
 
 	return res;
@@ -406,8 +405,7 @@ GL3_LoadPic(char *name, byte *pic, int width, int realwidth,
 	{
 		ri.Sys_Error(ERR_DROP, "GL3_LoadPic: \"%s\" is too long", name);
 	}
-
-	strcpy(image->name, name);
+	strcpy_s (image->name, strlen(name) + 1, name);
 	image->registration_sequence = registration_sequence;
 
 	image->width = width;
@@ -426,7 +424,7 @@ GL3_LoadPic(char *name, byte *pic, int width, int realwidth,
 
 	image->texnum = texNum;
 
-	glObjectLabel (GL_TEXTURE, texNum, strlen (name), name);
+	glObjectLabel (GL_TEXTURE, texNum, (GLsizei) strlen (name), name);
 
 	GL3_Bind(GL_TEXTURE_2D, 0, texNum);
 
@@ -599,7 +597,8 @@ gl3image_t *
 GL3_FindImage(char *name, imagetype_t type)
 {
 	gl3image_t *image;
-	int i, len;
+	int i;
+	size_t	len;
 	byte *pic;
 	int width, height;
 	char *ptr;
@@ -746,14 +745,14 @@ GL3_FindImage(char *name, imagetype_t type)
 		realwidth = 0;
 		realheight = 0;
 
-		strcpy(tmp_name, namewe);
-		strcat(tmp_name, ".wal");
+		strcpy_s (tmp_name, strlen(namewe) + 1, namewe);
+		strcat_s (tmp_name, strlen(namewe) + 5, ".wal");
 		GetWalInfo(tmp_name, &realwidth, &realheight);
 
 		if (realwidth == 0 || realheight == 0) {
 			/* It's a sky or model skin. */
-			strcpy(tmp_name, namewe);
-			strcat(tmp_name, ".pcx");
+			strcpy_s (tmp_name, strlen(namewe) + 1, namewe);
+			strcat_s (tmp_name, strlen(namewe) + 5, ".pcx");
 			GetPCXInfo(tmp_name, &realwidth, &realheight);
 		}
 
