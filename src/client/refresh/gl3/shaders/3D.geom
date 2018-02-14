@@ -9,7 +9,6 @@ in VS_OUT {
 	vec2		TexCoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	float		refPlaneDist;
 	flat uint	SurfFlags;
 	flat int	refIndex;
 } gs_in[];
@@ -47,10 +46,10 @@ void outputPrimitive (bool clip, bool reverse) {
 			gl_Position = gl_in[i].gl_Position;
 		} else {
 			if (reverse) {
-				gl_ClipDistance[0] = gs_in[i].refPlaneDist;
+				gl_ClipDistance[0] = gl_in[i].gl_ClipDistance[0];
 				gl_Position = transProj * transView * refData[gs_in[i].refIndex].refMatrix * vec4 (gs_in[i].WorldCoord, 1.0);
 			} else {
-				gl_ClipDistance[0] = -gs_in[i].refPlaneDist;
+				gl_ClipDistance[0] = -gl_in[i].gl_ClipDistance[0];
 				gl_Position = transProj * transView * vec4 (findRefractedPos (viewPos, gs_in[i].WorldCoord, refData[gs_in[i].refIndex]), 1.0);
 			}
 		}
@@ -135,7 +134,7 @@ void main() {
 				refPlaneDist[i] = -refPlaneDist[i];
 */
 			// is point on plane?
-			if (abs(gs_in[i].refPlaneDist) < 0.1) k++;
+			if (abs(gl_in[i].gl_ClipDistance[0]) < 0.1) k++;
 //			if (abs(newplane.w) < 0.1) k++;
 		}
 

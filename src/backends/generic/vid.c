@@ -188,6 +188,7 @@ VID_CheckChanges(void)
 		if(!VID_LoadRefresh() && (strcmp(vid_renderer->string, "gl1") != 0))
 		{
 			Com_Printf("\n ... trying again with standard OpenGL1.x renderer ... \n\n");
+			vid_renderer->flags &= ~CVAR_ARCHIVE;
 			Cvar_Set("vid_renderer", "gl1");
 			VID_LoadRefresh();
 		}
@@ -248,7 +249,7 @@ void VID_WriteScreenshot( int width, int height, int comp, const void* data )
 		if(argc > 2)
 		{
 			const char* q = Cmd_Argv(2);
-			int qualityStrLen = strlen(q);
+			size_t qualityStrLen = strlen(q);
 			for(i=0; i<qualityStrLen; ++i)
 			{
 				if(q[i] < '0' || q[i] > '9')
@@ -277,8 +278,8 @@ void VID_WriteScreenshot( int width, int height, int comp, const void* data )
 	{
 		FILE *f;
 		Com_sprintf(checkname, sizeof(checkname), "%s/scrnshot/q2_%04d.%s", gameDir, i, supportedFormats[format]);
-		f = fopen(checkname, "rb");
-
+		f = fopen (checkname, "rb");
+		
 		if (!f)
 		{
 			Com_sprintf(picname, sizeof(picname), "q2_%04d.%s", i, supportedFormats[format]);

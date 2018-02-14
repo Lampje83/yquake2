@@ -178,6 +178,7 @@ FloodAreaConnections(void)
 	}
 }
 
+// ERIK: this needs to be exported by BSP library
 void
 CM_SetAreaPortalState(int portalnum, qboolean open)
 {
@@ -190,6 +191,7 @@ CM_SetAreaPortalState(int portalnum, qboolean open)
 	FloodAreaConnections();
 }
 
+// ERIK: this needs to be exported by BSP library
 qboolean
 CM_AreasConnected(int area1, int area2)
 {
@@ -217,6 +219,7 @@ CM_AreasConnected(int area1, int area2)
  *
  * This is used by the client refreshes to cull visibility
  */
+ // ERIK: this needs to be exported by BSP library
 int
 CM_WriteAreaBits(byte *buffer, int area)
 {
@@ -253,6 +256,7 @@ CM_WriteAreaBits(byte *buffer, int area)
 /*
  * Writes the portal state to a savegame file
  */
+ // ERIK: this needs to be exported by BSP library
 void
 CM_WritePortalState(FILE *f)
 {
@@ -263,6 +267,7 @@ CM_WritePortalState(FILE *f)
  * Reads the portal state from a savegame file
  * and recalculates the area connections
  */
+ // ERIK: this needs to be exported by BSP library
 void
 CM_ReadPortalState(fileHandle_t f)
 {
@@ -274,6 +279,7 @@ CM_ReadPortalState(fileHandle_t f)
  * Returns true if any leaf under headnode has a cluster that
  * is potentially visible
  */
+ // ERIK: this needs to be exported by BSP library
 qboolean
 CM_HeadnodeVisible(int nodenum, byte *visbits)
 {
@@ -389,6 +395,7 @@ CM_InitBoxHull(void)
  * To keep everything totally uniform, bounding boxes are turned into
  * small BSP trees instead of being compared directly.
  */
+ // ERIK: this needs to be exported by BSP library
 int
 CM_HeadnodeForBox(vec3_t mins, vec3_t maxs)
 {
@@ -448,6 +455,7 @@ CM_PointLeafnum_r(vec3_t p, int num)
 	return -1 - num;
 }
 
+// ERIK: this needs to be exported by BSP library
 int
 CM_PointLeafnum(vec3_t p)
 {
@@ -533,6 +541,7 @@ CM_BoxLeafnums_headnode(vec3_t mins, vec3_t maxs, int *list,
 	return leaf_count;
 }
 
+// ERIK: this needs to be exported by BSP library
 int
 CM_BoxLeafnums(vec3_t mins, vec3_t maxs, int *list, int listsize, int *topnode)
 {
@@ -540,6 +549,7 @@ CM_BoxLeafnums(vec3_t mins, vec3_t maxs, int *list, int listsize, int *topnode)
 			listsize, map_cmodels[0].headnode, topnode);
 }
 
+// ERIK: this needs to be exported by BSP library
 int
 CM_PointContents(vec3_t p, int headnode)
 {
@@ -559,6 +569,7 @@ CM_PointContents(vec3_t p, int headnode)
  * Handles offseting and rotation of the end points for moving and
  * rotating entities
  */
+ // ERIK: this needs to be exported by BSP library
 int
 CM_TransformedPointContents(vec3_t p, int headnode,
 		vec3_t origin, vec3_t angles)
@@ -956,7 +967,7 @@ CM_RecursiveHullCheck(int num, float p1f, float p2f, vec3_t p1, vec3_t p2)
 
 	else if (t1 > t2)
 	{
-		idist = 1.0 / (t1 - t2);
+		idist = 1.0f / (t1 - t2);
 		side = 0;
 		frac2 = (t1 - offset - DIST_EPSILON) * idist;
 		frac = (t1 + offset + DIST_EPSILON) * idist;
@@ -1010,6 +1021,7 @@ CM_RecursiveHullCheck(int num, float p1f, float p2f, vec3_t p1, vec3_t p2)
 	CM_RecursiveHullCheck(node->children[side ^ 1], midf, p2f, mid, p2);
 }
 
+// ERIK: this needs to be exported by BSP library
 trace_t
 CM_BoxTrace(vec3_t start, vec3_t end, vec3_t mins, vec3_t maxs,
 		int headnode, int brushmask)
@@ -1112,6 +1124,7 @@ CM_BoxTrace(vec3_t start, vec3_t end, vec3_t mins, vec3_t maxs,
  * Handles offseting and rotation of the end points for moving and
  * rotating entities
  */
+ // ERIK: this needs to be exported by BSP library
 trace_t
 CM_TransformedBoxTrace(vec3_t start, vec3_t end, vec3_t mins, vec3_t maxs,
 		int headnode, int brushmask, vec3_t origin, vec3_t angles)
@@ -1625,6 +1638,7 @@ CMod_LoadEntityString(lump_t *l)
 /*
  * Loads in the map and all submodels
  */
+// ERIK: this needs to be exported by BSP library
 cmodel_t *
 CM_LoadMap(char *name, qboolean clientload, unsigned *checksum)
 {
@@ -1716,11 +1730,12 @@ CM_LoadMap(char *name, qboolean clientload, unsigned *checksum)
 	memset(portalopen, 0, sizeof(portalopen));
 	FloodAreaConnections();
 
-	strcpy(map_name, name);
+	strcpy_s (map_name, strlen(name) + 1, name);
 
 	return &map_cmodels[0];
 }
 
+// ERIK: this needs to be exported by BSP library
 cmodel_t *
 CM_InlineModel(char *name)
 {
@@ -1741,24 +1756,28 @@ CM_InlineModel(char *name)
 	return &map_cmodels[num];
 }
 
+// ERIK: this needs to be exported by BSP library
 int
 CM_NumClusters(void)
 {
 	return numclusters;
 }
 
+// ERIK: this needs to be exported by BSP library
 int
 CM_NumInlineModels(void)
 {
 	return numcmodels;
 }
 
+// ERIK: this needs to be exported by BSP library
 char *
 CM_EntityString(void)
 {
 	return map_entitystring;
 }
 
+// ERIK: this needs to be exported by BSP library
 int
 CM_LeafContents(int leafnum)
 {
@@ -1770,6 +1789,7 @@ CM_LeafContents(int leafnum)
 	return map_leafs[leafnum].contents;
 }
 
+// ERIK: this needs to be exported by BSP library
 int
 CM_LeafCluster(int leafnum)
 {
@@ -1781,6 +1801,7 @@ CM_LeafCluster(int leafnum)
 	return map_leafs[leafnum].cluster;
 }
 
+// ERIK: this needs to be exported by BSP library
 int
 CM_LeafArea(int leafnum)
 {
@@ -1795,7 +1816,7 @@ CM_LeafArea(int leafnum)
 void
 CM_DecompressVis(byte *in, byte *out)
 {
-	int c;
+	size_t c;
 	byte *out_p;
 	int row;
 
@@ -1840,6 +1861,7 @@ CM_DecompressVis(byte *in, byte *out)
 	while (out_p - out < row);
 }
 
+// ERIK: this needs to be exported by BSP library
 byte *
 CM_ClusterPVS(int cluster)
 {
@@ -1857,6 +1879,7 @@ CM_ClusterPVS(int cluster)
 	return pvsrow;
 }
 
+// ERIK: this needs to be exported by BSP library
 byte *
 CM_ClusterPHS(int cluster)
 {

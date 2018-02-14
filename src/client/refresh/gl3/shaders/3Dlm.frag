@@ -27,7 +27,6 @@ in VS_OUT {
 	vec2		LMcoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	float		refPlaneDist;
 	flat uint	LightFlags;
 	flat uint	SurfFlags;
 	flat int	refIndex;

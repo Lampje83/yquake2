@@ -40,7 +40,7 @@ layout (std140) uniform refDat {
 #endif
 
 #ifdef __INTELLISENSE__
-typedef
+struct
 #endif
 in gl_PerVertex {
 	vec4 gl_Position;
@@ -59,6 +59,44 @@ int count;
 float refPlaneDist[6];
 
 void writeVertexData (int index);
+vec3 getVertexPos (int index);
+float getClipDistance (int index);
+
+void outputPrimitive (bool clip, bool reverse, int count, int refIndex) {
+	if (gl_InvocationID > 0) {
+		return;
+	}
+
+	for (int j = 0; j < count; j++) {
+		int i;
+		if (reverse) {
+			// reverse winding. Needed when drawing reflected triangles, for proper culling
+			i = count - 1 - j;
+		}
+		else {
+			i = j;
+		}
+
+		writeVertexData (i);
+
+		if (!clip) {
+			gl_ClipDistance[0] = 0.0;
+			gl_Position = transProj * transView * vec4 (getVertexPos(i), 1.0);
+		}
+		else {
+			if (reverse) {
+				gl_ClipDistance[0] = getClipDistance(i);
+				gl_Position = transProj * transView * refData[refIndex].refMatrix * vec4 (getVertexPos(i), 1.0);
+			}
+			else {
+				gl_ClipDistance[0] = -getClipDistance(i);
+				gl_Position = transProj * transView * vec4 (findRefractedPos (viewPos, getVertexPos(i), refData[refIndex]), 1.0); // gl_in[i].gl_Position;
+			}
+		}
+		EmitVertex ();
+	}
+	EndPrimitive ();
+}
 
 #define LDBL_EPSILON 1.084202172485504434E-19
 // #define M_SQRT3 1.7320508075688772935274463L   // sqrt(3)

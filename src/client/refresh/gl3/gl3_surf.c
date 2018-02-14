@@ -958,16 +958,7 @@ RenderLightmappedPoly(msurface_t *surf)
 
 	GL3_Bind(GL_TEXTURE_2D, 0, image->texnum);
 	GL3_BindLightmap(surf->lightmaptexturenum);
-#if 0 // removing redundant shaders
-	if (surf->texinfo->flags & SURF_FLOWING)
 	{
-		GL3_UseProgram(gl3state.si3DlmFlow.shaderProgram);
-		UpdateLMscales(lmScales, &gl3state.si3DlmFlow);
-	}
-	else
-#endif
-	{
-		//GL3_UseProgram(gl3state.si3Dlm.shaderProgram);
 		GL3_BindProgramPipeline (gl3state.si3Dlm);
 		UpdateLMscales(lmScales, &gl3state.si3Dlm);
 	}
@@ -1047,10 +1038,9 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 		}
 		VectorScale (surforg, 1.0f / surf->polys->numverts, surforg);
 		VectorMA (surforg, -1, surf->plane->normal, surforg);
-
+		
 		if (GL3_Mod_PointInLeaf (surforg, gl3_worldmodel)->contents & CONTENTS_WATER) {
-		// if (strstr (surf->texinfo->image->name, "bluwter")) {
-				gl3state.uniRefData[r].refrindex = 1.333f;
+			gl3state.uniRefData[r].refrindex = 1.333f;
 		}
 		gl3state.uniRefData[ r ].refMatrix = HMM_Householder ( gl3state.uniRefData[ r ].plane, -1 );
 

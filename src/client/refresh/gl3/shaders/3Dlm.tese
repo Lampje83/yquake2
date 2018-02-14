@@ -35,7 +35,6 @@ in TCS_OUT {
 	vec2		LMcoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	float		refPlaneDist;
 	flat uint	LightFlags;
 	flat uint	SurfFlags;
 	flat int	refIndex;
@@ -46,7 +45,6 @@ out VS_OUT {
 	vec2		LMcoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	float		refPlaneDist;
 	flat uint	LightFlags;
 	flat uint	SurfFlags;
 	flat int	refIndex;
@@ -58,11 +56,10 @@ void main (void) {
 	tese_out.LMcoord = tese_in[0].LMcoord * gl_TessCoord.x + tese_in[1].LMcoord * gl_TessCoord.y + tese_in[2].LMcoord * gl_TessCoord.z;
 	tese_out.WorldCoord = tese_in[0].WorldCoord * gl_TessCoord.x + tese_in[1].WorldCoord * gl_TessCoord.y + tese_in[2].WorldCoord * gl_TessCoord.z;
 	tese_out.Normal = tese_in[0].Normal * gl_TessCoord.x + tese_in[1].Normal * gl_TessCoord.y + tese_in[2].Normal * gl_TessCoord.z;
-	tese_out.refPlaneDist = tese_in[0].refPlaneDist * gl_TessCoord.x + tese_in[1].refPlaneDist * gl_TessCoord.y + tese_in[2].refPlaneDist * gl_TessCoord.z;
 	tese_out.LightFlags = tese_in[2].LightFlags;
 	tese_out.SurfFlags = tese_in[2].SurfFlags;
 	tese_out.refIndex = tese_in[2].refIndex;
 	gl_Position = transProj * transView * vec4 (tese_in[0].WorldCoord * gl_TessCoord.x + tese_in[1].WorldCoord * gl_TessCoord.y + tese_in[2].WorldCoord * gl_TessCoord.z, 1);
-	//gl_ClipDistance[0] = 0.0; //gl_in[0].gl_ClipDistance[0] * gl_TessCoord.x + gl_in[1].gl_ClipDistance[0] * gl_TessCoord.y + gl_in[2].gl_ClipDistance[0] * gl_TessCoord.z;
+	gl_ClipDistance[0] = gl_in[0].gl_ClipDistance[0] * gl_TessCoord.x + gl_in[1].gl_ClipDistance[0] * gl_TessCoord.y + gl_in[2].gl_ClipDistance[0] * gl_TessCoord.z;
 
 }

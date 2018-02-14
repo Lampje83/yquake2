@@ -49,8 +49,12 @@ Geometry shader will only be used to generate quads for 2D triangles, or sprites
 Its PRIMARY function will be to select the appropiate framebuffer layer for rendering
 Consider using extension GL_AMD_VERTEX_SHADER_LAYER extension to skip GS altogether
 
+The geometry shader will also be used to generate depth cubemaps, using a different
+geometry shader file.
+
 The fragment shader should be as pluggable as possible, like a universal
 appliable material.
+
 Texture coordinate attribute should be one vec4, which can be used as color for
 textureless objects
 */
@@ -500,7 +504,6 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 			}
 		}
 	}
-	//prog = CreateShaderProgram ( shaders3D[2] != 0 ? 3 : 2, shaders3D );
 	prog = CreateShaderProgram ( numshaders, shaders3D );
 
 	if(prog == 0)

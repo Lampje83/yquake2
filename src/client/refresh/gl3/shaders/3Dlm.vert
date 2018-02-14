@@ -9,7 +9,6 @@ out VS_OUT {
 	vec2		LMcoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	float		refPlaneDist;	// distance to reflection plane
 	flat uint	LightFlags;
 	flat uint	SurfFlags;
 	flat int	refIndex;
@@ -32,10 +31,10 @@ void main()
 	//vs.refPlaneDist = distToRefPlane (vs.WorldCoord.xyz, refData[vs.refIndex].plane);
 	vec4 plane = refData[refIndex + gl_InstanceID].plane;
 	if (distToPlane (viewPos, plane) < 0) {
-		vs.refPlaneDist = -distToPlane (vs.WorldCoord.xyz, plane);
+		gl_ClipDistance[0] = -distToPlane (vs.WorldCoord.xyz, plane);
 		vs.SurfFlags = surfFlags | REFSURF_PLANEBACK;
 	} else {
-		vs.refPlaneDist = distToPlane (vs.WorldCoord.xyz, plane);
+		gl_ClipDistance[0] = distToPlane (vs.WorldCoord.xyz, plane);
 		vs.SurfFlags = surfFlags;
 	}
 	gl_Position = transProj * transView * worldCoord;
