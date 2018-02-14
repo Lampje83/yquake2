@@ -29,8 +29,5 @@
     <ClInclude Include="..\src\common\header\files.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Quake-2-Tools\common\bspfile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

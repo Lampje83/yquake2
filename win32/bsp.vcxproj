@@ -159,7 +159,6 @@
     <ClInclude Include="..\src\bsp\header\bsp.h" />
     <ClInclude Include="..\src\common\header\files.h" />
     <ClInclude Include="..\src\common\header\shared.h" />
-    <ClInclude Include="..\src\Quake-2-Tools\common\bspfile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
