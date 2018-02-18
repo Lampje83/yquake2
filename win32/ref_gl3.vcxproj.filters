@@ -233,5 +233,8 @@
     <None Include="..\src\client\refresh\gl3\shaders\Particles.geom">
       <Filter>Shader Files\Effects</Filter>
     </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dskycube.frag">
+      <Filter>Shader Files\Brush</Filter>
+    </None>
   </ItemGroup>
 </Project>

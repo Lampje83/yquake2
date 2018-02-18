@@ -147,8 +147,8 @@ typedef struct
 	hmm_mat4 transProjMat4;
 	hmm_mat4 transViewMat4;
 	hmm_mat4 transModelMat4;
-//	hmm_vec4 fluidPlane;
-//	hmm_vec4 cullDistances;
+
+	hmm_vec4 skyRotate;
 	hmm_vec3 viewPos;
 
 	GLint	refTexture;		// reflection texture index
@@ -158,7 +158,7 @@ typedef struct
 	GLfloat overbrightbits; // gl3_overbrightbits, applied to lightmaps (and elsewhere to models)
 	GLfloat particleFadeFactor; // gl3_particle_fade_factor, higher => less fading out towards edges
 	GLuint	flags;	// 1 = fullbright, 2 = lightmap, 3 = flat lightmap
-		GLfloat _padding[2]; // again, some padding to ensure this has right size
+	GLfloat _padding[2]; // again, some padding to ensure this has right size
 } gl3Uni3D_t;
 
 extern const hmm_mat4 gl3_identityMat4;
@@ -200,7 +200,8 @@ typedef struct 	{
 
 typedef enum refsurf_s {
 	REFSURF_ACTIVE = 1,
-	REFSURF_PLANEBACK = 2
+	REFSURF_PLANEBACK = 2,
+	REFSURF_REFRACT = 4
 } refsurf_t;
 
 typedef struct gl3UniRefdata_s {
@@ -228,6 +229,7 @@ typedef struct
 	// used for switching on/off light and stuff like that.
 	// most surfaces only have one really and the remaining for are filled with dummy data
 	GLuint lightmap_textureID; // instead of lightmap_textures+i use lightmap_textureID array texture
+	GLuint skytexture;
 
 	GLenum currenttarget[MAX_TEXTURE_UNITS];
 	GLuint currenttexture[MAX_TEXTURE_UNITS]; // bound to GL_TEXTURE0
@@ -258,6 +260,7 @@ typedef struct
 	gl3ShaderInfo_t si3DtransFlow; // for transparent flowing/scrolling things (=> no lightmap)
 #endif
 	gl3ShaderInfo_t si3Dsky;       // guess what..
+	gl3ShaderInfo_t si3Dskycube;   // cube mapped sky
 	gl3ShaderInfo_t si3Dsprite;    // for sprites
 	gl3ShaderInfo_t si3DspriteAlpha; // for sprites with alpha-testing
 
@@ -293,9 +296,9 @@ typedef struct
 	GLuint	reflectFB;		// reflection framebuffer
 	GLuint	refractFB;		// refration framebuffer
 
-	refplanedata_t	refPlanes[ MAX_REF_PLANES + 1 ]; // Contains the currently found reflection planes. 1 extra for neutral data
+	// refplanedata_t	refPlanes[ MAX_REF_PLANES + 1 ]; // Contains the currently found reflection planes. 1 extra for neutral data
 	int				numRefPlanes;					// Total number of refplanes found
-	int				currentRefPlane;				// Current reflection plane. Still needed?
+	// int				currentRefPlane;				// Current reflection plane. Still needed?
 	qboolean		refActive;
 	int				refIndices[ MAX_REF_PLANES ];
 
@@ -518,6 +521,7 @@ extern void GL3_LM_BeginBuildingLightmaps(gl3model_t *m);
 extern void GL3_LM_EndBuildingLightmaps(void);
 
 // gl3_warp.c
+extern hmm_vec4 GetSkyRotation (void);
 extern void GL3_EmitWaterPolys(msurface_t *fa);
 extern void GL3_SubdivideSurface(msurface_t *fa, gl3model_t* loadmodel);
 

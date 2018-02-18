@@ -56,6 +56,7 @@ void GL3_SurfInit(void)
 	glGenBuffers(1, &gl3state.vbo3D);
 	glGenBuffers ( 1, &gl3state.vboRefData );
 	GL3_BindVBO(gl3state.vbo3D);
+	//glBindVertexBuffer (0, gl3state.vbo3D, 0, sizeof (gl3_3D_vtx_t));
 
 	glEnableVertexAttribArray(GL3_ATTRIB_POSITION);
 	qglVertexAttribPointer(GL3_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(gl3_3D_vtx_t), 0);
@@ -282,6 +283,32 @@ typedef struct {
 
 DrawArraysIndirectCommand dc[MAX_INDICES];
 
+int GetPrimitiveMode (void) {
+	if (gl_tessellation->value != 0) {
+		qboolean compare;
+		if (gl3state.currentShaderProgram == 0) {
+			compare = gl3state.currentShaderProgramPipeline == gl3state.si3Dlm.shaderProgramPipeline;
+		}
+		else {
+			compare = gl3state.currentShaderProgram == gl3state.si3Dlm.shaderProgram;
+		}
+
+		if (compare
+#if 0
+			|| gl3state.currentShaderProgram == gl3state.si3DlmFlow.shaderProgram
+#endif
+			) {
+			return GL_PATCHES;
+		}
+		else {
+			return GL_TRIANGLES;
+		}
+	}
+	else {
+		return GL_TRIANGLE_FAN;
+	}
+}
+
 void GL_MultiDrawArrays ( void ) {
 	if ( numarrays > MAX_INDICES ) {
 		ri.Sys_Error ( ERR_DROP, __FUNCTION__": Array list overrun: %d, max %d\n", numarrays, MAX_INDICES );
@@ -298,8 +325,8 @@ void GL_MultiDrawArrays ( void ) {
 			//glDrawArraysInstanced (GL_TRIANGLE_FAN, dc[i].first, dc[i].count, gl3state.instanceCount + 1);
 		}
 //		somehow this doesn't work
-		glMultiDrawArraysIndirect (GL_TRIANGLE_FAN, dc, numarrays, 0);
-	
+		glMultiDrawArraysIndirect (GetPrimitiveMode(), dc, numarrays, 0);
+
 		//glMultiDrawArrays ( GL_TRIANGLE_FAN, arraystart, arraylength, numarrays );
 		numarrays = 0;
 	}
@@ -311,40 +338,15 @@ void GL_DrawElements ( void ) {
 		return;
 	}
 
-	int primitivemode;
-
 	if ( numelements > MAX_INDICES ) {
 		ri.Sys_Error ( ERR_DROP, __FUNCTION__": Element list overrun: %d, max %d\n", numelements, MAX_INDICES );
 	} else if ( numelements ) {
-		GL3_BindVAO ( gl3state.vao3D );
-		GL3_BindVBO ( gl3state.vbo3D );
-		//glBufferData ( GL_ARRAY_BUFFER, sizeof ( gl3_3D_vtx_t )*gl3_worldmodel->numglverts, gl3_worldmodel->glverts, GL_STREAM_DRAW );
-
+		GL3_BindVAO (gl3state.vao3D);
+		GL3_BindVBO (gl3state.vbo3D);
 		GL3_BindEBO (gl3state.ebo3D);
 		glBufferData (GL_ELEMENT_ARRAY_BUFFER, numelements * sizeof (GLuint), elementlist, GL_STREAM_DRAW);
 
-		if (gl_tessellation->value != 0) {
-			qboolean compare;
-			if (gl3state.currentShaderProgram == 0) {
-				compare = gl3state.currentShaderProgramPipeline == gl3state.si3Dlm.shaderProgramPipeline;
-			} else {
-				compare = gl3state.currentShaderProgram == gl3state.si3Dlm.shaderProgram;
-			}
-
-			if (compare
-#if 0
-				|| gl3state.currentShaderProgram == gl3state.si3DlmFlow.shaderProgram
-#endif
-				) {
-				primitivemode = GL_PATCHES;
-			}
-			else {
-				primitivemode = GL_TRIANGLES;
-			}
-		} else {
-			primitivemode = GL_TRIANGLE_FAN;
-		}
-		glDrawElementsInstanced ( primitivemode, numelements, GL_UNSIGNED_INT, NULL, gl3state.instanceCount + 1);
+		glDrawElementsInstanced (GetPrimitiveMode(), numelements, GL_UNSIGNED_INT, NULL, gl3state.instanceCount + 1);
 		numelements = 0;
 	}
 }
@@ -502,7 +504,7 @@ GL3_DrawGLPoly ( msurface_t *fa ) {
 	}
 
 	if ( gl_multiarray->value ) {
-		arraystart[ numarrays ] = (GLuint) p->vertices - (GLuint) gl3_worldmodel->glverts;
+		arraystart[ numarrays ] = (GLuint) (p->vertices - gl3_worldmodel->glverts);
 		arraylength[ numarrays++ ] = p->numverts;
 	} else {
 		if (gl_tessellation->value) {
@@ -654,12 +656,21 @@ RenderBrushPoly(msurface_t *fa)
 	}
 	else
 #endif
-	{
+	if (fa->texinfo->flags & SURF_SKY || fa->flags & SURF_SKY) {
+		if (gl3state.currentShaderProgramPipeline != gl3state.si3Dskycube.shaderProgramPipeline) {
+			GL_DrawElements ();
+		}
+		GL3_BindProgramPipeline (gl3state.si3Dskycube);
+		GL3_Bind (GL_TEXTURE_CUBE_MAP, GL_TEXTURE0, gl3state.skytexture);
+	} else	{
+		if (gl3state.currentShaderProgramPipeline != gl3state.si3Dlm.shaderProgramPipeline) {
+			GL_DrawElements ();
+		}
 		GL3_BindProgramPipeline (gl3state.si3Dlm);
 		//GL3_UseProgram(gl3state.si3Dlm.shaderProgram);
 		UpdateLMscales(lmScales, &gl3state.si3Dlm);
-		GL3_DrawGLPoly(fa);
 	}
+	GL3_DrawGLPoly (fa);
 
 	// Note: lightmap chains are gone, lightmaps are rendered together with normal texture in one pass
 }
@@ -692,45 +703,6 @@ qboolean planeEquals ( cplane_t *a, cplane_t *b ) {
 	return false;
 }
 
-void GL3_RenderReflection ( int refp ) {
-	if ( gl3state.refPlanes[ refp ].frameCount == gl3_framecount ) {
-		// already rendered this reflection
-		return;
-	}
-	gl3state.refPlanes[ refp ].frameCount = gl3_framecount;
-
-	hmm_mat4 oldViewMat = gl3state.uni3DData.transModelMat4;
-
-	glBindBuffer ( GL_ARRAY_BUFFER, gl3state.vbo3D );
-	glDisableVertexAttribArray ( GL3_ATTRIB_REFINDEX );
-	glVertexAttribI1i ( GL3_ATTRIB_REFINDEX, refp );
-	gl3state.currentRefPlane = refp;
-	gl3state.refActive = true;
-
-	//gl3state.uni3DData.fluidPlane = plane;
-
-	// Draw the world
-	gl3state.uni3DData.alpha = 1.0f;
-	GL3_UpdateUBO3D ();
-	glEnable ( GL_CLIP_DISTANCE0 );
-
-	glDisable ( GL_BLEND );
-	GL3_DrawWorld ();
-	GL3_DrawEntitiesOnList ();
-	GL3_DrawParticles ();
-	GL3_DrawAlphaSurfaces ();
-	
-	// Restore normal framebuffer
-	gl3state.uni3DData.transModelMat4 = oldViewMat;
-
-	glVertexAttribI1i ( GL3_ATTRIB_REFINDEX, -1 );
-	gl3state.refActive = false;
-	glDisable ( GL_CLIP_DISTANCE0 );
-
-	glEnable ( GL_BLEND );
-	//		memcpy ( frustum, oldfrustum, sizeof ( cplane_t ) * 4 );
-}
-
 //#define DEBUGREFL
 
 void GL3_DrawAlphaSurfaces ( void ) {
@@ -739,7 +711,7 @@ void GL3_DrawAlphaSurfaces ( void ) {
 	/* go back to the world matrix */
 	GL_DrawElements ();
 	gl3state.uni3DData.transModelMat4 = gl3_identityMat4;
-	GL3_UpdateUBO3D ();
+	//GL3_UpdateUBO3D ();
 
 	glEnable ( GL_BLEND );
 #ifdef DEBUGREFL
@@ -750,6 +722,7 @@ void GL3_DrawAlphaSurfaces ( void ) {
 		R_Printf ( PRINT_ALL, "refplanes: %i ", gl3state.numRefPlanes );
 #endif
 
+	GL3_UpdateUBORefData ();
 	for ( s = gl3_alpha_surfaces; s != NULL; s = s->texturechain ) {
 
 		if (s->refIndex >= 0) {
@@ -759,7 +732,7 @@ void GL3_DrawAlphaSurfaces ( void ) {
 			refsurfcount[ s->refIndex ]++;
 #endif			
 			gl3state.uni3DData.refTexture = s->refIndex;
-			if ( ( ( s->flags & SURF_PLANEBACK ) == ( gl3state.refPlanes[ s->refIndex ].planeback ? SURF_PLANEBACK : 0 ) ) &&
+			if ( ( ( s->flags & SURF_PLANEBACK ) == ( gl3state.uniRefData[ s->refIndex ].flags & REFSURF_PLANEBACK  ) ) &&
 				( gl_reflection->value )
 				) {
 				int refp = s->refIndex;
@@ -793,10 +766,9 @@ void GL3_DrawAlphaSurfaces ( void ) {
 			GL3_DrawGLPoly ( s );
 #endif
 		} else {
-			GL3_UseProgram ( gl3state.si3Dtrans.shaderProgram );
+			GL3_BindProgramPipeline ( gl3state.si3Dtrans );
 			GL3_DrawGLPoly ( s );
 		}
-		GL3_UpdateUBORefData ();
 			GL_DrawElements ();
 	}
 #ifdef DEBUGREFL
@@ -825,7 +797,7 @@ DrawTextureChains(void)
 	GL3_BindVAO ( gl3state.vao3D );
 	GL3_BindVBO ( gl3state.vbo3D );
 	GL3_UpdateUBORefData ();
-
+	
 	for (i = 0, image = gl3textures; i < numgl3textures; i++, image++)
 	{
 		if (!image->registration_sequence)
@@ -977,7 +949,7 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 		return;
 
 	for ( r = 0; r < gl3state.numRefPlanes; r++ ) {
-		if ( ( gl3state.refPlanes[ r ].plane == surf->plane )
+		if ( (!memcmp(gl3state.uniRefData[ r ].plane.Elements, surf->plane, sizeof(hmm_vec4)) )
 			// && ( ( gl3state.refPlanes[ r ].planeback ? SURF_PLANEBACK : 0) == ( surf->flags & SURF_PLANEBACK ) ) 
 			) 
 		{
@@ -989,7 +961,7 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 
 	if ( addPlane ) {
 		// reset cull distances
-		gl3state.refPlanes[ r ].cullDistances = HMM_Vec4 ( -1, -1, -1, -1 );
+		gl3state.uniRefData[ r ].cullDistances = HMM_Vec4 ( -1, -1, -1, -1 );
 	}
 
 	// cull reflection view against visible reflection plane
@@ -1010,16 +982,14 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 		}
 		//continue;
 
-		if ( (  viewvec.X / viewvec.W ) > gl3state.refPlanes[ r ].cullDistances.Elements[ 0 ] ) gl3state.refPlanes[ r ].cullDistances.Elements[ 0 ] = min ( viewvec.X / viewvec.W, 1 );
-		if ( (  viewvec.Y / viewvec.W ) > gl3state.refPlanes[ r ].cullDistances.Elements[ 1 ] ) gl3state.refPlanes[ r ].cullDistances.Elements[ 1 ] = min ( viewvec.Y / viewvec.W, 1 );
-		if ( ( -viewvec.X / viewvec.W ) > gl3state.refPlanes[ r ].cullDistances.Elements[ 2 ] ) gl3state.refPlanes[ r ].cullDistances.Elements[ 2 ] = min ( -viewvec.X / viewvec.W, 1 );
-		if ( ( -viewvec.Y / viewvec.W ) > gl3state.refPlanes[ r ].cullDistances.Elements[ 3 ] ) gl3state.refPlanes[ r ].cullDistances.Elements[ 3 ] = min ( -viewvec.Y / viewvec.W, 1 );
+		if ( (  viewvec.X / viewvec.W ) > gl3state.uniRefData[ r ].cullDistances.Elements[ 0 ] ) gl3state.uniRefData[ r ].cullDistances.Elements[ 0 ] = min ( viewvec.X / viewvec.W, 1 );
+		if ( (  viewvec.Y / viewvec.W ) > gl3state.uniRefData[ r ].cullDistances.Elements[ 1 ] ) gl3state.uniRefData[ r ].cullDistances.Elements[ 1 ] = min ( viewvec.Y / viewvec.W, 1 );
+		if ( ( -viewvec.X / viewvec.W ) > gl3state.uniRefData[ r ].cullDistances.Elements[ 2 ] ) gl3state.uniRefData[ r ].cullDistances.Elements[ 2 ] = min ( -viewvec.X / viewvec.W, 1 );
+		if ( ( -viewvec.Y / viewvec.W ) > gl3state.uniRefData[ r ].cullDistances.Elements[ 3 ] ) gl3state.uniRefData[ r ].cullDistances.Elements[ 3 ] = min ( -viewvec.Y / viewvec.W, 1 );
 	}
 
-	gl3state.uniRefData[r].cullDistances = gl3state.refPlanes[r].cullDistances;
-
-	if ( ( gl3state.refPlanes[ r ].cullDistances.Elements[ 0 ] == -gl3state.refPlanes[ r ].cullDistances.Elements[ 2 ] ) ||
-		( gl3state.refPlanes[ r ].cullDistances.Elements[ 1 ] == -gl3state.refPlanes[ r ].cullDistances.Elements[ 3 ] ) ) {
+	if ( ( gl3state.uniRefData[ r ].cullDistances.Elements[ 0 ] == -gl3state.uniRefData[ r ].cullDistances.Elements[ 2 ] ) ||
+		( gl3state.uniRefData[ r ].cullDistances.Elements[ 1 ] == -gl3state.uniRefData[ r ].cullDistances.Elements[ 3 ] ) ) {
 		// surface is completely outside of frustum, don't add
 		return;
 	}
@@ -1038,17 +1008,28 @@ void AddSurfToReflectionBuffer ( msurface_t *surf ) {
 		}
 		VectorScale (surforg, 1.0f / surf->polys->numverts, surforg);
 		VectorMA (surforg, -1, surf->plane->normal, surforg);
-		
+		gl3state.uniRefData[ r ].refMatrix = HMM_Householder ( gl3state.uniRefData[ r ].plane, -1 );
+
+		//gl3state.refPlanes[ r ].id = r;
+		//gl3state.refPlanes[ r ].cullDistances = HMM_Vec4 ( -1, -1, -1, -1 );
+		//gl3state.refPlanes[ r ].plane = surf->plane;
+		//gl3state.refPlanes[ r ].planeback = ( surf->flags & SURF_PLANEBACK ) != 0;
+
 		if (GL3_Mod_PointInLeaf (surforg, gl3_worldmodel)->contents & CONTENTS_WATER) {
 			gl3state.uniRefData[r].refrindex = 1.333f;
 		}
-		gl3state.uniRefData[ r ].refMatrix = HMM_Householder ( gl3state.uniRefData[ r ].plane, -1 );
 
-		gl3state.refPlanes[ r ].id = r;
-		//gl3state.refPlanes[ r ].cullDistances = HMM_Vec4 ( -1, -1, -1, -1 );
-		gl3state.refPlanes[ r ].plane = surf->plane;
-		gl3state.refPlanes[ r ].planeback = ( surf->flags & SURF_PLANEBACK ) != 0;
+		if (gl3state.uniRefData[r].refrindex != 1.0f && gl3state.numRefPlanes < MAX_REF_PLANES - 1) {
+			memcpy (&gl3state.uniRefData[r + 1], &gl3state.uniRefData[r], sizeof (gl3UniRefData_t));
+			gl3state.numRefPlanes++;
+			gl3state.uniRefData[r + 1].flags |= REFSURF_REFRACT;
+		}
 		gl3state.numRefPlanes++;
+	}
+	else if (gl3state.uniRefData[r].refrindex != 1.0f) {
+		// as refractive surfaces are duplicated in the reflection list,
+		// we have to copy over the modified cull distances
+		memcpy (&gl3state.uniRefData[r + 1].cullDistances, &gl3state.uniRefData[r].cullDistances, sizeof (gl3state.uniRefData[r].cullDistances));
 	}
 
 }

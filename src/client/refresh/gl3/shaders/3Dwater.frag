@@ -55,6 +55,7 @@ void main()
 		projCoord.z = 0;
 
 		vec2 df;
+
 		df.x = -brightness (texture(tex, texw + vec2(-delta.x, 0)).rgb)
 			   -brightness (texture(tex, texw + vec2(-delta.x, delta.y)).rgb) / 3
 			   -brightness (texture(tex, texw + vec2(-delta.x, -delta.y)).rgb) / 3
@@ -86,21 +87,21 @@ void main()
 		float intensityY1 = brightness (texture(tex, texw - vec2(0, delta.y)).rgb);
 		float intensityY2 = brightness (texture(tex, texw + vec2(0, delta.y)).rgb);
 
-		float refldepth = 0.002 / (1.0 - texture(reflDepth, vec3(projCoord.xy, 1 + 2 * refTexture)).r);
+		float refldepth = 0.002 / (1.0 - texture(reflDepth, vec3(projCoord.xy, 1 + refTexture)).r);
 		refldepth -= 0.002 / (1.0 - gl_FragCoord.z);
 
 		projCoord.zw = projCoord.xy;
 		projCoord.xy += df * clamp(refldepth, 0.0, 0.125);
 		//projCoord.xy += df * (texture (reflDepth, vec3(projCoord.xy, 1 + 2 * refTexture)).z - gl_FragCoord.z);
 		//projCoord.zw += df * (texture (reflDepth, vec3(projCoord.xy, 2 + 2 * refTexture)).z - gl_FragCoord.z);
-		float refrdepth = 0.002 / (1.0 - texture(reflDepth, vec3(projCoord.zw, 2 + 2 * refTexture)).r);
+		float refrdepth = 0.002 / (1.0 - texture(reflDepth, vec3(projCoord.zw, 2 + refTexture)).r);
 		refrdepth -= 0.002 / (1.0 - gl_FragCoord.z);
 
 		projCoord.zw += df * clamp(refrdepth, 0.0, 0.25);
 		projCoord = clamp(projCoord, 0.0, 1.0);
 
-		vec4 refltex = texture(refl, vec3(projCoord.xy, 1 + 2 * refTexture)) * newalpha;
-		vec4 refrtex = texture(refl, vec3(projCoord.zw, 2 + 2 * refTexture)) * (1 - newalpha);
+		vec4 refltex = texture(refl, vec3(projCoord.xy, 1 + refTexture)) * newalpha;
+		vec4 refrtex = texture(refl, vec3(projCoord.zw, 2 + refTexture)) * (1 - newalpha);
 		//texel.rgb *= vec3(1 - newalpha);
 		if (plane.z < 0) { plane = -plane; }
 		if ((dot(plane.xyz, viewPos) - plane.w) < 0) {

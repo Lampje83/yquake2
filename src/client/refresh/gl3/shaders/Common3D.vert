@@ -1,6 +1,7 @@
 //#version 430 core
 #ifdef __INTELLISENSE__
 #include "glsl.h"
+#include "Common.glsl"
 #endif
 
 in vec3 position;   // GL3_ATTRIB_POSITION
@@ -20,6 +21,8 @@ layout (std140) uniform uni3D
 	mat4 transProj;
 	mat4 transView;
 	mat4 transModel;
+
+	vec4 skyRotate;
 	vec3 viewPos;
 
 	int		refTexture;	// which texture to draw on reflecting surface

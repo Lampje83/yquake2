@@ -45,10 +45,9 @@ void main () {
 	tesc_out[gl_InvocationID].refIndex = tesc_in[gl_InvocationID].refIndex;
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 	gl_out[gl_InvocationID].gl_ClipDistance[0] = gl_in[gl_InvocationID].gl_ClipDistance[0];
+
 	if (gl_InvocationID == 0) {
-		if (tesc_in[0].refIndex >= 0 && (gl_in[0].gl_ClipDistance[0] < 0
-			|| gl_in[1].gl_ClipDistance[0] < 0
-			|| gl_in[2].gl_ClipDistance[0] < 0) && refData[tesc_in[0].refIndex].refrindex != 1.0) {
+		if (tesc_in[0].refIndex >= 0 && ((refData[tesc_in[0].refIndex].flags & REFSURF_REFRACT) != 0) && refData[tesc_in[0].refIndex].refrindex != 1.0) {
 			vec3 lengths;
 
 			scrpos[0] = tesc_in[0].WorldCoord.xyz;
@@ -70,4 +69,5 @@ void main () {
 			gl_TessLevelOuter[2] = 1;
 		}
 	}
+	// TODO: move reflection/refraction window clipping from geometry shader here
 }

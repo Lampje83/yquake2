@@ -735,6 +735,7 @@ static qboolean createShaders ( void ) {
 	if ( !initShader3D ( &gl3state.si3DcolorOnly,	"shaders/3D.vert",		"shaders/3Dcolor.frag",			"shaders/3D.geom",		"flat-colored 3D rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dturb,		"shaders/3D.vert",		"shaders/3Dwater.frag",			"shaders/3D.geom",		"water rendering" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3Dsky,			"shaders/3D.vert",		"shaders/3Dsky.frag",			"shaders/3d.geom",		"sky rendering" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3Dskycube,		"shaders/3D.vert",		"shaders/3Dskycube.frag",		"shaders/3d.geom",		"sky cubemap rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dsprite,		"shaders/3D.vert",		"shaders/3Dsprite.frag",		"shaders/3d.geom",		"sprite rendering" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3DspriteAlpha, "shaders/3D.vert",		"shaders/3DspriteAlpha.frag",	"shaders/3d.geom",		"alpha-tested sprite rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dalias,		"shaders/Alias.vert",	"shaders/Alias.frag",			"shaders/Alias.geom",	"rendering textured models" ) ) { return false;	}

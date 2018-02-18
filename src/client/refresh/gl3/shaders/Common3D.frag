@@ -24,8 +24,8 @@ layout (std140) uniform uni3D
 	mat4 transProj;
 	mat4 transView;
 	mat4 transModel;
-//	vec4 fluidPlane;
-//	vec4 cullDistances;
+
+	vec4 skyRotate;
 	vec3 viewPos;
 
 	int		refTexture;	// which texture to draw on reflecting surface

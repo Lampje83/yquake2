@@ -11,8 +11,8 @@ layout (std140) uniform uni3D {
 	mat4 transProj;
 	mat4 transView;
 	mat4 transModel;
-	//	vec4 fluidPlane;
-	//	vec4 cullDistances;
+
+	vec4 skyRotate;
 	vec3 viewPos;
 
 	int		refTexture;
@@ -24,7 +24,7 @@ layout (std140) uniform uni3D {
 	uint  flags;
 	float _pad_1; // AMDs legacy windows driver needs this, otherwise uni3D has wrong size
 	float _pad_2;
-	//float _pad_3;
+	// float _pad_3;
 #ifndef __INTELLISENSE__
 };
 #endif
@@ -56,11 +56,7 @@ out gl_PerVertex {
 
 int count;
 
-float refPlaneDist[6];
-
 void writeVertexData (int index);
-vec3 getVertexPos (int index);
-float getClipDistance (int index);
 
 void outputPrimitive (bool clip, bool reverse, int count, int refIndex) {
 	if (gl_InvocationID > 0) {
@@ -78,21 +74,6 @@ void outputPrimitive (bool clip, bool reverse, int count, int refIndex) {
 		}
 
 		writeVertexData (i);
-
-		if (!clip) {
-			gl_ClipDistance[0] = 0.0;
-			gl_Position = transProj * transView * vec4 (getVertexPos(i), 1.0);
-		}
-		else {
-			if (reverse) {
-				gl_ClipDistance[0] = getClipDistance(i);
-				gl_Position = transProj * transView * refData[refIndex].refMatrix * vec4 (getVertexPos(i), 1.0);
-			}
-			else {
-				gl_ClipDistance[0] = -getClipDistance(i);
-				gl_Position = transProj * transView * vec4 (findRefractedPos (viewPos, getVertexPos(i), refData[refIndex]), 1.0); // gl_in[i].gl_Position;
-			}
-		}
 		EmitVertex ();
 	}
 	EndPrimitive ();

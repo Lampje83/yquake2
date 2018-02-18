@@ -1340,7 +1340,7 @@ SetupGL(void)
 	gl3state.uni3DData.viewPos.X = gl3_newrefdef.vieworg[ 0 ];
 	gl3state.uni3DData.viewPos.Y = gl3_newrefdef.vieworg[ 1 ];
 	gl3state.uni3DData.viewPos.Z = gl3_newrefdef.vieworg[ 2 ];
-
+	gl3state.uni3DData.skyRotate = GetSkyRotation ();
 	GL3_UpdateUBO3D();
 
 	/* set drawing parms */
@@ -1653,6 +1653,8 @@ GL3_RenderFrame(refdef_t *fd)
 		//GL3_DrawTexture ( 0, vid.height, vid.width, -vid.height );
 		GL3_DrawCroppedTexture (fd->x, fd->y, fd->width, fd->height);
 	//}
+
+	glEnable (GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	if(v_blend[3] != 0.0f)
 	{

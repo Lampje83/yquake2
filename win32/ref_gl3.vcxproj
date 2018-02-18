@@ -361,6 +361,7 @@
     <None Include="..\src\client\refresh\gl3\shaders\3Dlm.tese">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dskycube.frag" />
     <None Include="..\src\client\refresh\gl3\shaders\Common3D.geom">
       <DeploymentContent>false</DeploymentContent>
     </None>

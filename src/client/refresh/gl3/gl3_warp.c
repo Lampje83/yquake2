@@ -331,6 +331,9 @@ int vec_to_st[6][3] = {
 	{-2, 1, -3}
 };
 
+hmm_vec4 GetSkyRotation (void) {
+	return HMM_Vec4 (skyaxis[0], skyaxis[1], skyaxis[2], skyrotate);
+}
 
 void
 GL3_SetSky(char *name, float rotate, vec3_t axis)
@@ -359,6 +362,23 @@ GL3_SetSky(char *name, float rotate, vec3_t axis)
 		sky_min = 1.0 / 512;
 		sky_max = 511.0 / 512;
 	}
+
+	if (gl3state.skytexture) {
+		glDeleteTextures (1, &gl3state.skytexture);
+	}
+
+	glGenTextures (1, &gl3state.skytexture);
+	GL3_Bind (GL_TEXTURE_CUBE_MAP, 0, gl3state.skytexture);
+	glTexStorage2D (GL_TEXTURE_CUBE_MAP, 1, gl3_tex_solid_format, sky_images[0]->width, sky_images[0]->height);
+	//glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, 0, 0, sky_images[0]->width, sky_images[0]->height, GL_RGB, sky_images[0].)
+	glCopyImageSubData (sky_images[3]->texnum, GL_TEXTURE_2D, 0, 0, 0, 0, gl3state.skytexture, GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0, sky_images[0]->width, sky_images[0]->height, 1);
+	glCopyImageSubData (sky_images[1]->texnum, GL_TEXTURE_2D, 0, 0, 0, 0, gl3state.skytexture, GL_TEXTURE_CUBE_MAP, 0, 0, 0, 1, sky_images[1]->width, sky_images[1]->height, 1);
+	glCopyImageSubData (sky_images[4]->texnum, GL_TEXTURE_2D, 0, 0, 0, 0, gl3state.skytexture, GL_TEXTURE_CUBE_MAP, 0, 0, 0, 2, sky_images[2]->width, sky_images[2]->height, 1); // OK
+	glCopyImageSubData (sky_images[5]->texnum, GL_TEXTURE_2D, 0, 0, 0, 0, gl3state.skytexture, GL_TEXTURE_CUBE_MAP, 0, 0, 0, 3, sky_images[3]->width, sky_images[3]->height, 1); // OK
+	glCopyImageSubData (sky_images[0]->texnum, GL_TEXTURE_2D, 0, 0, 0, 0, gl3state.skytexture, GL_TEXTURE_CUBE_MAP, 0, 0, 0, 4, sky_images[4]->width, sky_images[4]->height, 1);
+	glCopyImageSubData (sky_images[2]->texnum, GL_TEXTURE_2D, 0, 0, 0, 0, gl3state.skytexture, GL_TEXTURE_CUBE_MAP, 0, 0, 0, 5, sky_images[5]->width, sky_images[5]->height, 1);
+
+	gl3state.uni3DData.skyRotate = GetSkyRotation ();
 }
 
 static void
