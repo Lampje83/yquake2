@@ -215,7 +215,7 @@ void GL3_SurfInit(void)
 
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTextureDepth );
 	//glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 32, 0, GL_DEPTH_COMPONENT, GL_BYTE, 0 );
-	glTexStorage3D (GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT24, vid.width, vid.height, 32);
+	glTexStorage3D (GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT16, vid.width, vid.height, 32);
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -287,10 +287,16 @@ int GetPrimitiveMode (void) {
 	if (gl_tessellation->value != 0) {
 		qboolean compare;
 		if (gl3state.currentShaderProgram == 0) {
-			compare = gl3state.currentShaderProgramPipeline == gl3state.si3Dlm.shaderProgramPipeline;
+			compare = gl3state.currentShaderProgramPipeline == gl3state.si3Dlm.shaderProgramPipeline ||
+				gl3state.currentShaderProgramPipeline == gl3state.si3Dtrans.shaderProgramPipeline ||
+				gl3state.currentShaderProgramPipeline == gl3state.si3Dturb.shaderProgramPipeline ||
+				gl3state.currentShaderProgramPipeline == gl3state.si3DcolorOnly.shaderProgramPipeline;
 		}
 		else {
-			compare = gl3state.currentShaderProgram == gl3state.si3Dlm.shaderProgram;
+			compare = gl3state.currentShaderProgram == gl3state.si3Dlm.shaderProgram ||
+				gl3state.currentShaderProgram == gl3state.si3Dtrans.shaderProgram ||
+				gl3state.currentShaderProgram == gl3state.si3Dturb.shaderProgram ||
+				gl3state.currentShaderProgram == gl3state.si3DcolorOnly.shaderProgram;
 		}
 
 		if (compare
@@ -866,7 +872,7 @@ DrawTriangleOutlines( void ) {
 	gl3state.uniCommonData.color = HMM_Vec4( 1, 1, 1, 1 );
 	GL3_UpdateUBOCommon();
 
-	GL3_UseProgram( gl3state.si3DcolorOnly.shaderProgram );
+	GL3_BindProgramPipeline ( gl3state.si3DcolorOnly );
 
 	for ( i = 0, image = gl3textures; i < numgl3textures; i++, image++ ) {
 		if ( !image->registration_sequence ) {
@@ -1400,9 +1406,10 @@ void GL3_DrawWorld(void)
 
 	}
 
-
 	DrawTextureChains();
-	GL3_DrawSkyBox();
+	if (gl_skycube->value == 0.0f) {
+		GL3_DrawSkyBox ();
+	}
 	DrawTriangleOutlines();
 
 	currententity = NULL;

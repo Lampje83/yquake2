@@ -358,6 +358,9 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glsl.h</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glsl.h</ForcedIncludeFiles>
     </ClCompile>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.tesc" />
+    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.tese" />
+    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.vert" />
     <None Include="..\src\client\refresh\gl3\shaders\3Dlm.tese">
       <DeploymentContent>true</DeploymentContent>
     </None>

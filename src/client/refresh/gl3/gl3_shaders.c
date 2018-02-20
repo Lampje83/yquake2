@@ -125,7 +125,6 @@ CompileShader (GLenum shaderType, const char* shaderSrc, const char* shaderSrc2)
 
 		return 0;
 	}
-
 	return shader;
 }
 
@@ -208,7 +207,7 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 		else {
 			if (infoLogLength > 3) {
 				R_Printf (PRINT_ALL, "Linking shader program succeeded: %s\n", bufPtr);
-			}
+			}			
 		}
 	}
 
@@ -465,51 +464,70 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	}
 
 
-	// hack
-	if (geomFilename != NULL) {
-		if (strcmp (geomFilename, "shaders/3Dlm.geom") == 0) {
-			if (!(fileSize = ri.FS_LoadFile ("shaders/3Dlm.tese", (void **) &teseSrc))) {
-				R_Printf (PRINT_ALL, __FUNCTION__": Failed to load 3D tessellation evaluation shader!\n");
-			}
+	// try to locate tessellation shaders
+	char tessFilename[64], baseName[64];
+	size_t extoffset = strstr (vertFilename, ".") - vertFilename;
+	strncpy_s (baseName, sizeof(baseName), vertFilename, extoffset);
+	Com_sprintf (tessFilename, 64, "%s.tese", baseName);
 
-			GLuint tessshadernum[2];
-			if (gl_tessellation->value) {
-				tessshadernum[0] = CompileShader (GL_TESS_EVALUATION_SHADER, teseSrc, NULL);
-
-				if (!(fileSize = ri.FS_LoadFile ("shaders/3Dlm.tesc", (void **) &tescSrc))) {
-					R_Printf (PRINT_ALL, __FUNCTION__": Failed to load 3D tessellation control shader!\n");
-					tessshadernum[1] = 0;
-				} else {
-					tessshadernum[1] = CompileShader (GL_TESS_CONTROL_SHADER, tescSrc, NULL);
-				}
-			} else {
-				tessshadernum[0] = tessshadernum[1] = 0;
-			}
-
-			if (tessshadernum[0] > 0) {
-				// insert tessellation evaluation shader
-				shaders3D[3] = shaders3D[2];
-				shaders3D[2] = shaders3D[1];
-				shaders3D[1] = tessshadernum[0];
-				numshaders++;
-			}
-
-			if (tessshadernum[1] > 0) {
-				// insert tessellation control shader
-				shaders3D[4] = shaders3D[3];
-				shaders3D[3] = shaders3D[2];
-				shaders3D[2] = shaders3D[1];
-				shaders3D[1] = tessshadernum[1];
-				numshaders++;
-			}
-		}
+	if ((fileSize = ri.FS_LoadFile (tessFilename, (void **) &teseSrc)) <= 0) {
+		R_Printf (PRINT_DEVELOPER, __FUNCTION__": Failed to load 3D tessellation evaluation shader!\n");
 	}
+
+	GLuint tessshadernum[2];
+	if (fileSize > 0) {
+		tessshadernum[0] = CompileShader (GL_TESS_EVALUATION_SHADER, teseSrc, NULL);
+
+		Com_sprintf (tessFilename, 64, "%s.tesc", baseName);
+
+		if ((fileSize = ri.FS_LoadFile (tessFilename, (void **) &tescSrc)) <= 0) {
+			R_Printf (PRINT_DEVELOPER, __FUNCTION__": Failed to load 3D tessellation control shader!\n");
+			tessshadernum[1] = 0;
+		} else {
+			tessshadernum[1] = CompileShader (GL_TESS_CONTROL_SHADER, tescSrc, NULL);
+		}
+	} else {
+		tessshadernum[0] = tessshadernum[1] = 0;
+	}
+
+	if (tessshadernum[0] > 0) {
+		// insert tessellation evaluation shader
+		shaders3D[3] = shaders3D[2];
+		shaders3D[2] = shaders3D[1];
+		shaders3D[1] = tessshadernum[0];
+		numshaders++;
+	}
+
+	if (tessshadernum[1] > 0) {
+		// insert tessellation control shader
+		shaders3D[4] = shaders3D[3];
+		shaders3D[3] = shaders3D[2];
+		shaders3D[2] = shaders3D[1];
+		shaders3D[1] = tessshadernum[1];
+		numshaders++;
+	}
+
 	prog = CreateShaderProgram ( numshaders, shaders3D );
 
 	if(prog == 0)
 	{
 		goto err_cleanup;
 	}
+
+	byte *programBinary;
+	GLsizei length;
+	GLenum binFormat;
+	FILE* f;
+
+	glGetProgramiv (prog, GL_PROGRAM_BINARY_LENGTH, &length);
+	programBinary = malloc (length);
+	glGetProgramBinary (prog, length, &length, &binFormat, programBinary);
+	char fname[96];
+	Com_sprintf (fname, sizeof (fname), "%s/shaders/%s.o", ri.FS_Gamedir (), shaderDesc);
+	fopen_s (&f, fname, "wb");
+	fwrite (programBinary, 1, length, f);
+	fclose (f);
+	free (programBinary);
 
 	glObjectLabel (GL_PROGRAM, prog, strlen (shaderDesc), shaderDesc);
 
@@ -731,13 +749,13 @@ static qboolean createShaders ( void ) {
 	if ( !initShader2D ( &gl3state.si2Darray,		"shaders/2d.vert",		"shaders/2darray.frag",									"array-textured 2D rendering" ) ) { return false; }
 	if ( !initShader2D ( &gl3state.si2Dcolor,		"shaders/2Dcolor.vert", "shaders/2Dcolor.frag",									"color-only 2D rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dlm,			"shaders/3Dlm.vert",	"shaders/3Dlm.frag",			"shaders/3Dlm.geom",	"textured 3D rendering with lightmap" ) ) { return false; }
-	if ( !initShader3D ( &gl3state.si3Dtrans,		"shaders/3D.vert",		"shaders/3D.frag",				"shaders/3D.geom",		"rendering translucent 3D things" ) ) { return false; }
-	if ( !initShader3D ( &gl3state.si3DcolorOnly,	"shaders/3D.vert",		"shaders/3Dcolor.frag",			"shaders/3D.geom",		"flat-colored 3D rendering" ) ) { return false;	}
-	if ( !initShader3D ( &gl3state.si3Dturb,		"shaders/3D.vert",		"shaders/3Dwater.frag",			"shaders/3D.geom",		"water rendering" ) ) { return false; }
-	if ( !initShader3D ( &gl3state.si3Dsky,			"shaders/3D.vert",		"shaders/3Dsky.frag",			"shaders/3d.geom",		"sky rendering" ) ) { return false;	}
-	if ( !initShader3D ( &gl3state.si3Dskycube,		"shaders/3D.vert",		"shaders/3Dskycube.frag",		"shaders/3d.geom",		"sky cubemap rendering" ) ) { return false;	}
-	if ( !initShader3D ( &gl3state.si3Dsprite,		"shaders/3D.vert",		"shaders/3Dsprite.frag",		"shaders/3d.geom",		"sprite rendering" ) ) { return false; }
-	if ( !initShader3D ( &gl3state.si3DspriteAlpha, "shaders/3D.vert",		"shaders/3DspriteAlpha.frag",	"shaders/3d.geom",		"alpha-tested sprite rendering" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3Dtrans,		"shaders/3Dcolor.vert",	"shaders/3D.frag",				"shaders/3D.geom",		"rendering translucent 3D things" ) ) { return false; }
+	if ( !initShader3D ( &gl3state.si3DcolorOnly,	"shaders/3Dcolor.vert",	"shaders/3Dcolor.frag",			"shaders/3D.geom",		"flat-colored 3D rendering" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3Dturb,		"shaders/3Dcolor.vert",	"shaders/3Dwater.frag",			"shaders/3D.geom",		"water rendering" ) ) { return false; }
+	if ( !initShader3D ( &gl3state.si3Dsky,			"shaders/3D.vert",		"shaders/3Dsky.frag",			"shaders/3D.geom",		"sky rendering" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3Dskycube,		"shaders/3D.vert",		"shaders/3Dskycube.frag",		"shaders/3D.geom",		"sky cubemap rendering" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3Dsprite,		"shaders/3D.vert",		"shaders/3Dsprite.frag",		"shaders/3D.geom",		"sprite rendering" ) ) { return false; }
+	if ( !initShader3D ( &gl3state.si3DspriteAlpha, "shaders/3D.vert",		"shaders/3DspriteAlpha.frag",	"shaders/3D.geom",		"alpha-tested sprite rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dalias,		"shaders/Alias.vert",	"shaders/Alias.frag",			"shaders/Alias.geom",	"rendering textured models" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3DaliasColor,	"shaders/Alias.vert",	"shaders/AliasColor.frag",		"shaders/Alias.geom",	"flat-colored models" ) ) { return false;	}
 

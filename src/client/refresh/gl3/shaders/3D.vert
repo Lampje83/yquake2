@@ -20,20 +20,31 @@ void main()
 		vs.TexCoord.s -= time / 48.0 * 32.0;
 	}
 
-	vs.WorldCoord = (transModel * vec4 ( position, 1.0 )).xyz;
-
-	vec4 worldNormal = transModel * vec4 ( normal, 0.0f );
-	vs.Normal = normalize ( worldNormal.xyz );
+	vs.WorldCoord = (transModel * vec4 (position, 1.0f)).xyz;
+	vs.Normal = normalize ((transModel * vec4 (normal, 0.0f)).xyz);
+	vs.SurfFlags = surfFlags;
 	vs.refIndex = refIndex + gl_InstanceID;
-	gl_Position = transProj * transView * vec4(vs.WorldCoord, 1.0);
 
-	vec4 plane = refData[refIndex + gl_InstanceID].plane;
-	if (distToPlane (viewPos, plane) < 0) {
-		gl_ClipDistance[0] = -distToPlane (vs.WorldCoord.xyz, plane);
-		vs.SurfFlags = surfFlags | REFSURF_PLANEBACK;
-	} else {
-		gl_ClipDistance[0] = distToPlane (vs.WorldCoord.xyz, plane);
-		vs.SurfFlags = surfFlags & (~REFSURF_PLANEBACK);
+	vec3 modifiedCoord;
+
+	if (vs.refIndex >= 0) {
+		if ((refData[vs.refIndex].flags & REFSURF_REFRACT) != 0) {
+			modifiedCoord = findRefractedPos (viewPos, vs.WorldCoord, refData[vs.refIndex]);
+		}
+		else {
+			modifiedCoord = (refData[vs.refIndex].refMatrix * vec4 (vs.WorldCoord, 1.0)).xyz;
+		}
+
+		vec4 plane = refData[vs.refIndex].plane;
+		gl_ClipDistance[0] = -distToPlane (modifiedCoord, plane);
+		if (distToPlane (viewPos, plane) < 0) {
+			gl_ClipDistance[0] = -gl_ClipDistance[0];
+			vs.SurfFlags |= REFSURF_PLANEBACK;
+		}
 	}
-	gl_Position = transProj * transView * vec4(vs.WorldCoord, 1);
+	else {
+		modifiedCoord = vs.WorldCoord;
+		gl_ClipDistance[0] = 0.0;
+	}
+	gl_Position = transProj * transView * vec4 (modifiedCoord, 1.0);
 }

@@ -3,6 +3,9 @@
 // it gets attributes and uniforms from Common3D.frag
 #define VS_OUT struct
 #endif
+
+layout (early_fragment_tests) in;
+
 uniform sampler2D tex;
 
 uniform	sampler2DArray refl;
@@ -83,19 +86,27 @@ void main()
 		}
 		if (plane.z > 0) { plane = -plane; }
 
-		float intensityX2 = brightness (texture(tex, texw + vec2(delta.x, 0)).rgb);
-		float intensityY1 = brightness (texture(tex, texw - vec2(0, delta.y)).rgb);
-		float intensityY2 = brightness (texture(tex, texw + vec2(0, delta.y)).rgb);
-
-		float refldepth = 0.002 / (1.0 - texture(reflDepth, vec3(projCoord.xy, 1 + refTexture)).r);
-		refldepth -= 0.002 / (1.0 - gl_FragCoord.z);
+		float refldepth;
+		if (fs_in.refIndex == -1) {
+			refldepth = 0.002 / (1.0 - texture (reflDepth, vec3 (projCoord.xy, 1 + refTexture)).r);
+			refldepth -= 0.002 / (1.0 - gl_FragCoord.z);
+		}
+		else {
+			refldepth = 0.05;
+		}
 
 		projCoord.zw = projCoord.xy;
 		projCoord.xy += df * clamp(refldepth, 0.0, 0.125);
-		//projCoord.xy += df * (texture (reflDepth, vec3(projCoord.xy, 1 + 2 * refTexture)).z - gl_FragCoord.z);
-		//projCoord.zw += df * (texture (reflDepth, vec3(projCoord.xy, 2 + 2 * refTexture)).z - gl_FragCoord.z);
-		float refrdepth = 0.002 / (1.0 - texture(reflDepth, vec3(projCoord.zw, 2 + refTexture)).r);
-		refrdepth -= 0.002 / (1.0 - gl_FragCoord.z);
+		//projCoord.xy += df * (texture (reflDepth, vec3(projCoord.xy, 1 + refTexture)).z - gl_FragCoord.z);
+		//projCoord.zw += df * (texture (reflDepth, vec3(projCoord.xy, 2 + refTexture)).z - gl_FragCoord.z);
+		float refrdepth;
+		if (fs_in.refIndex == -1) {
+			refrdepth = 0.002 / (1.0 - texture (reflDepth, vec3 (projCoord.zw, 2 + refTexture)).r);
+			refrdepth -= 0.002 / (1.0 - gl_FragCoord.z);
+		}
+		else {
+			refrdepth = 0.1;
+		}
 
 		projCoord.zw += df * clamp(refrdepth, 0.0, 0.25);
 		projCoord = clamp(projCoord, 0.0, 1.0);
@@ -112,7 +123,7 @@ void main()
 		// debug
 		// texel += vec3(((refTexture + 1) & 1) / 1, ((refTexture + 1) & 6) / 6.0, ((refTexture + 1) & 8) / 8.0) * 0.25;
 		texel.rgb += refltex.rgb; // * (1.0 - (texel.a * newalpha));
-		texel.rgb += refrtex.rgb * clamp (pow (0.95, refrdepth * 80.0), 0.0, 1.0);
+		texel.rgb += refrtex.rgb *clamp (pow (0.95, refrdepth * 80.0), 0.0, 1.0);
 	}
 	outColor.rgb = texel.rgb;
 	outColor.a = 1;//newalpha; // I think alpha shouldn't be modified by gamma and intensity

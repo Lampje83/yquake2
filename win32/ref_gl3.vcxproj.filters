@@ -236,5 +236,14 @@
     <None Include="..\src\client\refresh\gl3\shaders\3Dskycube.frag">
       <Filter>Shader Files\Brush</Filter>
     </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.vert">
+      <Filter>Shader Files\Brush</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.tese">
+      <Filter>Shader Files\Brush</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.tesc">
+      <Filter>Shader Files\Brush</Filter>
+    </None>
   </ItemGroup>
 </Project>

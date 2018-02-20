@@ -15,20 +15,16 @@ layout (std140) uniform refDat {
 
 in VS_OUT {
 	vec2		TexCoord;
-	vec2		LMcoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	flat uint	LightFlags;
 	flat uint	SurfFlags;
 	flat int	refIndex;
 } tesc_in[];
 
 out TCS_OUT {
 	vec2		TexCoord;
-	vec2		LMcoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	flat uint	LightFlags;
 	flat uint	SurfFlags;
 	flat int	refIndex;
 } tesc_out[];
@@ -37,10 +33,8 @@ void main () {
 	vec2 scrpos[3];
 
 	tesc_out[gl_InvocationID].TexCoord = tesc_in[gl_InvocationID].TexCoord;
-	tesc_out[gl_InvocationID].LMcoord = tesc_in[gl_InvocationID].LMcoord;
 	tesc_out[gl_InvocationID].WorldCoord = tesc_in[gl_InvocationID].WorldCoord;
 	tesc_out[gl_InvocationID].Normal = tesc_in[gl_InvocationID].Normal;
-	tesc_out[gl_InvocationID].LightFlags = tesc_in[gl_InvocationID].LightFlags;
 	tesc_out[gl_InvocationID].SurfFlags = tesc_in[gl_InvocationID].SurfFlags;
 	tesc_out[gl_InvocationID].refIndex = tesc_in[gl_InvocationID].refIndex;
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
@@ -77,14 +71,15 @@ void main () {
 #endif
 			if (tesc_in[0].refIndex >= 0 && ((refData[tesc_in[0].refIndex].flags & REFSURF_REFRACT) != 0) && refData[tesc_in[0].refIndex].refrindex != 1.0) {
 				vec3 lengths;
+
 #if 0
 				scrpos[0] = tesc_in[0].WorldCoord.xyz;
 				scrpos[1] = tesc_in[1].WorldCoord.xyz;
 				scrpos[2] = tesc_in[2].WorldCoord.xyz;
 #else
-				scrpos[0] = clamp (gl_in[0].gl_Position.xy / gl_in[0].gl_Position.w, -1, 1);
-				scrpos[1] = clamp (gl_in[1].gl_Position.xy / gl_in[1].gl_Position.w, -1, 1);
-				scrpos[2] = clamp (gl_in[2].gl_Position.xy / gl_in[2].gl_Position.w, -1, 1);
+				scrpos[0] = clamp(gl_in[0].gl_Position.xy / gl_in[0].gl_Position.w, -1, 1);
+				scrpos[1] = clamp(gl_in[1].gl_Position.xy / gl_in[1].gl_Position.w, -1, 1);
+				scrpos[2] = clamp(gl_in[2].gl_Position.xy / gl_in[2].gl_Position.w, -1, 1);
 #endif
 				lengths[0] = length (scrpos[0] - scrpos[1]);
 				lengths[1] = length (scrpos[1] - scrpos[2]);

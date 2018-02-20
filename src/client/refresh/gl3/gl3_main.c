@@ -886,45 +886,50 @@ GL3_DrawParticles(void)
 		assert(sizeof(part_vtx)==9*sizeof(float)); // remember to update GL3_SurfInit() if this changes!
 
 		// part_vtx buf[numParticles];
-		part_vtx *buf = malloc(numParticles * sizeof(part_vtx));
 
-		// TODO: viewOrg could be in UBO
-		vec3_t viewOrg;
-		VectorCopy(gl3_newrefdef.vieworg, viewOrg);
+//		part_vtx *buf = malloc(numParticles * sizeof(part_vtx));
+
+		GL3_BindVAO (gl3state.vaoParticle);
+		GL3_BindVBO (gl3state.vboParticle);
+		glBufferData (GL_ARRAY_BUFFER, sizeof (part_vtx)*numParticles, NULL, GL_STREAM_DRAW);
+		part_vtx *buf = glMapBuffer (GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
 		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
 		glEnable(GL_PROGRAM_POINT_SIZE);
 
 		GL3_UseProgram(gl3state.siParticle.shaderProgram);
-
+		
 		for ( i = 0, p = gl3_newrefdef.particles; i < numParticles; i++, p++ )
 		{
 			*(int *) color = d_8to24table [ p->color & 0xFF ];
 			part_vtx* cur = &buf[i];
-			vec3_t offset; // between viewOrg and particle position
-			VectorSubtract(viewOrg, p->origin, offset);
 
 			VectorCopy(p->origin, cur->pos);
 			cur->size = pointSize;
-			cur->dist = VectorLength(offset);
+
+			// distance is calculated in vertex shader
+			//vec3_t offset; // between viewOrg and particle position
+			//VectorSubtract(viewOrg, p->origin, offset);
+			//cur->dist = VectorLength(offset);
 
 			for(int j=0; j<3; ++j)  cur->color[j] = color[j]/255.0f;
 
 			cur->color[3] = p->alpha;
 		}
-
+/*
 		GL3_BindVAO(gl3state.vaoParticle);
 		GL3_BindVBO(gl3state.vboParticle);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(part_vtx)*numParticles, buf, GL_STREAM_DRAW);
+*/
+		glUnmapBuffer (GL_ARRAY_BUFFER);
 		glDrawArraysInstanced(GL_POINTS, 0, numParticles, gl3state.instanceCount + 1);
-
 
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);
 		glDisable(GL_PROGRAM_POINT_SIZE);
 
-		free(buf);
+//		free(buf);
 	}
 }
 
@@ -1512,7 +1517,6 @@ GL3_RenderView(refdef_t *fd)
 	GL3_DrawWorld();
 	GL3_DrawEntitiesOnList();
 
-
 	// render alpha surfaces into reflection buffers first
 	if (gl3state.instanceCount > 0)
 	{
@@ -1523,6 +1527,8 @@ GL3_RenderView(refdef_t *fd)
 		GL3_DrawParticles ();
 		glDepthMask (1);
 		glVertexAttribI1i (GL3_ATTRIB_REFINDEX, -1);
+
+		glMemoryBarrier (GL_FRAMEBUFFER_BARRIER_BIT);
 	}
 	gl3state.instanceCount = 0;
 
@@ -1796,8 +1802,14 @@ GL3_BeginFrame(float camera_separation)
 		gl_tessellation->modified = false;
 		if (gl_tessellation->value == 0) {
 			glUseProgramStages (gl3state.si3Dlm.shaderProgramPipeline, GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT, 0);
+			glUseProgramStages (gl3state.si3DcolorOnly.shaderProgramPipeline, GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT, 0);
+			glUseProgramStages (gl3state.si3Dturb.shaderProgramPipeline, GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT, 0);
+			glUseProgramStages (gl3state.si3Dtrans.shaderProgramPipeline, GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT, 0);
 		} else {
 			glUseProgramStages (gl3state.si3Dlm.shaderProgramPipeline, GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT, gl3state.si3Dlm.shaderProgram);
+			glUseProgramStages (gl3state.si3DcolorOnly.shaderProgramPipeline, GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT, gl3state.si3DcolorOnly.shaderProgram);
+			glUseProgramStages (gl3state.si3Dturb.shaderProgramPipeline, GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT, gl3state.si3Dturb.shaderProgram);
+			glUseProgramStages (gl3state.si3Dtrans.shaderProgramPipeline, GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT, gl3state.si3Dtrans.shaderProgram);
 		}
 	}
 	/* go into 2D mode */

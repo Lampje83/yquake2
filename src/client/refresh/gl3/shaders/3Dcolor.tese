@@ -41,20 +41,16 @@ layout (std140) uniform refDat {
 
 in TCS_OUT {
 	vec2		TexCoord;
-	vec2		LMcoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	flat uint	LightFlags;
 	flat uint	SurfFlags;
 	flat int	refIndex;
 } tese_in[];
 
 out VS_OUT {
 	vec2		TexCoord;
-	vec2		LMcoord;
 	vec3		WorldCoord;
 	vec3		Normal;
-	flat uint	LightFlags;
 	flat uint	SurfFlags;
 	flat int	refIndex;
 } tese_out;
@@ -63,10 +59,8 @@ void main (void) {
 	bool	refrActive = false;
 	//gl_Position = gl_in[0].gl_Position[0] * gl_TessCoord.x + gl_in[1].gl_Position * gl_TessCoord.y + gl_in[2].gl_Position * gl_TessCoord.z;
 	tese_out.TexCoord = tese_in[0].TexCoord * gl_TessCoord.x + tese_in[1].TexCoord * gl_TessCoord.y + tese_in[2].TexCoord * gl_TessCoord.z;
-	tese_out.LMcoord = tese_in[0].LMcoord * gl_TessCoord.x + tese_in[1].LMcoord * gl_TessCoord.y + tese_in[2].LMcoord * gl_TessCoord.z;
 	tese_out.WorldCoord = tese_in[0].WorldCoord * gl_TessCoord.x + tese_in[1].WorldCoord * gl_TessCoord.y + tese_in[2].WorldCoord * gl_TessCoord.z;
 	tese_out.Normal = tese_in[0].Normal * gl_TessCoord.x + tese_in[1].Normal * gl_TessCoord.y + tese_in[2].Normal * gl_TessCoord.z;
-	tese_out.LightFlags = tese_in[2].LightFlags;
 	tese_out.SurfFlags = tese_in[2].SurfFlags;
 	tese_out.refIndex = tese_in[2].refIndex;
 
@@ -84,7 +78,7 @@ void main (void) {
 	else if (gl_TessCoord.x == 0.0 && gl_TessCoord.y == 0.0 && gl_TessCoord.z == 1.0) {
 		gl_Position = gl_in[2].gl_Position;
 	}
-	else if (refrActive) {
+	else if (tese_in[2].refIndex >= 0 && (refData[tese_in[2].refIndex].flags & REFSURF_REFRACT) != 0) {
 		vec3 worldCoord = tese_in[0].WorldCoord * gl_TessCoord.x + tese_in[1].WorldCoord * gl_TessCoord.y + tese_in[2].WorldCoord * gl_TessCoord.z;
 		gl_Position = transProj * transView * vec4 (findRefractedPos(viewPos, worldCoord, refData[tese_in[2].refIndex]), 1);
 	}

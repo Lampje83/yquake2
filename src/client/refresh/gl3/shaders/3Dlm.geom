@@ -44,7 +44,7 @@ void main() {
 
 	if (reflectionActive) {
 		// perform frustum culling
-
+#if 1
 		for (j = 0; j < 5; j++) {
 			k = 0;
 			for (i = 0; i < gl_in.length(); i++) {
@@ -63,7 +63,7 @@ void main() {
 					return;
 			}
 		}
-
+#endif
 		gl_Layer = 1 + gs_in[0].refIndex;
 	} else {
 		gl_Layer = 0;

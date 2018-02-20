@@ -247,7 +247,7 @@ GL3_EmitWaterPolys(msurface_t *fa)
 		}
 	}
 */
-	GL3_UseProgram(gl3state.si3Dturb.shaderProgram);
+	GL3_BindProgramPipeline(gl3state.si3Dturb);
 
 	GL3_BindVAO(gl3state.vao3D);
 	GL3_BindVBO(gl3state.vbo3D);

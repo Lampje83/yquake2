@@ -197,7 +197,7 @@ DrawAliasFrameLerp(dmdl_t *paliashdr, entity_t* entity, vec3_t shadelight)
 	// (the buffers are static global so we don't have malloc()/free() for each rendered model)
 	da_clear(vtxBuf);
 	da_clear(idxBuf);
-
+#if 0
 	while (1)
 	{
 		GLushort nextVtxIdx = da_count(vtxBuf);
@@ -311,14 +311,53 @@ DrawAliasFrameLerp(dmdl_t *paliashdr, entity_t* entity, vec3_t shadelight)
 			}
 		}
 	}
+#else
+	/* 
+	The previous code converted gl draw lists to simple triangles,
+	the gl draw lists were introduced to combine triangles into
+	triangle fans and strips. So converting them back seems real stupid to me
+	This seems to be slightly faster 
+	Some optimization is still possible, by precaching a buffer for each frame
+	and combining identical vertices, reintroducing an element list
+	Also, lerping can be done in hardware
+	*/
+
+	gl3_alias_vtx_t* buf = da_addn_uninit (vtxBuf, paliashdr->num_tris * 3);
+	//GLushort *add = da_addn_uninit (idxBuf, paliashdr->num_tris * 3);
+	dtriangle_t *tris = (dtriangle_t *)((byte *)paliashdr + paliashdr->ofs_tris);
+	dstvert_t *st = (dstvert_t *)((byte *)paliashdr + paliashdr->ofs_st);
+	for (i = 0; i < paliashdr->num_tris; i++) {
+		for (int j = 0; j < 3; j++) {
+			buf[i * 3 + j].pos[0] = s_lerped[tris[i].index_xyz[j]][0];
+			buf[i * 3 + j].pos[1] = s_lerped[tris[i].index_xyz[j]][1];
+			buf[i * 3 + j].pos[2] = s_lerped[tris[i].index_xyz[j]][2];
+			if (colorOnly) {
+				buf[i * 3 + j].color[0] = shadelight[0];
+				buf[i * 3 + j].color[1] = shadelight[1];
+				buf[i * 3 + j].color[2] = shadelight[2];
+			}
+			else {
+				l = shadedots[verts[tris[i].index_xyz[j]].lightnormalindex];
+				buf[i * 3 + j].color[0] = l * shadelight[0];
+				buf[i * 3 + j].color[1] = l * shadelight[1];
+				buf[i * 3 + j].color[2] = l * shadelight[2];
+				buf[i * 3 + j].texCoord[0] = (float)st[tris[i].index_st[j]].s / (float)paliashdr->skinwidth;
+				buf[i * 3 + j].texCoord[1] = (float)st[tris[i].index_st[j]].t / (float)paliashdr->skinheight;
+			}
+			buf[i * 3 + j].color[3] = alpha;
+			//add[i * 3 + j] = i * 3 + j;
+		}
+	}
+#endif
 
 	GL3_BindVAO(gl3state.vaoAlias);
 	GL3_BindVBO(gl3state.vboAlias);
 
 	glBufferData(GL_ARRAY_BUFFER, da_count(vtxBuf)*sizeof(gl3_alias_vtx_t), vtxBuf.p, GL_STREAM_DRAW);
-	GL3_BindEBO(gl3state.eboAlias);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, da_count(idxBuf)*sizeof(GLushort), idxBuf.p, GL_STREAM_DRAW);
-	glDrawElementsInstanced (GL_TRIANGLES, da_count (idxBuf), GL_UNSIGNED_SHORT, NULL, gl3state.instanceCount + 1);
+	//GL3_BindEBO(gl3state.eboAlias);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, da_count(idxBuf)*sizeof(GLushort), idxBuf.p, GL_STREAM_DRAW);
+	//glDrawElementsInstanced (GL_TRIANGLES, da_count (idxBuf), GL_UNSIGNED_SHORT, NULL, gl3state.instanceCount + 1);
+	glDrawArraysInstanced (GL_TRIANGLES, 0, da_count (vtxBuf), gl3state.instanceCount + 1);
 }
 
 static void
