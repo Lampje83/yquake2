@@ -30,15 +30,15 @@ void main()
 		projCoord.xy *= bufSize.xy;
 		projCoord.z = 1 + refTexture;
 
-		vec4 refltex = texture(refl, projCoord.xyz) * newalpha;
-		texel.rgb *= vec3(1 - newalpha);
+		//vec4 refltex = texture(refl, projCoord.xyz) * newalpha;
+		//texel.rgb *= vec3(1 - newalpha);
+		texel.rgb = mix (texel.rgb, texture (refl, projCoord.xyz).rgb, newalpha);
 		// debug
 		//texel += vec3(((refTexture + 1) & 1) / 1, ((refTexture + 1) & 6) / 6.0, ((refTexture + 1) & 8) / 8.0) * 0.25;
 
-		texel.rgb += refltex.rgb; // * (1.0 - (texel.a * newalpha));
+		//texel.rgb += refltex.rgb; // * (1.0 - (texel.a * newalpha));
 		//texel.rgb += texture(refl, vec3(projCoord.xy, projCoord.z + 1)).rgb * (1 - newalpha);
 	}
-
-	outColor.rgb = texel.rgb;
-	outColor.a = texel.a*newalpha;
+	texel.a *= newalpha;
+	outColor = texel;
 }

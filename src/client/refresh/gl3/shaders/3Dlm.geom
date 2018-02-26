@@ -68,5 +68,5 @@ void main() {
 	} else {
 		gl_Layer = 0;
 	}
-	outputPrimitive (false, (reflectionActive) && ((refData[gs_in[0].refIndex].flags & REFSURF_REFRACT) == 0), gl_in.length (), 0);
+	outputPrimitive ((reflectionActive) && ((refData[gs_in[0].refIndex].flags & REFSURF_REFRACT) == 0), gl_in.length ());
 }

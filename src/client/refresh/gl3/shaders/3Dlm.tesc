@@ -13,7 +13,7 @@ layout (std140) uniform refDat {
 };
 #endif
 
-in VS_OUT {
+struct Vertex {
 	vec2		TexCoord;
 	vec2		LMcoord;
 	vec3		WorldCoord;
@@ -21,8 +21,10 @@ in VS_OUT {
 	flat uint	LightFlags;
 	flat uint	SurfFlags;
 	flat int	refIndex;
-} tesc_in[];
+};
 
+in Vertex VS_OUT[];
+/*
 out TCS_OUT {
 	vec2		TexCoord;
 	vec2		LMcoord;
@@ -32,17 +34,20 @@ out TCS_OUT {
 	flat uint	SurfFlags;
 	flat int	refIndex;
 } tesc_out[];
+*/
+out Vertex TCS_OUT[];
 
 void main () {
 	vec2 scrpos[3];
 
-	tesc_out[gl_InvocationID].TexCoord = tesc_in[gl_InvocationID].TexCoord;
-	tesc_out[gl_InvocationID].LMcoord = tesc_in[gl_InvocationID].LMcoord;
-	tesc_out[gl_InvocationID].WorldCoord = tesc_in[gl_InvocationID].WorldCoord;
-	tesc_out[gl_InvocationID].Normal = tesc_in[gl_InvocationID].Normal;
-	tesc_out[gl_InvocationID].LightFlags = tesc_in[gl_InvocationID].LightFlags;
-	tesc_out[gl_InvocationID].SurfFlags = tesc_in[gl_InvocationID].SurfFlags;
-	tesc_out[gl_InvocationID].refIndex = tesc_in[gl_InvocationID].refIndex;
+	TCS_OUT[gl_InvocationID].TexCoord = VS_OUT[gl_InvocationID].TexCoord;
+	TCS_OUT[gl_InvocationID].LMcoord = VS_OUT[gl_InvocationID].LMcoord;
+	TCS_OUT[gl_InvocationID].WorldCoord = VS_OUT[gl_InvocationID].WorldCoord;
+	TCS_OUT[gl_InvocationID].Normal = VS_OUT[gl_InvocationID].Normal;
+	TCS_OUT[gl_InvocationID].LightFlags = VS_OUT[gl_InvocationID].LightFlags;
+	TCS_OUT[gl_InvocationID].SurfFlags = VS_OUT[gl_InvocationID].SurfFlags;
+	TCS_OUT[gl_InvocationID].refIndex = VS_OUT[gl_InvocationID].refIndex;
+
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 	gl_out[gl_InvocationID].gl_ClipDistance[0] = gl_in[gl_InvocationID].gl_ClipDistance[0];
 
@@ -75,7 +80,7 @@ void main () {
 				}
 			}
 #endif
-			if (tesc_in[0].refIndex >= 0 && ((refData[tesc_in[0].refIndex].flags & REFSURF_REFRACT) != 0) && refData[tesc_in[0].refIndex].refrindex != 1.0) {
+			if (VS_OUT[0].refIndex >= 0 && ((refData[VS_OUT[0].refIndex].flags & REFSURF_REFRACT) != 0) && refData[VS_OUT[0].refIndex].refrindex != 1.0) {
 				vec3 lengths;
 #if 0
 				scrpos[0] = tesc_in[0].WorldCoord.xyz;

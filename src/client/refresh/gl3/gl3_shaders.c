@@ -102,7 +102,7 @@ CompileShader (GLenum shaderType, const char* shaderSrc, const char* shaderSrc2)
 		if (bufPtr == NULL) {
 			bufPtr = buf;
 			bufLen = sizeof (buf);
-			eprintf ("WARN: In CompileShader(), malloc(%d) failed!\n", infoLogLength + 1);
+			R_Printf (PRINT_ALL, "WARN: In CompileShader(), malloc(%d) failed!\n", infoLogLength + 1);
 		}
 	}
 
@@ -118,14 +118,29 @@ CompileShader (GLenum shaderType, const char* shaderSrc, const char* shaderSrc2)
 		case GL_TESS_EVALUATION_SHADER: shaderTypeStr = "TessEvaluation"; break;
 	}
 	if (status != GL_TRUE) {
-		eprintf ("ERROR: Compiling %s Shader failed: %s\n", shaderTypeStr, bufPtr);
+		R_Printf (PRINT_ALL, "ERROR: Compiling %s Shader failed: %s\n", shaderTypeStr, bufPtr);
 		glDeleteShader (shader);
 
 		if (bufPtr != buf)  free (bufPtr);
 
 		return 0;
 	}
+	else if (infoLogLength >= 3) {
+		R_Printf (PRINT_ALL, "%s shader: %s\n", shaderTypeStr, bufPtr);
+	}
 	return shader;
+}
+static void BindAttribLocations (int shaderProgram) {
+	// make sure all shaders use the same attribute locations for common attributes
+	// (so the same VAO can easily be used with different shaders)
+	glBindAttribLocation (shaderProgram, GL3_ATTRIB_POSITION, "position");
+	glBindAttribLocation (shaderProgram, GL3_ATTRIB_TEXCOORD, "texCoord");
+	glBindAttribLocation (shaderProgram, GL3_ATTRIB_LMTEXCOORD, "lmTexCoord");
+	glBindAttribLocation (shaderProgram, GL3_ATTRIB_COLOR, "vertColor");
+	glBindAttribLocation (shaderProgram, GL3_ATTRIB_NORMAL, "normal");
+	glBindAttribLocation (shaderProgram, GL3_ATTRIB_LIGHTFLAGS, "lightFlags");
+	glBindAttribLocation (shaderProgram, GL3_ATTRIB_SURFFLAGS, "surfFlags");
+	glBindAttribLocation (shaderProgram, GL3_ATTRIB_REFINDEX, "refIndex");
 }
 
 static GLuint
@@ -145,30 +160,22 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 		int err = glGetError ();
 		if (err != GL_NO_ERROR) {
 			R_Printf (PRINT_ALL, __FUNCTION__": Error %i while attaching shader. Program #%i, shader #%i at index %i\n", err, shaderProgram, shaders[i], i);
-
-			char message[8192];
-			int msglen;
-			glGetShaderInfoLog (shaders[i], sizeof (message), &msglen, message);
-
-			R_Printf (PRINT_ALL, "%s\n", message);
-			if (glIsShader (shaders[i]) == false)
-				R_Printf (PRINT_ALL, "#%i is not a valid shader object\n", shaders[i]);
 		}
-	}
 
-	// make sure all shaders use the same attribute locations for common attributes
-	// (so the same VAO can easily be used with different shaders)
-	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_POSITION, "position" );
-	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_TEXCOORD, "texCoord" );
-	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_LMTEXCOORD, "lmTexCoord" );
-	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_COLOR, "vertColor" );
-	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_NORMAL, "normal" );
-	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_LIGHTFLAGS, "lightFlags" );
-	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_SURFFLAGS, "surfFlags" );
-	glBindAttribLocation ( shaderProgram, GL3_ATTRIB_REFINDEX, "refIndex" );
+		char message[8192];
+		int msglen;
+		glGetShaderInfoLog (shaders[i], sizeof (message), &msglen, message);
+
+		if (msglen >= 3) {
+			R_Printf (PRINT_ALL, "%s\n", message);
+		}
+		if (glIsShader (shaders[i]) == false)
+			R_Printf (PRINT_ALL, "#%i is not a valid shader object\n", shaders[i]);
+	}
 
 	// the following line is not necessary/implicit (as there's only one output)
 	// glBindFragDataLocation(shaderProgram, 0, "outColor"); XXX would this even be here?
+	BindAttribLocations (shaderProgram);
 
 	glProgramParameteri (shaderProgram, GL_PROGRAM_SEPARABLE, GL_TRUE);
 	glLinkProgram(shaderProgram);
@@ -273,6 +280,7 @@ initShader2D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	}
 
 	prog = CreateShaderProgram(2, shaders2D);
+	//BindAttribLocations (prog);
 
 	// I think the shaders aren't needed anymore once they're linked into the program
 	glDeleteShader(shaders2D[0]);
@@ -508,11 +516,12 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	}
 
 	prog = CreateShaderProgram ( numshaders, shaders3D );
-
 	if(prog == 0)
 	{
 		goto err_cleanup;
 	}
+
+	//BindAttribLocations (prog);
 
 	byte *programBinary;
 	GLsizei length;
@@ -524,9 +533,10 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 	glGetProgramBinary (prog, length, &length, &binFormat, programBinary);
 	char fname[96];
 	Com_sprintf (fname, sizeof (fname), "%s/shaders/%s.o", ri.FS_Gamedir (), shaderDesc);
-	fopen_s (&f, fname, "wb");
-	fwrite (programBinary, 1, length, f);
-	fclose (f);
+	if (!fopen_s (&f, fname, "wb")) {
+		fwrite (programBinary, 1, length, f);
+		fclose (f);
+	}
 	free (programBinary);
 
 	glObjectLabel (GL_PROGRAM, prog, strlen (shaderDesc), shaderDesc);
@@ -645,6 +655,11 @@ initShader3D(gl3ShaderInfo_t* shaderInfo, const char* vertFilename, const char* 
 		glProgramUniform1i (prog, lmLoc, 1);
 	}
 
+	GLint bumpLoc = glGetUniformLocation (prog, "bump");
+	if (bumpLoc != -1) {
+		glProgramUniform1i (prog, bumpLoc, 2);
+	}
+
 	GLint reflLoc = glGetUniformLocation ( prog, "refl" );
 	if ( reflLoc != -1 ) {
 		glProgramUniform1i ( prog, reflLoc, 5 );
@@ -691,6 +706,83 @@ err_cleanup:
 	if ( prog != 0 )  glDeleteProgram ( prog );
 
 	R_Printf (PRINT_ALL, "WARNING: Failed to create shader program for %s!\n", shaderDesc);
+	return false;
+}
+
+static qboolean
+initShaderCompute (gl3ShaderInfo_t* shaderInfo, const char *compFilename, const char* shaderDesc) {
+	GLuint	prog = 0;
+	GLuint	shader = 0;
+	int		fileSize;
+	char*	compSrc;
+
+	if (shaderInfo->shaderProgram != 0)
+	{
+		R_Printf (PRINT_ALL, "WARNING: calling initShaderCompute for gl3ShaderInfo_t that already has a shaderProgram!\n");
+		glDeleteProgram (shaderInfo->shaderProgram);
+		shaderInfo->shaderProgram = 0;
+	}
+
+	if (!(fileSize = ri.FS_LoadFile (compFilename, (void **)&compSrc))) {
+		R_Printf (PRINT_ALL, __FUNCTION__": Failed to load compute shader %s!\n", compFilename);
+		return false;
+	}
+
+	shader = CompileShader (GL_COMPUTE_SHADER, compSrc, NULL);
+	if (!shader) {
+		goto err_cleanup;
+	}
+
+	prog = CreateShaderProgram (1, &shader);
+	if (!prog) {
+		goto err_cleanup;
+	}
+
+	glDeleteShader (shader);
+	shader = 0;
+
+	// make sure texture is GL_TEXTURE0
+	GLint texLoc = glGetUniformLocation (prog, "tex");
+	if (texLoc != -1)
+	{
+		glProgramUniform1i (prog, texLoc, 0);
+	}
+
+	// ..  and the lightmap texture uses GL_TEXTURE1
+	char lmName[10] = "lightmap";
+	GLint lmLoc = glGetUniformLocation (prog, lmName);
+	if (lmLoc != -1)
+	{
+		glProgramUniform1i (prog, lmLoc, 1);
+	}
+
+	GLint bumpLoc = glGetUniformLocation (prog, "bump");
+	if (bumpLoc != -1) {
+		glProgramUniform1i (prog, bumpLoc, 2);
+	}
+
+	GLint reflLoc = glGetUniformLocation (prog, "refl");
+	if (reflLoc != -1) {
+		glProgramUniform1i (prog, reflLoc, 5);
+	}
+
+	GLint reflDLoc = glGetUniformLocation (prog, "reflDepth");
+	if (reflDLoc != -1) {
+		glProgramUniform1i (prog, reflDLoc, 6);
+	}
+
+	shaderInfo->shaderProgram = prog;
+
+	return true;
+
+err_cleanup:
+	if (prog != 0) {
+		glDeleteProgram (prog);
+	}
+	if (shader != 0) {
+		glDeleteShader (shader);
+	}
+	
 	return false;
 }
 
@@ -750,7 +842,7 @@ static qboolean createShaders ( void ) {
 	if ( !initShader2D ( &gl3state.si2Dcolor,		"shaders/2Dcolor.vert", "shaders/2Dcolor.frag",									"color-only 2D rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dlm,			"shaders/3Dlm.vert",	"shaders/3Dlm.frag",			"shaders/3Dlm.geom",	"textured 3D rendering with lightmap" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3Dtrans,		"shaders/3Dcolor.vert",	"shaders/3D.frag",				"shaders/3D.geom",		"rendering translucent 3D things" ) ) { return false; }
-	if ( !initShader3D ( &gl3state.si3DcolorOnly,	"shaders/3Dcolor.vert",	"shaders/3Dcolor.frag",			"shaders/3D.geom",		"flat-colored 3D rendering" ) ) { return false;	}
+	if ( !initShader3D ( &gl3state.si3DcolorOnly,	"shaders/3D.vert",		"shaders/3Dcolor.frag",			"shaders/3D.geom",		"flat-colored 3D rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dturb,		"shaders/3Dcolor.vert",	"shaders/3Dwater.frag",			"shaders/3D.geom",		"water rendering" ) ) { return false; }
 	if ( !initShader3D ( &gl3state.si3Dsky,			"shaders/3D.vert",		"shaders/3Dsky.frag",			"shaders/3D.geom",		"sky rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dskycube,		"shaders/3D.vert",		"shaders/3Dskycube.frag",		"shaders/3D.geom",		"sky cubemap rendering" ) ) { return false;	}
@@ -758,12 +850,13 @@ static qboolean createShaders ( void ) {
 	if ( !initShader3D ( &gl3state.si3DspriteAlpha, "shaders/3D.vert",		"shaders/3DspriteAlpha.frag",	"shaders/3D.geom",		"alpha-tested sprite rendering" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3Dalias,		"shaders/Alias.vert",	"shaders/Alias.frag",			"shaders/Alias.geom",	"rendering textured models" ) ) { return false;	}
 	if ( !initShader3D ( &gl3state.si3DaliasColor,	"shaders/Alias.vert",	"shaders/AliasColor.frag",		"shaders/Alias.geom",	"flat-colored models" ) ) { return false;	}
-
 	const char* particleFrag = "shaders/Particles.frag";
 	if ( gl3_particle_square->value != 0.0f ) {
 		particleFrag = "shaders/ParticlesSquare.frag";
 	}
 	if ( !initShader3D ( &gl3state.siParticle, "shaders/Particles.vert", particleFrag, "shaders/Particles.geom", "rendering particles" ) ) { return false; }
+
+	if (!initShaderCompute (&gl3state.siBumpmap, "shaders/bumpmap.comp", "generating bumpmaps")) { return false; }
 
 	gl3state.currentShaderProgram = 0;
 
@@ -792,7 +885,7 @@ void GL3_ShutdownShaders(void)
 {
 	deleteShaders();
 
-	// let's (ab)use the fact that all 4 UBO handles are consecutive fields
+	// let's (ab)use the fact that all UBO handles are consecutive fields
 	// of the gl3state struct
 	glDeleteBuffers(5, &gl3state.uniCommonUBO);
 	gl3state.uniCommonUBO = gl3state.uni2DUBO = gl3state.uni3DUBO = gl3state.uniLightsUBO = gl3state.uniRefDataUBO = 0;

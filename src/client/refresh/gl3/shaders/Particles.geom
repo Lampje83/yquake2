@@ -51,17 +51,7 @@ void main () {
 			}
 		}
 
-		if (k < 1) {
-			// output reflected triangle
-			gl_Layer = 1 + passRefIndex[0] * 2;
-			//outputPrimitive (true, true);
-		}
-		if (k > 0) {
-			// output refracted triangle
-			gl_Layer = 2 + passRefIndex[0] * 2;
-			//outputRefractedPrimitive (false);
-			//outputPrimitive (true, false);
-		}
+		gl_Layer = 1 + passRefIndex[0];
 	} else {
 		gl_Layer = 0;
 		//outputPrimitive (false, false);

@@ -206,7 +206,7 @@ void GL3_SurfInit(void)
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTexture );
 //	glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_R11F_G11F_B10F, vid.width, vid.height, 32, 0, GL_RGBA, GL_FLOAT, 0 );
 	//glTexImage3D (GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, vid.width, vid.height, 32, 0, GL_RGBA, GL_BYTE, 0);
-	glTexStorage3D (GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, vid.width, vid.height, 32);
+	glTexStorage3D (GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, vid.width, vid.height, 32, GL_FALSE);
 //	glTexImage3D (GL_TEXTURE_2D_ARRAY, 0, GL_RGB, 1024, 1024, 32, 0, GL_RGBA, GL_BYTE, 0);
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -215,7 +215,7 @@ void GL3_SurfInit(void)
 
 	glBindTexture ( GL_TEXTURE_2D_ARRAY, gl3state.reflectTextureDepth );
 	//glTexImage3D ( GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, vid.width, vid.height, 32, 0, GL_DEPTH_COMPONENT, GL_BYTE, 0 );
-	glTexStorage3D (GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT16, vid.width, vid.height, 32);
+	glTexStorage3D (GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT16, vid.width, vid.height, 32, GL_FALSE);
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri ( GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -237,6 +237,8 @@ void GL3_SurfInit(void)
 
 	// Set framebuffer target to default output
 	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
+
+	glEnable (GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 
 void GL3_SurfShutdown(void)
@@ -653,21 +655,13 @@ RenderBrushPoly(msurface_t *fa)
 		lmScales[map].B = gl3_newrefdef.lightstyles[fa->styles[map]].rgb[2];
 		lmScales[map].A = 1.0f;
 	}
-#if 0 // removing redundant shaders
-	if (fa->texinfo->flags & SURF_FLOWING)
-	{
-		GL3_UseProgram(gl3state.si3DlmFlow.shaderProgram);
-		UpdateLMscales(lmScales, &gl3state.si3DlmFlow);
-		GL3_DrawGLPoly(fa);
-	}
-	else
-#endif
+
 	if (fa->texinfo->flags & SURF_SKY || fa->flags & SURF_SKY) {
 		if (gl3state.currentShaderProgramPipeline != gl3state.si3Dskycube.shaderProgramPipeline) {
 			GL_DrawElements ();
 		}
 		GL3_BindProgramPipeline (gl3state.si3Dskycube);
-		GL3_Bind (GL_TEXTURE_CUBE_MAP, GL_TEXTURE0, gl3state.skytexture);
+		GL3_Bind (GL_TEXTURE_CUBE_MAP, 0, gl3state.skytexture);
 	} else	{
 		if (gl3state.currentShaderProgramPipeline != gl3state.si3Dlm.shaderProgramPipeline) {
 			GL_DrawElements ();
@@ -751,6 +745,13 @@ void GL3_DrawAlphaSurfaces ( void ) {
 		}
 
 		GL3_Bind (GL_TEXTURE_2D, 0, s->texinfo->image->texnum );
+		if (s->texinfo->image->bumptex != GL_INVALID_INDEX) {
+			GL3_Bind (GL_TEXTURE_2D, 2, s->texinfo->image->bumptex);
+		}
+		else {
+			GL3_Bind (GL_TEXTURE_2D, 2, 0);
+		}
+
 		c_brush_polys++;
 		float alpha = 1.0f;
 		if ( s->texinfo->flags & SURF_TRANS33 ) {
@@ -766,11 +767,6 @@ void GL3_DrawAlphaSurfaces ( void ) {
 
 		if ( s->flags & SURF_DRAWTURB ) {
 			GL3_EmitWaterPolys ( s );
-#if 0	// removing redundant shaders
-		} else if ( s->texinfo->flags & SURF_FLOWING ) {
-			GL3_UseProgram ( gl3state.si3DtransFlow.shaderProgram );
-			GL3_DrawGLPoly ( s );
-#endif
 		} else {
 			GL3_BindProgramPipeline ( gl3state.si3Dtrans );
 			GL3_DrawGLPoly ( s );
@@ -1210,7 +1206,7 @@ RecursiveWorldNode(mnode_t *node)
 
 	if ( gl_cullpvs->value ) {
 		if ( CullBox ( node->minmaxs, node->minmaxs + 3 ) ) {
-			//return;
+			return;
 		}
 	}
 	/* if a leaf node, draw stuff */

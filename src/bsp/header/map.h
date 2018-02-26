@@ -6,9 +6,20 @@
 #define EXPORT
 #define IMPORT
 
+/*
+extern int qbsp3 (int argc, char **argv);
+extern int qvis3 (int argc, char **argv);
+extern int qrad3 (int argc, char **argv);
+*/
+
 typedef struct {
 	int		apiversion;
-} bspexport_t;
+	int		bspversion;
+
+	int		(EXPORT *DoBSP) (int argc, char **argv);
+	int		(EXPORT *DoVis) (int argc, char **argv);
+	int		(EXPORT *DoRad) (int argc, char **argv);
+} mapexport_t;
 
 typedef struct {
 	void	(IMPORT *Sys_Error) (int err_level, char *str, ...) __attribute__ ((format (printf, 2, 3)));
@@ -16,7 +27,7 @@ typedef struct {
 	void	(IMPORT *Cmd_AddCommand) (char *name, void (*cmd)(void));
 	void	(IMPORT *Cmd_RemoveCommand) (char *name);
 	int		(IMPORT *Cmd_Argc) (void);
-	char	*(IMPORT *Cmd_Argv) (int i);
+	char*	(IMPORT *Cmd_Argv) (int i);
 	void	(IMPORT *Cmd_ExecuteText) (int exec_when, char *text);
 
 	void	(IMPORT *Com_VPrintf) (int print_level, const char *fmt, va_list argptr);
@@ -31,10 +42,13 @@ typedef struct {
 
 	// gamedir will be the current directory that generated
 	// files should be stored to, ie: "f:\quake\id1"
-	char	*(IMPORT *FS_Gamedir) (void);
+	char*	(IMPORT *FS_Gamedir) (void);
 
-	cvar_t	*(IMPORT *Cvar_Get) (char *name, char *value, int flags);
-	cvar_t	*(IMPORT *Cvar_Set) (char *name, char *value);
-	void	 (IMPORT *Cvar_SetValue) (char *name, float value);
+	cvar_t*	(IMPORT *Cvar_Get) (char *name, char *value, int flags);
+	cvar_t*	(IMPORT *Cvar_Set) (char *name, char *value);
+	void	(IMPORT *Cvar_SetValue) (char *name, float value);
 
-} bspimport_t;
+} mapimport_t;
+
+extern mapimport_t	bi;
+void Com_Printf (char *msg, ...);

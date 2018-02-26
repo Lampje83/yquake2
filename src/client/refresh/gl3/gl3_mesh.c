@@ -156,11 +156,11 @@ DrawAliasFrameLerp(dmdl_t *paliashdr, entity_t* entity, vec3_t shadelight)
 
 	if (colorOnly)
 	{
-		GL3_UseProgram(gl3state.si3DaliasColor.shaderProgram);
+		GL3_BindProgramPipeline (gl3state.si3DaliasColor);
 	}
 	else
 	{
-		GL3_UseProgram(gl3state.si3Dalias.shaderProgram);
+		GL3_BindProgramPipeline (gl3state.si3Dalias);
 	}
 
 	/* move should be the delta back to the previous frame * backlerp */

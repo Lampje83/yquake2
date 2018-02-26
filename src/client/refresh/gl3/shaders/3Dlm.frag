@@ -47,7 +47,6 @@ void main()
 	}
 	else
 	{
-		// assume all lightmaps are the same size
 		ivec2 lmSize = textureSize (lightmap, 0).xy;
 		ivec2 LMcoord = ivec2(fs_in.LMcoord * lmSize);
 		

@@ -74,27 +74,30 @@
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>$(ProjectDir)..\src\bsp\common;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)..\src\bsp\common;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>$(ProjectDir)..\src\bsp\common;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)..\src\bsp\common;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";WIN32;_DEBUG;BSP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";WIN32;_DEBUG;BSP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);LIBMODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -107,8 +110,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";_DEBUG;BSP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;YQ2OSTYPE="Windows";YQ2ARCH="x86";_DEBUG;BSP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);LIBMODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -123,8 +125,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";WIN32;NDEBUG;BSP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";WIN32;NDEBUG;BSP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);LIBMODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -141,8 +142,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";NDEBUG;BSP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;YQ2OSTYPE="Windows";YQ2ARCH="x86";NDEBUG;BSP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);LIBMODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -153,11 +153,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\bsp\bsp_main.c" />
+    <ClCompile Include="..\src\bsp\map_main.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\bsp\header\bsp.h" />
-    <ClInclude Include="..\src\common\header\files.h" />
+    <ClInclude Include="..\src\bsp\header\map.h" />
     <ClInclude Include="..\src\common\header\shared.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\bsp\bsp_main.c">
+    <ClCompile Include="..\src\bsp\map_main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -23,10 +23,7 @@
     <ClInclude Include="..\src\common\header\shared.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\bsp\header\bsp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\header\files.h">
+    <ClInclude Include="..\src\bsp\header\map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -647,6 +647,7 @@ GL3_FindImage(char *name, imagetype_t type)
 
 	/* load the pic from disk */
 	pic = NULL;
+	image->bumptex = -1;
 
 	if (strcmp(ext, "pcx") == 0)
 	{

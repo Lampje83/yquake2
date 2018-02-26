@@ -36,6 +36,10 @@ static int mod_numknown;
 int registration_sequence;
 static byte *mod_base;
 
+#define MAX_LIGHTSOURCES 1024
+particle_t lightsources[MAX_LIGHTSOURCES];
+unsigned int numlightsources = 0;
+
 /* the inline * models from the current map are kept seperate */
 gl3model_t mod_inline[MAX_MOD_KNOWN];
 
@@ -361,7 +365,7 @@ Mod_LoadTexinfo(lump_t *l)
 		{
 			out->next = NULL;
 		}
-
+		
 		Com_sprintf(name, sizeof(name), "textures/%s.wal", in->texture);
 
 		out->image = GL3_FindImage(name, it_wall);
@@ -370,6 +374,29 @@ Mod_LoadTexinfo(lump_t *l)
 		{
 			R_Printf(PRINT_ALL, "Couldn't load %s\n", name);
 			out->image = gl3_notexture;
+		}
+		if (in->flags & SURF_WARP) {
+			if (out->image->bumptex == -1) {
+				int bumpmap;
+				char* texname[80];
+				GL3_Bind (GL_TEXTURE_2D, 0, out->image->texnum);
+				glGenTextures (1, &bumpmap);
+				Com_sprintf (texname, 80, "%s bump", out->image->name);
+				glObjectLabel (GL_TEXTURE, bumpmap, strlen (texname), texname);
+
+				GL3_Bind (GL_TEXTURE_2D, 2, bumpmap);
+				glTexStorage2D (GL_TEXTURE_2D, 4, GL_RG8_SNORM, out->image->width, out->image->height);
+				//GL3_Bind (GL_TEXTURE_2D, 2, 0);
+				glBindImageTexture (2, bumpmap, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG8_SNORM);
+				//glUseProgramStages (gl3state.currentShaderProgramPipeline, GL_COMPUTE_SHADER_BIT, gl3state.siBumpmap.shaderProgram);
+				GL3_UseProgram (gl3state.siBumpmap.shaderProgram);
+				glDispatchCompute (out->image->width >> 4, out->image->height >> 4, 1);
+				glMemoryBarrier (GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+				glGenerateMipmap (GL_TEXTURE_2D);
+				out->image->bumptex = bumpmap;
+			}
+		} else {
+			out->image->bumptex = -1;
 		}
 	}
 
@@ -507,6 +534,7 @@ Mod_LoadFaces(lump_t *l)
 	loadmodel->numglverts = 0;
 
 	GL3_LM_BeginBuildingLightmaps(loadmodel);
+	numlightsources = 0;
 
 	for (surfnum = 0; surfnum < count; surfnum++, in++, out++)
 	{
@@ -572,6 +600,27 @@ Mod_LoadFaces(lump_t *l)
 		// ERIK: this was skipped in case of SURF_WARP, but we have a fragment shader now.
 		// Polygons don't have to be subdivided anymore
 		GL3_LM_BuildPolygonFromSurface(out);
+
+		if (out->texinfo->flags & SURF_LIGHT && numlightsources < MAX_LIGHTSOURCES) {
+			vec3_t	center = { 0 };
+			for (i = 0; i < out->numedges; i++) {
+				int e = loadmodel->surfedges[out->firstedge + i];
+				if (e < 0) {
+					VectorAdd (center, loadmodel->vertexes[loadmodel->edges[-e].v[1]].position, center);
+				} else {
+					VectorAdd (center, loadmodel->vertexes[loadmodel->edges[e].v[0]].position, center);
+				}
+			}
+			VectorScale (center, 1.0f / out->numedges, center);
+			if (!(out->flags & SURF_PLANEBACK))
+				VectorAdd (center, out->plane->normal, center);
+			else
+				VectorSubtract (center, out->plane->normal, center);
+			VectorCopy (center, lightsources[numlightsources].origin);
+			lightsources[numlightsources].color = 7;
+			
+			numlightsources++;
+		}
 	}
 
 	R_Printf ( PRINT_DEVELOPER, "%d glverts created\n", currentmodel->numglverts );

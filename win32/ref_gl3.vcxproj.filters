@@ -165,9 +165,6 @@
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.geom">
       <Filter>Shader Files\Brush</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Drefract.vert">
-      <Filter>Shader Files\Brush</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dsky.frag">
       <Filter>Shader Files\Brush</Filter>
     </ClInclude>
@@ -243,6 +240,9 @@
       <Filter>Shader Files\Brush</Filter>
     </None>
     <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.tesc">
+      <Filter>Shader Files\Brush</Filter>
+    </None>
+    <None Include="..\src\client\refresh\gl3\shaders\bumpmap.comp">
       <Filter>Shader Files\Brush</Filter>
     </None>
   </ItemGroup>

@@ -58,7 +58,7 @@ int count;
 
 void writeVertexData (int index);
 
-void outputPrimitive (bool clip, bool reverse, int count, int refIndex) {
+void outputPrimitive (bool reverse, int count) {
 	if (gl_InvocationID > 0) {
 		return;
 	}

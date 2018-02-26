@@ -1,0 +1,40 @@
+#ifdef __INTELLISENSE__
+#include "glsl.h"
+#include "Common.glsl"
+#endif
+
+layout (local_size_x = 16, local_size_y = 16) in;
+
+uniform sampler2D tex;
+uniform image2D bump;
+
+float brightness (vec3 color)
+{
+	return (color.r + color.g + color.b);
+}
+
+void main () {
+	ivec2 texPos = ivec2(gl_GlobalInvocationID.xy);
+	vec2 df;
+	vec2 scale = 1.0 / textureSize (tex, 0);
+
+	if (texPos.x >= imageSize (bump).x) return;
+	if (texPos.y >= imageSize (bump).y) return;
+	
+	df.x = -brightness (texture (tex, (texPos + ivec2 (-1, 0)) * scale).rgb)
+		  - brightness (texture (tex, (texPos + ivec2 (-1, 1)) * scale).rgb) * 0.33
+		  - brightness (texture (tex, (texPos + ivec2 (-1, -1)) * scale).rgb) * 0.33
+		  + brightness (texture (tex, (texPos + ivec2 (1, 0)) * scale).rgb)
+		  + brightness (texture (tex, (texPos + ivec2 (1, 1)) * scale).rgb) * 0.33
+		  + brightness (texture (tex, (texPos + ivec2 (1, -1)) * scale).rgb) * 0.33
+		;
+	df.y = -brightness (texture (tex, (texPos + ivec2 (0, -1)) * scale).rgb)
+		  - brightness (texture (tex, (texPos + ivec2 (1, -1)) * scale).rgb) * 0.33
+		  - brightness (texture (tex, (texPos + ivec2 (-1, -1)) * scale).rgb) * 0.33
+		  + brightness (texture (tex, (texPos + ivec2 (0, 1)) * scale).rgb)
+		  + brightness (texture (tex, (texPos + ivec2 (1, 1)) * scale).rgb) * 0.33
+		  + brightness (texture (tex, (texPos + ivec2 (-1, 1)) * scale).rgb) * 0.33
+		;
+
+	imageStore (bump, texPos, vec4(df, 0.0, 0.0));
+}

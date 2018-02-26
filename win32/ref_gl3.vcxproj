@@ -286,10 +286,6 @@
       <FileType>Document</FileType>
       <DeploymentContent>true</DeploymentContent>
     </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Drefract.vert">
-      <FileType>Document</FileType>
-      <DeploymentContent>true</DeploymentContent>
-    </ClInclude>
     <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dsky.frag">
       <FileType>Document</FileType>
       <DeploymentContent>true</DeploymentContent>
@@ -365,6 +361,7 @@
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\src\client\refresh\gl3\shaders\3Dskycube.frag" />
+    <None Include="..\src\client\refresh\gl3\shaders\bumpmap.comp" />
     <None Include="..\src\client\refresh\gl3\shaders\Common3D.geom">
       <DeploymentContent>false</DeploymentContent>
     </None>

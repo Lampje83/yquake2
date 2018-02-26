@@ -698,7 +698,7 @@ GL3_DrawBeam(entity_t *e)
 	glEnable(GL_BLEND);
 	glDepthMask(GL_FALSE);
 
-	GL3_UseProgram(gl3state.si3DcolorOnly.shaderProgram);
+	GL3_UseProgram (gl3state.si3DcolorOnly.shaderProgram);
 
 	r = (LittleLong(d_8to24table[e->skinnum & 0xFF])) & 0xFF;
 	g = (LittleLong(d_8to24table[e->skinnum & 0xFF]) >> 8) & 0xFF;
@@ -861,6 +861,9 @@ GL3_DrawNullModel(void)
 	GL3_UpdateUBO3D();
 }
 
+extern unsigned int numlightsources;
+extern particle_t lightsources[];
+
 void
 GL3_DrawParticles(void)
 {
@@ -891,14 +894,14 @@ GL3_DrawParticles(void)
 
 		GL3_BindVAO (gl3state.vaoParticle);
 		GL3_BindVBO (gl3state.vboParticle);
-		glBufferData (GL_ARRAY_BUFFER, sizeof (part_vtx)*numParticles, NULL, GL_STREAM_DRAW);
+		glBufferData (GL_ARRAY_BUFFER, sizeof (part_vtx)*(numParticles + numlightsources), NULL, GL_STREAM_DRAW);
 		part_vtx *buf = glMapBuffer (GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
 		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
 		glEnable(GL_PROGRAM_POINT_SIZE);
 
-		GL3_UseProgram(gl3state.siParticle.shaderProgram);
+		GL3_BindProgramPipeline (gl3state.siParticle);
 		
 		for ( i = 0, p = gl3_newrefdef.particles; i < numParticles; i++, p++ )
 		{
@@ -917,13 +920,24 @@ GL3_DrawParticles(void)
 
 			cur->color[3] = p->alpha;
 		}
+
+		for (i = 0; i < numlightsources; i++) {
+			*(int *)color = d_8to24table[lightsources[i].color & 0xFF];
+			part_vtx *cur = &buf[numParticles + i];
+
+			VectorCopy (lightsources[i].origin, cur->pos);
+			cur->size = pointSize;
+
+			for (int j = 0; j<3; ++j)  cur->color[j] = color[j] / 255.0f;
+			cur->color[3] = 1;
+		}
 /*
 		GL3_BindVAO(gl3state.vaoParticle);
 		GL3_BindVBO(gl3state.vboParticle);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(part_vtx)*numParticles, buf, GL_STREAM_DRAW);
 */
 		glUnmapBuffer (GL_ARRAY_BUFFER);
-		glDrawArraysInstanced(GL_POINTS, 0, numParticles, gl3state.instanceCount + 1);
+		glDrawArraysInstanced(GL_POINTS, 0, numParticles + numlightsources, gl3state.instanceCount + 1);
 
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);
@@ -1362,6 +1376,7 @@ SetupGL(void)
 }
 
 extern int c_visible_lightmaps, c_visible_textures;
+extern void GL3_DrawCroppedTexture (float x, float y, float w, float h);
 
 /*
  * gl3_newrefdef must be set before the first call
@@ -1625,7 +1640,6 @@ GL3_SetLightLevel(void)
 }
 
 extern GLuint vao2D, vbo2D;
-extern void GL3_DrawCroppedTexture (float x, float y, float w, float h);
 
 static void
 GL3_RenderFrame(refdef_t *fd)
@@ -1649,23 +1663,20 @@ GL3_RenderFrame(refdef_t *fd)
 	GL3_SetLightLevel ();
 
 	glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
+
+	int x = (vid.width - gl3_newrefdef.width) / 2;
+	int y = (vid.height - gl3_newrefdef.height) / 2;
+
+	//glBlitFramebuffer (x, y, x + gl3_newrefdef.width, y + gl3_newrefdef.height, x, y, x + gl3_newrefdef.width, y + gl3_newrefdef.height, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	GL3_SetGL2D ();
-	//glClear ( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
 	glEnable (GL_BLEND);
-	//if ( gl3state.numRefPlanes > 0 && gl_reflection->value ) {
-		GL3_Bind (GL_TEXTURE_2D_ARRAY, 0, gl3state.reflectTexture );
+	GL3_Bind (GL_TEXTURE_2D_ARRAY, 0, gl3state.reflectTexture );
 
-		GL3_UseProgram ( gl3state.si2Darray.shaderProgram );
-		//GL3_DrawTexture ( 0, vid.height, vid.width, -vid.height );
-		GL3_DrawCroppedTexture (fd->x, fd->y, fd->width, fd->height);
-	//}
-
-	glEnable (GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	GL3_BindProgramPipeline ( gl3state.si2Darray );
+	GL3_DrawCroppedTexture (fd->x, fd->y, fd->width, fd->height);
 
 	if(v_blend[3] != 0.0f)
 	{
-		int x = (vid.width - gl3_newrefdef.width)/2;
-		int y = (vid.height - gl3_newrefdef.height)/2;
 
 		GL3_Draw_Flash(v_blend, x, y, gl3_newrefdef.width, gl3_newrefdef.height);
 	}

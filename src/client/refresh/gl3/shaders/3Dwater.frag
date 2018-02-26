@@ -7,6 +7,7 @@
 layout (early_fragment_tests) in;
 
 uniform sampler2D tex;
+uniform sampler2D bump;
 
 uniform	sampler2DArray refl;
 uniform sampler2DArray reflDepth;
@@ -57,8 +58,8 @@ void main()
 		projCoord.xy *= bufSize.xy;
 		projCoord.z = 0;
 
-		vec2 df;
-
+		vec2 df = texture(bump, texw).rg;
+		/*
 		df.x = -brightness (texture(tex, texw + vec2(-delta.x, 0)).rgb)
 			   -brightness (texture(tex, texw + vec2(-delta.x, delta.y)).rgb) / 3
 			   -brightness (texture(tex, texw + vec2(-delta.x, -delta.y)).rgb) / 3
@@ -73,6 +74,7 @@ void main()
 			   +brightness (texture(tex, texw + vec2(delta.x, delta.y)).rgb) / 3
 			   +brightness (texture(tex, texw + vec2(-delta.x, delta.y)).rgb) / 3
 				;
+		*/
 
 		float dp = abs (dot (normalize(fs_in.Normal + vec3(df, 0.0) * 0.15), viewang));
 

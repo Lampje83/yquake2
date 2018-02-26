@@ -735,7 +735,7 @@ GL3_DrawSkyBox(void)
 	gl3state.uni3DData.transModelMat4 = modMVmat;
 	GL3_UpdateUBO3D();
 
-	GL3_UseProgram(gl3state.si3Dsky.shaderProgram);
+	GL3_BindProgramPipeline (gl3state.si3Dsky);
 	GL3_BindVAO(gl3state.vao3Dtrans);
 	GL3_BindVBO(gl3state.vbo3Dtrans);
 
@@ -772,7 +772,7 @@ GL3_DrawSkyBox(void)
 
 	if ( gl_showtris->value ) {
 
-		GL3_UseProgram( gl3state.si3DcolorOnly.shaderProgram );
+		GL3_BindProgramPipeline ( gl3state.si3DcolorOnly );
 		glDisable( GL_DEPTH_TEST );
 		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 

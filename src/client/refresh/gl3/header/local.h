@@ -267,6 +267,7 @@ typedef struct
 	gl3ShaderInfo_t si3Dalias;      // for models
 	gl3ShaderInfo_t si3DaliasColor; // for models w/ flat colors
 
+	gl3ShaderInfo_t siBumpmap;
 	// NOTE: make sure siParticle is always the last shaderInfo (or adapt GL3_ShutdownShaders())
 	gl3ShaderInfo_t siParticle; // for particles. surprising, right?
 
@@ -338,6 +339,7 @@ typedef struct image_s
 	// qboolean scrap; // currently unused
 	qboolean has_alpha;
 
+	GLuint bumptex;
 } gl3image_t;
 
 enum {MAX_GL3TEXTURES = 1024};
@@ -385,9 +387,6 @@ GL3_UseProgram(GLuint shaderProgram)
 	{
 		gl3state.currentShaderProgram = shaderProgram;
 		glUseProgram(shaderProgram);
-
-		if (gl3state.currentShaderProgramPipeline != 0)
-			glActiveShaderProgram (gl3state.currentShaderProgramPipeline, shaderProgram);
 	}
 }
 
