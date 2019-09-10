@@ -1,4 +1,8 @@
 // it gets attributes and uniforms from Common3D.frag
+#ifdef __INTELLISENSE__
+#include "Common.glsl"
+#include "Common3D.frag"
+#endif
 
 struct DynLight { // gl3UniDynLight in C
 	vec3 lightOrigin;

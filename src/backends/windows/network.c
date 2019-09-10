@@ -399,7 +399,9 @@ NET_StringToSockaddr(char *s, struct sockaddr_storage *sadr)
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_family = PF_UNSPEC;
 
-	strcpy(copy, s);
+	//strcpy_s (copy, min(strlen(s), sizeof(copy)), s);
+	strcpy (copy, s);
+	
 	addrs = space = copy;
 
 	if (*addrs == '[')
@@ -819,7 +821,7 @@ NET_IPSocket(char *net_interface, int port, netsrc_t type, int family)
 	hints.ai_flags = AI_PASSIVE;
 
 	if (!net_interface || !net_interface[0] ||
-		!stricmp(net_interface, "localhost"))
+		!_stricmp(net_interface, "localhost"))
 	{
 		Host = (family == AF_INET6) ? "::" : "0.0.0.0";
 	}
@@ -834,7 +836,7 @@ NET_IPSocket(char *net_interface, int port, netsrc_t type, int family)
 	}
 	else
 	{
-		sprintf(Buf, "%5d", port);
+		sprintf_s(Buf, BUFSIZ, "%5d", port);
 		Service = Buf;
 	}
 
@@ -843,19 +845,23 @@ NET_IPSocket(char *net_interface, int port, netsrc_t type, int family)
 		return 0;
 	}
 
+	char errmsg[256];
+
 	for (ai = res; ai != NULL; ai = ai->ai_next)
 	{
 		if ((newsocket =
-				 socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol)) == -1)
+				 (int)socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol)) == -1)
 		{
-			Com_Printf("NET_IPSocket: socket: %s\n", strerror(errno));
+			strerror_s (errmsg, sizeof (errmsg), errno);
+			Com_Printf("NET_IPSocket: socket: %s\n", errmsg);
 			continue;
 		}
 
 		/* make it non-blocking */
 		if (ioctlsocket(newsocket, FIONBIO, &t) == -1)
 		{
-			Com_Printf("NET_IPSocket: ioctl FIONBIO: %s\n", strerror(errno));
+			strerror_s (errmsg, sizeof (errmsg), errno);
+			Com_Printf("NET_IPSocket: ioctl FIONBIO: %s\n", errmsg);
 			continue;
 		}
 
@@ -873,15 +879,16 @@ NET_IPSocket(char *net_interface, int port, netsrc_t type, int family)
 			if (setsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (char *)&one,
 						sizeof(one)))
 			{
-				Com_Printf("ERROR: NET_IPSocket: setsockopt SO_BROADCAST:%s\n",
-						strerror(errno));
+				strerror_s (errmsg, sizeof (errmsg), errno);
+				Com_Printf("ERROR: NET_IPSocket: setsockopt SO_BROADCAST:%s\n", errmsg);
 				return 0;
 			}
 		}
 
-		if (bind(newsocket, ai->ai_addr, ai->ai_addrlen) < 0)
+		if (bind(newsocket, ai->ai_addr, (int)ai->ai_addrlen) < 0)
 		{
-			Com_Printf("NET_IPSocket: bind: %s\n", strerror(errno));
+			strerror_s (errmsg, sizeof (errmsg), errno);
+			Com_Printf("NET_IPSocket: bind: %s\n", errmsg);
 			closesocket(newsocket);
 		}
 		else
@@ -925,8 +932,9 @@ NET_IPSocket(char *net_interface, int port, netsrc_t type, int family)
 							(char *)&mreq.ipv6mr_interface,
 							sizeof(mreq.ipv6mr_interface)) < 0)
 				{
+					strerror_s (errmsg, sizeof (errmsg), errno);
 					Com_Printf("NET_IPSocket: IPV6_MULTICAST_IF: %s\n",
-							strerror(errno));
+							errmsg);
 				}
 
 				/* Join multicast group ONLY if server */
@@ -955,8 +963,9 @@ NET_IPSocket(char *net_interface, int port, netsrc_t type, int family)
 
 					if (Error)
 					{
+						strerror_s (errmsg, sizeof (errmsg), errno);
 						Com_Printf("NET_IPSocket: IPV6_JOIN_GROUP: %s\n",
-								strerror(errno));
+								errmsg);
 						break;
 					}
 				}
@@ -1048,7 +1057,7 @@ NET_IPXSocket(int port)
 	unsigned long t = 1;
 	int err;
 
-	if ((newsocket = socket(PF_IPX, SOCK_DGRAM, NSPROTO_IPX)) == -1)
+	if ((newsocket = (int)socket(PF_IPX, SOCK_DGRAM, NSPROTO_IPX)) == -1)
 	{
 		err = WSAGetLastError();
 

@@ -542,7 +542,7 @@ PM_AddCurrents(vec3_t wishvel)
 }
 
 void
-PM_WaterMove(void)
+PM_WaterMove (void)
 {
 	int i;
 	vec3_t wishvel;
@@ -552,11 +552,11 @@ PM_WaterMove(void)
 	/* user intentions */
 	for (i = 0; i < 3; i++)
 	{
-		wishvel[i] = pml.forward[i] * pm->cmd.forwardmove + 
-					 pml.right[i] * pm->cmd.sidemove;
+		wishvel[i] = pml.forward[i] * pm->cmd.forwardmove +
+			pml.right[i] * pm->cmd.sidemove;
 	}
 
-	if (!pm->cmd.forwardmove && !pm->cmd.sidemove && !pm->cmd.upmove)
+	if (!pm->cmd.forwardmove && !pm->cmd.sidemove && !pm->cmd.upmove && !(pm->s.pm_type == PM_FLY))
 	{
 		wishvel[2] -= 60; /* drift towards bottom */
 	}
@@ -565,18 +565,20 @@ PM_WaterMove(void)
 		wishvel[2] += pm->cmd.upmove;
 	}
 
-	PM_AddCurrents(wishvel);
+	PM_AddCurrents (wishvel);
 
-	VectorCopy(wishvel, wishdir);
-	wishspeed = VectorNormalize(wishdir);
+	VectorCopy (wishvel, wishdir);
+	wishspeed = VectorNormalize (wishdir);
 
 	if (wishspeed > pm_maxspeed)
 	{
-		VectorScale(wishvel, pm_maxspeed / wishspeed, wishvel);
+		VectorScale (wishvel, pm_maxspeed / wishspeed, wishvel);
 		wishspeed = pm_maxspeed;
 	}
 
-	wishspeed *= 0.5;
+	if (pm->s.pm_type != PM_FLY || (pm->waterlevel > 0)) {
+		wishspeed *= 0.5;
+	}
 
 	PM_Accelerate(wishdir, wishspeed, pm_wateraccelerate);
 
@@ -1468,7 +1470,7 @@ Pmove(pmove_t *pmove)
 
 		PM_Friction();
 
-		if (pm->waterlevel >= 2)
+		if (pm->waterlevel >= 2 || (pm->s.pm_type == PM_FLY && !pm->groundentity))
 		{
 			PM_WaterMove();
 		}
