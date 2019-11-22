@@ -190,13 +190,13 @@ CreateShaderProgram(int numShaders, const GLuint* shaders)
 		glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &infoLogLength);
 		if(infoLogLength >= bufLen)
 		{
-			bufPtr = malloc(infoLogLength+1);
-			bufLen = infoLogLength+1;
+			bufPtr = malloc((int)infoLogLength + 1);
+			bufLen = infoLogLength + 1;
 			if(bufPtr == NULL)
 			{
 				bufPtr = buf;
 				bufLen = sizeof(buf);
-				eprintf("WARN: In CreateShaderProgram(), malloc(%d) failed!\n", infoLogLength+1);
+				eprintf("WARN: In CreateShaderProgram(), malloc(%d) failed!\n", infoLogLength + 1);
 			}
 		}
 
