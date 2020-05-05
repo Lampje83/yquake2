@@ -19,6 +19,10 @@ typedef struct {
 	int		(EXPORT *DoBSP) (int argc, char **argv);
 	int		(EXPORT *DoVis) (int argc, char **argv);
 	int		(EXPORT *DoRad) (int argc, char **argv);
+
+	cmodel_t* (EXPORT* CM_LoadMap) (char* name, qboolean clientload, unsigned* checksum);
+	cmodel_t* (EXPORT* CM_InlineModel) (char* name);
+
 } mapexport_t;
 
 typedef struct {

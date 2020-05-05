@@ -112,11 +112,15 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;YQ2OSTYPE="Windows";YQ2ARCH="x86";_DEBUG;BSP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);LIBMODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

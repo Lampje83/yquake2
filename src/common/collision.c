@@ -1612,6 +1612,7 @@ CMod_LoadVisibility(lump_t *l)
 {
 	numvisibility = l->filelen;
 
+	l->filelen = MAX_MAP_VISIBILITY + 1;
 	if (l->filelen > MAX_MAP_VISIBILITY)
 	{
 		Com_Error(ERR_DROP, "Map has too large visibility lump");
