@@ -31,19 +31,19 @@
 
 extern void M_ForceMenuOff(void);
 
-static cvar_t *gl_mode;
-static cvar_t *gl_hudscale;
-static cvar_t *gl_consolescale;
-static cvar_t *gl_menuscale;
-static cvar_t *crosshair_scale;
-static cvar_t *fov;
-extern cvar_t *scr_viewsize;
-extern cvar_t *vid_gamma;
-extern cvar_t *vid_fullscreen;
-extern cvar_t *vid_renderer;
-static cvar_t *gl_swapinterval;
-static cvar_t *gl_anisotropic;
-static cvar_t *gl_msaa_samples;
+static cvar_t* gl_mode;
+static cvar_t* gl_hudscale;
+static cvar_t* gl_consolescale;
+static cvar_t* gl_menuscale;
+static cvar_t* crosshair_scale;
+static cvar_t* fov;
+extern cvar_t* scr_viewsize;
+extern cvar_t* vid_gamma;
+extern cvar_t* vid_fullscreen;
+extern cvar_t* vid_renderer;
+static cvar_t* gl_swapinterval;
+static cvar_t* gl_anisotropic;
+static cvar_t* gl_msaa_samples;
 
 static menuframework_s s_opengl_menu;
 
@@ -80,9 +80,9 @@ GetRenderer(void)
 }
 
 static int
-GetCustomValue(menulist_s *list)
+GetCustomValue(menulist_s* list)
 {
-	static menulist_s *last;
+	static menulist_s* last;
 	static int i;
 
 	if (list != last)
@@ -92,8 +92,7 @@ GetCustomValue(menulist_s *list)
 		do
 		{
 			i++;
-		}
-		while (list->itemnames[i]);
+		} while (list->itemnames[i]);
 		i--;
 	}
 
@@ -101,24 +100,24 @@ GetCustomValue(menulist_s *list)
 }
 
 static void
-BrightnessCallback(void *s)
+BrightnessCallback(void* s)
 {
-	menuslider_s *slider = (menuslider_s *)s;
+	menuslider_s* slider = (menuslider_s*)s;
 
 	float gamma = slider->curvalue / 10.0;
 	Cvar_SetValue("vid_gamma", gamma);
 }
 
 static void
-FOVCallback(void *s) {
-	menuslider_s *slider = (menuslider_s *)s;
+FOVCallback(void* s) {
+	menuslider_s* slider = (menuslider_s*)s;
 	Cvar_SetValue("fov", slider->curvalue);
 }
 
 static void
-AnisotropicCallback(void *s)
+AnisotropicCallback(void* s)
 {
-	menulist_s *list = (menulist_s *)s;
+	menulist_s* list = (menulist_s*)s;
 
 	if (list->curvalue == 0)
 	{
@@ -131,13 +130,13 @@ AnisotropicCallback(void *s)
 }
 
 static void
-ResetDefaults(void *unused)
+ResetDefaults(void* unused)
 {
 	VID_MenuInit();
 }
 
 static void
-ApplyChanges(void *unused)
+ApplyChanges(void* unused)
 {
 	qboolean restart = false;
 
@@ -229,14 +228,14 @@ VID_MenuInit(void)
 {
 	int y = 0;
 
-	static const char *renderers[] = {
+	static const char* renderers[] = {
 			"[OpenGL 1.4]",
 			"[OpenGL 4.3]",
 			"[Custom    ]",
 			0
 	};
 
-	static const char *resolutions[] = {
+	static const char* resolutions[] = {
 		"[320 240   ]",
 		"[400 300   ]",
 		"[512 384   ]",
@@ -260,6 +259,7 @@ VID_MenuInit(void)
 		"[1680 1050 ]",
 		"[1920 1080 ]",
 		"[1920 1200 ]",
+		"[1920 1280 ]",
 		"[2048 1536 ]",
 		"[2560x1080 ]",
 		"[2560x1440 ]",
@@ -273,7 +273,7 @@ VID_MenuInit(void)
 		0
 	};
 
-	static const char *uiscale_names[] = {
+	static const char* uiscale_names[] = {
 		"auto",
 		"1x",
 		"2x",
@@ -285,20 +285,20 @@ VID_MenuInit(void)
 		0
 	};
 
-	static const char *yesno_names[] = {
+	static const char* yesno_names[] = {
 		"no",
 		"yes",
 		0
 	};
 
-	static const char *fullscreen_names[] = {
+	static const char* fullscreen_names[] = {
 			"no",
 			"keep resolution",
 			"switch resolution",
 			0
 	};
 
-	static const char *pow2_names[] = {
+	static const char* pow2_names[] = {
 		"off",
 		"2x",
 		"4x",
@@ -334,7 +334,7 @@ VID_MenuInit(void)
 
 	if (!fov)
 	{
-		fov = Cvar_Get("fov", "90",  CVAR_USERINFO | CVAR_ARCHIVE);
+		fov = Cvar_Get("fov", "90", CVAR_USERINFO | CVAR_ARCHIVE);
 	}
 
 	if (!vid_gamma)
@@ -420,8 +420,8 @@ VID_MenuInit(void)
 		s_uiscale_list.curvalue = 0;
 	}
 	else if (gl_hudscale->value > 0 &&
-			gl_hudscale->value < GetCustomValue(&s_uiscale_list) &&
-			gl_hudscale->value == (int)gl_hudscale->value)
+		gl_hudscale->value < GetCustomValue(&s_uiscale_list) &&
+		gl_hudscale->value == (int)gl_hudscale->value)
 	{
 		s_uiscale_list.curvalue = gl_hudscale->value;
 	}
@@ -457,7 +457,7 @@ VID_MenuInit(void)
 		{
 			s_af_list.curvalue++;
 		} while (pow2_names[s_af_list.curvalue] &&
-				pow(2, s_af_list.curvalue) <= gl_anisotropic->value);
+			pow(2, s_af_list.curvalue) <= gl_anisotropic->value);
 		s_af_list.curvalue--;
 	}
 
@@ -473,7 +473,7 @@ VID_MenuInit(void)
 		{
 			s_msaa_list.curvalue++;
 		} while (pow2_names[s_msaa_list.curvalue] &&
-				pow(2, s_msaa_list.curvalue) <= gl_msaa_samples->value);
+			pow(2, s_msaa_list.curvalue) <= gl_msaa_samples->value);
 		s_msaa_list.curvalue--;
 	}
 
@@ -489,17 +489,17 @@ VID_MenuInit(void)
 	s_apply_action.generic.y = (y += 10);
 	s_apply_action.generic.callback = ApplyChanges;
 
-	Menu_AddItem(&s_opengl_menu, (void *)&s_renderer_list);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_mode_list);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_brightness_slider);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_fov_slider);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_uiscale_list);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_fs_box);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_vsync_list);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_af_list);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_msaa_list);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_defaults_action);
-	Menu_AddItem(&s_opengl_menu, (void *)&s_apply_action);
+	Menu_AddItem(&s_opengl_menu, (void*)&s_renderer_list);
+	Menu_AddItem(&s_opengl_menu, (void*)&s_mode_list);
+	Menu_AddItem(&s_opengl_menu, (void*)&s_brightness_slider);
+	Menu_AddItem(&s_opengl_menu, (void*)&s_fov_slider);
+	Menu_AddItem(&s_opengl_menu, (void*)&s_uiscale_list);
+	Menu_AddItem(&s_opengl_menu, (void*)&s_fs_box);
+	Menu_AddItem(&s_opengl_menu, (void*)&s_vsync_list);
+	Menu_AddItem(&s_opengl_menu, (void*)&s_af_list);
+	Menu_AddItem(&s_opengl_menu, (void*)&s_msaa_list);
+	Menu_AddItem(&s_opengl_menu, (void*)&s_defaults_action);
+	Menu_AddItem(&s_opengl_menu, (void*)&s_apply_action);
 
 	Menu_Center(&s_opengl_menu);
 	s_opengl_menu.x -= 8;
@@ -514,7 +514,7 @@ VID_MenuDraw(void)
 	/* draw the banner */
 	Draw_GetPicSize(&w, &h, "m_banner_video");
 	Draw_PicScaled(viddef.width / 2 - (w * scale) / 2, viddef.height / 2 - (110 * scale),
-			"m_banner_video", scale);
+		"m_banner_video", scale);
 
 	/* move cursor to a reasonable starting position */
 	Menu_AdjustCursor(&s_opengl_menu, 1);
@@ -523,37 +523,37 @@ VID_MenuDraw(void)
 	Menu_Draw(&s_opengl_menu);
 }
 
-const char *
+const char*
 VID_MenuKey(int key)
 {
 	extern void M_PopMenu(void);
 
-	menuframework_s *m = &s_opengl_menu;
-	static const char *sound = "misc/menu1.wav";
+	menuframework_s* m = &s_opengl_menu;
+	static const char* sound = "misc/menu1.wav";
 	int menu_key = Key_GetMenuKey(key);
 
 	switch (menu_key)
 	{
-		case K_ESCAPE:
-			M_PopMenu();
-			return NULL;
-		case K_UPARROW:
-			m->cursor--;
-			Menu_AdjustCursor(m, -1);
-			break;
-		case K_DOWNARROW:
-			m->cursor++;
-			Menu_AdjustCursor(m, 1);
-			break;
-		case K_LEFTARROW:
-			Menu_SlideItem(m, -1);
-			break;
-		case K_RIGHTARROW:
-			Menu_SlideItem(m, 1);
-			break;
-		case K_ENTER:
-			Menu_SelectItem(m);
-			break;
+	case K_ESCAPE:
+		M_PopMenu();
+		return NULL;
+	case K_UPARROW:
+		m->cursor--;
+		Menu_AdjustCursor(m, -1);
+		break;
+	case K_DOWNARROW:
+		m->cursor++;
+		Menu_AdjustCursor(m, 1);
+		break;
+	case K_LEFTARROW:
+		Menu_SlideItem(m, -1);
+		break;
+	case K_RIGHTARROW:
+		Menu_SlideItem(m, 1);
+		break;
+	case K_ENTER:
+		Menu_SelectItem(m);
+		break;
 	}
 
 	return sound;
