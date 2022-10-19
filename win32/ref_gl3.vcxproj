@@ -1,373 +1,373 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{A6861DEC-4E60-44A4-98A8-F03DEC75BE6B}</ProjectGuid>
-    <RootNamespace>ref_gl3</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\src\SDL2-2.0.7\lib\x86;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\src\SDL2-2.0.7\lib\x86;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\src\SDL2-2.0.7\lib\x64;$(LibraryPath)</LibraryPath>
-    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\src\SDL2-2.0.7\lib\x64;$(LibraryPath)</LibraryPath>
-    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <CustomBuildStep>
-      <Command>
-      </Command>
-    </CustomBuildStep>
-    <CustomBuildStep />
-    <PostBuildEvent>
-      <Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying shaders</Message>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <BrowseInformation>true</BrowseInformation>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <CustomBuildStep>
-      <Command>
-      </Command>
-    </CustomBuildStep>
-    <CustomBuildStep />
-    <PostBuildEvent>
-      <Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying shaders</Message>
-    </PostBuildEvent>
-    <Bscmake>
-      <PreserveSbr>true</PreserveSbr>
-    </Bscmake>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-    </ClCompile>
-    <Link>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-    </Link>
-    <CustomBuildStep>
-      <Command>
-      </Command>
-    </CustomBuildStep>
-    <CustomBuildStep />
-    <PostBuildEvent>
-      <Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying shaders</Message>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-    </ClCompile>
-    <Link>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <CustomBuildStep>
-      <Command>
-      </Command>
-    </CustomBuildStep>
-    <CustomBuildStep />
-    <PostBuildEvent>
-      <Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message>Copying shaders</Message>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\backends\windows\shared\mem.c" />
-    <ClCompile Include="..\src\client\refresh\files\pcx.c" />
-    <ClCompile Include="..\src\client\refresh\files\stb.c" />
-    <ClCompile Include="..\src\client\refresh\files\wal.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_draw.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_image.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_light.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_lightmap.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_main.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_md2.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_mesh.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_misc.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_model.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_sdl.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_shaders.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_sp2.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_surf.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\gl3_warp.c" />
-    <ClCompile Include="..\src\client\refresh\gl3\glad\src\glad.c" />
-    <ClCompile Include="..\src\common\md4.c" />
-    <ClCompile Include="..\src\common\shared\shared.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\client\refresh\constants\anorms.h" />
-    <ClInclude Include="..\src\client\refresh\constants\anormtab.h" />
-    <ClInclude Include="..\src\client\refresh\constants\warpsin.h" />
-    <ClInclude Include="..\src\client\refresh\files\stb_image.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\glad\include\glad\glad.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\glad\include\KHR\khrplatform.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\header\DG_dynarr.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\header\HandmadeMath.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\header\local.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\header\model.h" />
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\glsl.h" />
-    <ClInclude Include="..\src\client\refresh\ref_shared.h" />
-    <ClInclude Include="..\src\common\header\shared.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\src\client\refresh\gl3\shaders\2d.frag">
-      <FileType>Document</FileType>
-    </None>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\2d.vert">
-      <FileType>Document</FileType>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">glsl.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">glsl.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glsl.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glsl.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\2darray.frag">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\2Dcolor.frag">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\2Dcolor.vert">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3D.frag">
-      <FileType>Document</FileType>
-      <DeploymentContent>true</DeploymentContent>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3D.vert">
-      <FileType>Document</FileType>
-      <DeploymentContent>true</DeploymentContent>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dcolor.frag">
-      <FileType>Document</FileType>
-      <DeploymentContent>true</DeploymentContent>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.frag">
-      <FileType>Document</FileType>
-      <DeploymentContent>true</DeploymentContent>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.geom">
-      <FileType>Document</FileType>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <DeploymentContent>true</DeploymentContent>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.vert">
-      <FileType>Document</FileType>
-      <DeploymentContent>true</DeploymentContent>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dsky.frag">
-      <FileType>Document</FileType>
-      <DeploymentContent>true</DeploymentContent>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dsprite.frag">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3DspriteAlpha.frag">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\3Dwater.frag">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <DeploymentContent>true</DeploymentContent>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\Alias.frag">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\Alias.vert">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\AliasColor.frag">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\Common3D.frag">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\Common3D.vert">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\Particles.frag">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\Particles.vert">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\ParticlesSquare.frag">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <None Include="..\src\client\refresh\gl3\shaders\3D.geom">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\Alias.geom">
-      <FileType>Document</FileType>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-    </ClInclude>
-    <ClInclude Include="..\src\client\refresh\gl3\shaders\Common.glsl">
-      <FileType>Document</FileType>
-    </ClInclude>
-    <ClCompile Include="..\src\client\refresh\gl3\shaders\3Dlm.tesc">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">glsl.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">glsl.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glsl.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glsl.h</ForcedIncludeFiles>
-    </ClCompile>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.tesc" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.tese" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dcolor.vert" />
-    <None Include="..\src\client\refresh\gl3\shaders\3Dlm.tese">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\3Dskycube.frag" />
-    <None Include="..\src\client\refresh\gl3\shaders\bumpmap.comp" />
-    <None Include="..\src\client\refresh\gl3\shaders\Common3D.geom">
-      <DeploymentContent>false</DeploymentContent>
-    </None>
-    <None Include="..\src\client\refresh\gl3\shaders\Particles.geom" />
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+	<ItemGroup Label="ProjectConfigurations">
+		<ProjectConfiguration Include="Debug|Win32">
+			<Configuration>Debug</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Release|Win32">
+			<Configuration>Release</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Debug|x64">
+			<Configuration>Debug</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Release|x64">
+			<Configuration>Release</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+	</ItemGroup>
+	<PropertyGroup Label="Globals">
+		<VCProjectVersion>15.0</VCProjectVersion>
+		<ProjectGuid>{A6861DEC-4E60-44A4-98A8-F03DEC75BE6B}</ProjectGuid>
+		<RootNamespace>ref_gl3</RootNamespace>
+		<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+		<ConfigurationType>DynamicLibrary</ConfigurationType>
+		<UseDebugLibraries>true</UseDebugLibraries>
+		<PlatformToolset>v142</PlatformToolset>
+		<CharacterSet>MultiByte</CharacterSet>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+		<ConfigurationType>DynamicLibrary</ConfigurationType>
+		<UseDebugLibraries>false</UseDebugLibraries>
+		<PlatformToolset>v142</PlatformToolset>
+		<WholeProgramOptimization>true</WholeProgramOptimization>
+		<CharacterSet>MultiByte</CharacterSet>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+		<ConfigurationType>DynamicLibrary</ConfigurationType>
+		<UseDebugLibraries>true</UseDebugLibraries>
+		<PlatformToolset>v142</PlatformToolset>
+		<CharacterSet>MultiByte</CharacterSet>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+		<ConfigurationType>DynamicLibrary</ConfigurationType>
+		<UseDebugLibraries>false</UseDebugLibraries>
+		<PlatformToolset>v142</PlatformToolset>
+		<WholeProgramOptimization>true</WholeProgramOptimization>
+		<CharacterSet>MultiByte</CharacterSet>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+	<ImportGroup Label="ExtensionSettings">
+	</ImportGroup>
+	<ImportGroup Label="Shared">
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Label="UserMacros" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
+		<LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
+		<OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+		<IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
+		<LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
+		<OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+		<IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
+		<LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
+		<IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<IncludePath>$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\client\refresh\gl3\glad\include;$(IncludePath)</IncludePath>
+		<LibraryPath>$(OutDir);$(LibraryPath)</LibraryPath>
+		<IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+	</PropertyGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<ClCompile>
+			<WarningLevel>Level3</WarningLevel>
+			<Optimization>Disabled</Optimization>
+			<SDLCheck>false</SDLCheck>
+			<PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+			<AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+		</ClCompile>
+		<Link>
+			<AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+		</Link>
+		<CustomBuildStep>
+			<Command>
+			</Command>
+		</CustomBuildStep>
+		<CustomBuildStep />
+		<PostBuildEvent>
+			<Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
+		</PostBuildEvent>
+		<PostBuildEvent>
+			<Message>Copying shaders</Message>
+		</PostBuildEvent>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<ClCompile>
+			<WarningLevel>Level3</WarningLevel>
+			<Optimization>Disabled</Optimization>
+			<SDLCheck>false</SDLCheck>
+			<PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+			<AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+			<BrowseInformation>true</BrowseInformation>
+		</ClCompile>
+		<Link>
+			<AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+		</Link>
+		<CustomBuildStep>
+			<Command>
+			</Command>
+		</CustomBuildStep>
+		<CustomBuildStep />
+		<PostBuildEvent>
+			<Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
+		</PostBuildEvent>
+		<PostBuildEvent>
+			<Message>Copying shaders</Message>
+		</PostBuildEvent>
+		<Bscmake>
+			<PreserveSbr>true</PreserveSbr>
+		</Bscmake>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<ClCompile>
+			<WarningLevel>Level3</WarningLevel>
+			<Optimization>MaxSpeed</Optimization>
+			<FunctionLevelLinking>true</FunctionLevelLinking>
+			<IntrinsicFunctions>true</IntrinsicFunctions>
+			<SDLCheck>false</SDLCheck>
+			<PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+			<AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+		</ClCompile>
+		<Link>
+			<EnableCOMDATFolding>true</EnableCOMDATFolding>
+			<OptimizeReferences>true</OptimizeReferences>
+			<AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+		</Link>
+		<CustomBuildStep>
+			<Command>
+			</Command>
+		</CustomBuildStep>
+		<CustomBuildStep />
+		<PostBuildEvent>
+			<Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
+		</PostBuildEvent>
+		<PostBuildEvent>
+			<Message>Copying shaders</Message>
+		</PostBuildEvent>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<ClCompile>
+			<WarningLevel>Level3</WarningLevel>
+			<Optimization>MaxSpeed</Optimization>
+			<FunctionLevelLinking>true</FunctionLevelLinking>
+			<IntrinsicFunctions>true</IntrinsicFunctions>
+			<SDLCheck>false</SDLCheck>
+			<PreprocessorDefinitions>YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+			<AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+		</ClCompile>
+		<Link>
+			<EnableCOMDATFolding>true</EnableCOMDATFolding>
+			<OptimizeReferences>true</OptimizeReferences>
+			<AdditionalDependencies>opengl32.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+		</Link>
+		<CustomBuildStep>
+			<Command>
+			</Command>
+		</CustomBuildStep>
+		<CustomBuildStep />
+		<PostBuildEvent>
+			<Command>copy "$(ProjectDir)..\src\client\refresh\gl3\shaders\*.*" "C:\Program Files (x86)\Quake II\baseq2\shaders\"</Command>
+		</PostBuildEvent>
+		<PostBuildEvent>
+			<Message>Copying shaders</Message>
+		</PostBuildEvent>
+	</ItemDefinitionGroup>
+	<ItemGroup>
+		<ClCompile Include="..\src\backends\windows\shared\mem.c" />
+		<ClCompile Include="..\src\client\refresh\files\pcx.c" />
+		<ClCompile Include="..\src\client\refresh\files\stb.c" />
+		<ClCompile Include="..\src\client\refresh\files\wal.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_draw.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_image.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_light.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_lightmap.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_main.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_md2.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_mesh.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_misc.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_model.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_sdl.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_shaders.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_sp2.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_surf.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\gl3_warp.c" />
+		<ClCompile Include="..\src\client\refresh\gl3\glad\src\glad.c" />
+		<ClCompile Include="..\src\common\md4.c" />
+		<ClCompile Include="..\src\common\shared\shared.c" />
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\src\client\refresh\constants\anorms.h" />
+		<ClInclude Include="..\src\client\refresh\constants\anormtab.h" />
+		<ClInclude Include="..\src\client\refresh\constants\warpsin.h" />
+		<ClInclude Include="..\src\client\refresh\files\stb_image.h" />
+		<ClInclude Include="..\src\client\refresh\gl3\glad\include\glad\glad.h" />
+		<ClInclude Include="..\src\client\refresh\gl3\glad\include\KHR\khrplatform.h" />
+		<ClInclude Include="..\src\client\refresh\gl3\header\DG_dynarr.h" />
+		<ClInclude Include="..\src\client\refresh\gl3\header\HandmadeMath.h" />
+		<ClInclude Include="..\src\client\refresh\gl3\header\local.h" />
+		<ClInclude Include="..\src\client\refresh\gl3\header\model.h" />
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\glsl.h" />
+		<ClInclude Include="..\src\client\refresh\ref_shared.h" />
+		<ClInclude Include="..\src\common\header\shared.h" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\src\client\refresh\gl3\shaders\2d.frag">
+			<FileType>Document</FileType>
+		</None>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\2d.vert">
+			<FileType>Document</FileType>
+			<ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">glsl.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+			<ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">glsl.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+			<ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glsl.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+			<ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glsl.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\2darray.frag">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\2Dcolor.frag">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\2Dcolor.vert">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\3D.frag">
+			<FileType>Document</FileType>
+			<DeploymentContent>true</DeploymentContent>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\3D.vert">
+			<FileType>Document</FileType>
+			<DeploymentContent>true</DeploymentContent>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\3Dcolor.frag">
+			<FileType>Document</FileType>
+			<DeploymentContent>true</DeploymentContent>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.frag">
+			<FileType>Document</FileType>
+			<DeploymentContent>true</DeploymentContent>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.geom">
+			<FileType>Document</FileType>
+			<DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+			<DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+			<DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+			<DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+			<DeploymentContent>true</DeploymentContent>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\3Dlm.vert">
+			<FileType>Document</FileType>
+			<DeploymentContent>true</DeploymentContent>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\3Dsky.frag">
+			<FileType>Document</FileType>
+			<DeploymentContent>true</DeploymentContent>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\3Dsprite.frag">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\3DspriteAlpha.frag">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\3Dwater.frag">
+			<FileType>Document</FileType>
+			<ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+			<ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+			<ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+			<ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+			<DeploymentContent>true</DeploymentContent>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\Alias.frag">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\Alias.vert">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\AliasColor.frag">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\Common3D.frag">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\Common3D.vert">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\Particles.frag">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\Particles.vert">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\ParticlesSquare.frag">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<None Include="..\src\client\refresh\gl3\shaders\3D.geom">
+			<DeploymentContent>true</DeploymentContent>
+		</None>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\Alias.geom">
+			<FileType>Document</FileType>
+			<DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+			<DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+		</ClInclude>
+		<ClInclude Include="..\src\client\refresh\gl3\shaders\Common.glsl">
+			<FileType>Document</FileType>
+		</ClInclude>
+		<ClCompile Include="..\src\client\refresh\gl3\shaders\3Dlm.tesc">
+			<FileType>Document</FileType>
+			<ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+			<ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+			<ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+			<ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+			<DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+			<DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+			<DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+			<DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+			<ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">glsl.h</ForcedIncludeFiles>
+			<ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">glsl.h</ForcedIncludeFiles>
+			<ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glsl.h</ForcedIncludeFiles>
+			<ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glsl.h</ForcedIncludeFiles>
+		</ClCompile>
+		<None Include="..\src\client\refresh\gl3\shaders\3Dcolor.tesc" />
+		<None Include="..\src\client\refresh\gl3\shaders\3Dcolor.tese" />
+		<None Include="..\src\client\refresh\gl3\shaders\3Dcolor.vert" />
+		<None Include="..\src\client\refresh\gl3\shaders\3Dlm.tese">
+			<DeploymentContent>true</DeploymentContent>
+		</None>
+		<None Include="..\src\client\refresh\gl3\shaders\3Dskycube.frag" />
+		<None Include="..\src\client\refresh\gl3\shaders\bumpmap.comp" />
+		<None Include="..\src\client\refresh\gl3\shaders\Common3D.geom">
+			<DeploymentContent>false</DeploymentContent>
+		</None>
+		<None Include="..\src\client\refresh\gl3\shaders\Particles.geom" />
+	</ItemGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+	<ImportGroup Label="ExtensionTargets">
+	</ImportGroup>
 </Project>

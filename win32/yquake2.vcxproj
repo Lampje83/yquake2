@@ -1,273 +1,271 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{846FFA24-F2B6-49DB-90E8-9B19D4F97FC4}</ProjectGuid>
-    <RootNamespace>yquake2</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)..\src\openal-soft\include;$(SolutionDir)..\src\zlib-1.2.11;$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\libvorbis-1.3.5\include;$(SolutionDir)..\src\libogg-1.3.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win32;$(SolutionDir)..\src\SDL2-2.0.7\lib\x86;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)..\src\openal-soft\include;$(SolutionDir)..\src\zlib-1.2.11;$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\libvorbis-1.3.5\include;$(SolutionDir)..\src\libogg-1.3.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win32;$(SolutionDir)..\src\SDL2-2.0.7\lib\x86;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)..\src\openal-soft\include;$(SolutionDir)..\src\zlib-1.2.11;$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\libvorbis-1.3.5\include;$(SolutionDir)..\src\libogg-1.3.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\src\SDL2-2.0.7\lib\x64;C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win64;$(LibraryPath)</LibraryPath>
-    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..\src\openal-soft\include;$(SolutionDir)..\src\zlib-1.2.11;$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\libvorbis-1.3.5\include;$(SolutionDir)..\src\libogg-1.3.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\src\SDL2-2.0.7\lib\x64;C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win64;$(LibraryPath)</LibraryPath>
-    <IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>_MBCS;YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;USE_OPENAL;AL_NO_PROTOTYPES;DEFAULT_OPENAL_DRIVER="openal32.dll";OGG;ZIP</PreprocessorDefinitions>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-    </ClCompile>
-    <Link>
-      <AdditionalLibraryDirectories>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sdl2.lib;openal32.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ShowProgress>LinkVerboseLib</ShowProgress>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>_MBCS;YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;USE_OPENAL;AL_NO_PROTOTYPES;DEFAULT_OPENAL_DRIVER="openal32.dll";OGG;ZIP</PreprocessorDefinitions>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <BrowseInformation>true</BrowseInformation>
-    </ClCompile>
-    <Link>
-      <AdditionalLibraryDirectories>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sdl2.lib;openal32.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ShowProgress>LinkVerboseLib</ShowProgress>
-      <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
-    </Link>
-    <Bscmake>
-      <PreserveSbr>true</PreserveSbr>
-    </Bscmake>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>_MBCS;YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;USE_OPENAL;AL_NO_PROTOTYPES;DEFAULT_OPENAL_DRIVER="openal32.dll";OGG;ZIP</PreprocessorDefinitions>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-    </ClCompile>
-    <Link>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sdl2.lib;openal32.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ShowProgress>LinkVerboseLib</ShowProgress>
-      <LinkStatus>true</LinkStatus>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>_MBCS;YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;USE_OPENAL;AL_NO_PROTOTYPES;DEFAULT_OPENAL_DRIVER="openal32.dll";OGG;ZIP</PreprocessorDefinitions>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-    </ClCompile>
-    <Link>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sdl2.lib;openal32.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ShowProgress>LinkVerboseLib</ShowProgress>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\backends\generic\misc.c" />
-    <ClCompile Include="..\src\backends\generic\qal.c" />
-    <ClCompile Include="..\src\backends\generic\vid.c" />
-    <ClCompile Include="..\src\backends\sdl\cd.c" />
-    <ClCompile Include="..\src\backends\sdl\input.c" />
-    <ClCompile Include="..\src\backends\sdl\refresh.c" />
-    <ClCompile Include="..\src\backends\sdl\sound.c">
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)backends\sdl\</ObjectFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)backends\sdl\</ObjectFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)backends\sdl\</ObjectFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)backends\sdl\</ObjectFileName>
-    </ClCompile>
-    <ClCompile Include="..\src\backends\windows\network.c" />
-    <ClCompile Include="..\src\backends\windows\shared\mem.c" />
-    <ClCompile Include="..\src\backends\windows\system.c" />
-    <ClCompile Include="..\src\client\cl_cin.c" />
-    <ClCompile Include="..\src\client\cl_console.c" />
-    <ClCompile Include="..\src\client\cl_download.c" />
-    <ClCompile Include="..\src\client\cl_effects.c" />
-    <ClCompile Include="..\src\client\cl_entities.c" />
-    <ClCompile Include="..\src\client\cl_input.c" />
-    <ClCompile Include="..\src\client\cl_inventory.c" />
-    <ClCompile Include="..\src\client\cl_keyboard.c" />
-    <ClCompile Include="..\src\client\cl_lights.c" />
-    <ClCompile Include="..\src\client\cl_main.c" />
-    <ClCompile Include="..\src\client\cl_network.c" />
-    <ClCompile Include="..\src\client\cl_parse.c" />
-    <ClCompile Include="..\src\client\cl_particles.c" />
-    <ClCompile Include="..\src\client\cl_prediction.c" />
-    <ClCompile Include="..\src\client\cl_screen.c" />
-    <ClCompile Include="..\src\client\cl_tempentities.c" />
-    <ClCompile Include="..\src\client\cl_view.c" />
-    <ClCompile Include="..\src\client\menu\menu.c" />
-    <ClCompile Include="..\src\client\menu\qmenu.c" />
-    <ClCompile Include="..\src\client\menu\videomenu.c" />
-    <ClCompile Include="..\src\client\sound\ogg.c" />
-    <ClCompile Include="..\src\client\sound\openal.c" />
-    <ClCompile Include="..\src\client\sound\sound.c" />
-    <ClCompile Include="..\src\client\sound\wave.c" />
-    <ClCompile Include="..\src\common\argproc.c" />
-    <ClCompile Include="..\src\common\clientserver.c" />
-    <ClCompile Include="..\src\common\cmdparser.c" />
-    <ClCompile Include="..\src\common\collision.c" />
-    <ClCompile Include="..\src\common\crc.c" />
-    <ClCompile Include="..\src\common\cvar.c" />
-    <ClCompile Include="..\src\common\filesystem.c" />
-    <ClCompile Include="..\src\common\frame.c" />
-    <ClCompile Include="..\src\common\glob.c" />
-    <ClCompile Include="..\src\common\md4.c" />
-    <ClCompile Include="..\src\common\movemsg.c" />
-    <ClCompile Include="..\src\common\netchan.c" />
-    <ClCompile Include="..\src\common\pmove.c" />
-    <ClCompile Include="..\src\common\shared\flash.c" />
-    <ClCompile Include="..\src\common\shared\rand.c" />
-    <ClCompile Include="..\src\common\shared\shared.c" />
-    <ClCompile Include="..\src\common\szone.c" />
-    <ClCompile Include="..\src\common\unzip\ioapi.c" />
-    <ClCompile Include="..\src\common\unzip\unzip.c" />
-    <ClCompile Include="..\src\common\zone.c" />
-    <ClCompile Include="..\src\server\sv_cmd.c" />
-    <ClCompile Include="..\src\server\sv_conless.c" />
-    <ClCompile Include="..\src\server\sv_entities.c" />
-    <ClCompile Include="..\src\server\sv_game.c" />
-    <ClCompile Include="..\src\server\sv_init.c" />
-    <ClCompile Include="..\src\server\sv_main.c" />
-    <ClCompile Include="..\src\server\sv_save.c" />
-    <ClCompile Include="..\src\server\sv_send.c" />
-    <ClCompile Include="..\src\server\sv_user.c" />
-    <ClCompile Include="..\src\server\sv_world.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\backends\generic\header\input.h" />
-    <ClInclude Include="..\src\backends\generic\header\qal.h" />
-    <ClInclude Include="..\src\backends\windows\header\resource.h" />
-    <ClInclude Include="..\src\backends\windows\header\winquake.h" />
-    <ClInclude Include="..\src\client\header\client.h" />
-    <ClInclude Include="..\src\client\header\console.h" />
-    <ClInclude Include="..\src\client\header\keyboard.h" />
-    <ClInclude Include="..\src\client\header\ref.h" />
-    <ClInclude Include="..\src\client\header\screen.h" />
-    <ClInclude Include="..\src\client\header\vid.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\src\backends\windows\icon.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\src\libogg-1.3.2\win32\VS2010\libogg_static.vcxproj">
-      <Project>{15cbfeff-7965-41f5-b4e2-21e8795c9159}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\src\libvorbis-1.3.5\win32\VS2010\libvorbisfile\libvorbisfile_static.vcxproj">
-      <Project>{cebde98b-a6aa-46e6-bc79-faaf823db9ec}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\src\libvorbis-1.3.5\win32\VS2010\libvorbis\libvorbis_static.vcxproj">
-      <Project>{3a214e06-b95e-4d61-a291-1f8df2ec10fd}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\src\zlib-1.2.11\contrib\vstudio\vc14\zlibstat.vcxproj">
-      <Project>{745dec58-ebb3-47a9-a9b8-4c6627c01bf8}</Project>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+	<ItemGroup Label="ProjectConfigurations">
+		<ProjectConfiguration Include="Debug|Win32">
+			<Configuration>Debug</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Release|Win32">
+			<Configuration>Release</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Debug|x64">
+			<Configuration>Debug</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Release|x64">
+			<Configuration>Release</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+	</ItemGroup>
+	<PropertyGroup Label="Globals">
+		<VCProjectVersion>15.0</VCProjectVersion>
+		<ProjectGuid>{846FFA24-F2B6-49DB-90E8-9B19D4F97FC4}</ProjectGuid>
+		<RootNamespace>yquake2</RootNamespace>
+		<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>true</UseDebugLibraries>
+		<PlatformToolset>v142</PlatformToolset>
+		<CharacterSet>MultiByte</CharacterSet>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>false</UseDebugLibraries>
+		<PlatformToolset>v142</PlatformToolset>
+		<WholeProgramOptimization>true</WholeProgramOptimization>
+		<CharacterSet>MultiByte</CharacterSet>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>true</UseDebugLibraries>
+		<PlatformToolset>v142</PlatformToolset>
+		<CharacterSet>MultiByte</CharacterSet>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<UseDebugLibraries>false</UseDebugLibraries>
+		<PlatformToolset>v142</PlatformToolset>
+		<WholeProgramOptimization>true</WholeProgramOptimization>
+		<CharacterSet>MultiByte</CharacterSet>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+	<ImportGroup Label="ExtensionSettings">
+	</ImportGroup>
+	<ImportGroup Label="Shared">
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Label="UserMacros" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<IncludePath>$(SolutionDir)..\src\openal-soft\include;$(SolutionDir)..\src\zlib-1.2.11;$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\libvorbis-1.3.5\include;$(SolutionDir)..\src\libogg-1.3.2\include;$(IncludePath)</IncludePath>
+		<LibraryPath>C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win32;$(OutDir);$(LibraryPath)</LibraryPath>
+		<IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<IncludePath>$(SolutionDir)..\src\openal-soft\include;$(SolutionDir)..\src\zlib-1.2.11;$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\libvorbis-1.3.5\include;$(SolutionDir)..\src\libogg-1.3.2\include;$(IncludePath)</IncludePath>
+		<LibraryPath>C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win32;$(OutDir);$(LibraryPath)</LibraryPath>
+		<IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<IncludePath>$(SolutionDir)..\src\openal-soft\include;$(SolutionDir)..\src\zlib-1.2.11;$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\libvorbis-1.3.5\include;$(SolutionDir)..\src\libogg-1.3.2\include;$(IncludePath)</IncludePath>
+		<LibraryPath>$(OutDir);C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win64;$(LibraryPath)</LibraryPath>
+		<IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<IncludePath>$(SolutionDir)..\src\openal-soft\include;$(SolutionDir)..\src\zlib-1.2.11;$(SolutionDir)..\src\SDL2-2.0.7\include;$(SolutionDir)..\src\libvorbis-1.3.5\include;$(SolutionDir)..\src\libogg-1.3.2\include;$(IncludePath)</IncludePath>
+		<LibraryPath>$(OutDir);C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win64;$(LibraryPath)</LibraryPath>
+		<IntDir>$(SolutionDir)$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
+	</PropertyGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<ClCompile>
+			<WarningLevel>Level3</WarningLevel>
+			<Optimization>Disabled</Optimization>
+			<SDLCheck>false</SDLCheck>
+			<PreprocessorDefinitions>_MBCS;YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;USE_OPENAL;AL_NO_PROTOTYPES;DEFAULT_OPENAL_DRIVER="openal32.dll";OGG;ZIP</PreprocessorDefinitions>
+			<AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+			<MultiProcessorCompilation>true</MultiProcessorCompilation>
+		</ClCompile>
+		<Link>
+			<AdditionalLibraryDirectories>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<AdditionalDependencies>sdl2.lib;openal32.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<ShowProgress>LinkVerboseLib</ShowProgress>
+		</Link>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<ClCompile>
+			<WarningLevel>Level3</WarningLevel>
+			<Optimization>Disabled</Optimization>
+			<SDLCheck>false</SDLCheck>
+			<PreprocessorDefinitions>_MBCS;YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;USE_OPENAL;AL_NO_PROTOTYPES;DEFAULT_OPENAL_DRIVER="openal32.dll";OGG;ZIP</PreprocessorDefinitions>
+			<AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+			<MultiProcessorCompilation>true</MultiProcessorCompilation>
+			<BrowseInformation>true</BrowseInformation>
+		</ClCompile>
+		<Link>
+			<AdditionalLibraryDirectories>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<AdditionalDependencies>sdl2.lib;openal32.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<ShowProgress>LinkVerboseLib</ShowProgress>
+			<IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
+		</Link>
+		<Bscmake>
+			<PreserveSbr>true</PreserveSbr>
+		</Bscmake>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<ClCompile>
+			<WarningLevel>Level3</WarningLevel>
+			<Optimization>MaxSpeed</Optimization>
+			<FunctionLevelLinking>true</FunctionLevelLinking>
+			<IntrinsicFunctions>true</IntrinsicFunctions>
+			<SDLCheck>false</SDLCheck>
+			<PreprocessorDefinitions>_MBCS;YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;USE_OPENAL;AL_NO_PROTOTYPES;DEFAULT_OPENAL_DRIVER="openal32.dll";OGG;ZIP</PreprocessorDefinitions>
+			<AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+			<MultiProcessorCompilation>true</MultiProcessorCompilation>
+		</ClCompile>
+		<Link>
+			<EnableCOMDATFolding>true</EnableCOMDATFolding>
+			<OptimizeReferences>true</OptimizeReferences>
+			<AdditionalLibraryDirectories>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<AdditionalDependencies>sdl2.lib;openal32.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<ShowProgress>LinkVerboseLib</ShowProgress>
+			<LinkStatus>true</LinkStatus>
+			<ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+		</Link>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<ClCompile>
+			<WarningLevel>Level3</WarningLevel>
+			<Optimization>MaxSpeed</Optimization>
+			<FunctionLevelLinking>true</FunctionLevelLinking>
+			<IntrinsicFunctions>true</IntrinsicFunctions>
+			<SDLCheck>false</SDLCheck>
+			<PreprocessorDefinitions>_MBCS;YQ2OSTYPE="Windows";YQ2ARCH="x86";SDL2;USE_OPENAL;AL_NO_PROTOTYPES;DEFAULT_OPENAL_DRIVER="openal32.dll";OGG;ZIP</PreprocessorDefinitions>
+			<AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+			<MultiProcessorCompilation>true</MultiProcessorCompilation>
+		</ClCompile>
+		<Link>
+			<EnableCOMDATFolding>true</EnableCOMDATFolding>
+			<OptimizeReferences>true</OptimizeReferences>
+			<AdditionalLibraryDirectories>C:\Users\Erik\Documents\Visual Studio 2017\Projects\yquake2\src\SDL2-2.0.7\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<AdditionalDependencies>sdl2.lib;openal32.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<ShowProgress>LinkVerboseLib</ShowProgress>
+		</Link>
+	</ItemDefinitionGroup>
+	<ItemGroup>
+		<ClCompile Include="..\src\backends\generic\misc.c" />
+		<ClCompile Include="..\src\backends\generic\qal.c" />
+		<ClCompile Include="..\src\backends\generic\vid.c" />
+		<ClCompile Include="..\src\backends\sdl\cd.c" />
+		<ClCompile Include="..\src\backends\sdl\input.c" />
+		<ClCompile Include="..\src\backends\sdl\refresh.c" />
+		<ClCompile Include="..\src\backends\sdl\sound.c">
+			<ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)backends\sdl\</ObjectFileName>
+			<ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)backends\sdl\</ObjectFileName>
+			<ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)backends\sdl\</ObjectFileName>
+			<ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)backends\sdl\</ObjectFileName>
+		</ClCompile>
+		<ClCompile Include="..\src\backends\windows\network.c" />
+		<ClCompile Include="..\src\backends\windows\shared\mem.c" />
+		<ClCompile Include="..\src\backends\windows\system.c" />
+		<ClCompile Include="..\src\client\cl_cin.c" />
+		<ClCompile Include="..\src\client\cl_console.c" />
+		<ClCompile Include="..\src\client\cl_download.c" />
+		<ClCompile Include="..\src\client\cl_effects.c" />
+		<ClCompile Include="..\src\client\cl_entities.c" />
+		<ClCompile Include="..\src\client\cl_input.c" />
+		<ClCompile Include="..\src\client\cl_inventory.c" />
+		<ClCompile Include="..\src\client\cl_keyboard.c" />
+		<ClCompile Include="..\src\client\cl_lights.c" />
+		<ClCompile Include="..\src\client\cl_main.c" />
+		<ClCompile Include="..\src\client\cl_network.c" />
+		<ClCompile Include="..\src\client\cl_parse.c" />
+		<ClCompile Include="..\src\client\cl_particles.c" />
+		<ClCompile Include="..\src\client\cl_prediction.c" />
+		<ClCompile Include="..\src\client\cl_screen.c" />
+		<ClCompile Include="..\src\client\cl_tempentities.c" />
+		<ClCompile Include="..\src\client\cl_view.c" />
+		<ClCompile Include="..\src\client\menu\menu.c" />
+		<ClCompile Include="..\src\client\menu\qmenu.c" />
+		<ClCompile Include="..\src\client\menu\videomenu.c" />
+		<ClCompile Include="..\src\client\sound\ogg.c" />
+		<ClCompile Include="..\src\client\sound\openal.c" />
+		<ClCompile Include="..\src\client\sound\sound.c" />
+		<ClCompile Include="..\src\client\sound\wave.c" />
+		<ClCompile Include="..\src\common\argproc.c" />
+		<ClCompile Include="..\src\common\clientserver.c" />
+		<ClCompile Include="..\src\common\cmdparser.c" />
+		<ClCompile Include="..\src\common\collision.c" />
+		<ClCompile Include="..\src\common\crc.c" />
+		<ClCompile Include="..\src\common\cvar.c" />
+		<ClCompile Include="..\src\common\filesystem.c" />
+		<ClCompile Include="..\src\common\frame.c" />
+		<ClCompile Include="..\src\common\glob.c" />
+		<ClCompile Include="..\src\common\md4.c" />
+		<ClCompile Include="..\src\common\movemsg.c" />
+		<ClCompile Include="..\src\common\netchan.c" />
+		<ClCompile Include="..\src\common\pmove.c" />
+		<ClCompile Include="..\src\common\shared\flash.c" />
+		<ClCompile Include="..\src\common\shared\rand.c" />
+		<ClCompile Include="..\src\common\shared\shared.c" />
+		<ClCompile Include="..\src\common\szone.c" />
+		<ClCompile Include="..\src\common\unzip\ioapi.c" />
+		<ClCompile Include="..\src\common\unzip\unzip.c" />
+		<ClCompile Include="..\src\common\zone.c" />
+		<ClCompile Include="..\src\server\sv_cmd.c" />
+		<ClCompile Include="..\src\server\sv_conless.c" />
+		<ClCompile Include="..\src\server\sv_entities.c" />
+		<ClCompile Include="..\src\server\sv_game.c" />
+		<ClCompile Include="..\src\server\sv_init.c" />
+		<ClCompile Include="..\src\server\sv_main.c" />
+		<ClCompile Include="..\src\server\sv_save.c" />
+		<ClCompile Include="..\src\server\sv_send.c" />
+		<ClCompile Include="..\src\server\sv_user.c" />
+		<ClCompile Include="..\src\server\sv_world.c" />
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\src\backends\generic\header\input.h" />
+		<ClInclude Include="..\src\backends\generic\header\qal.h" />
+		<ClInclude Include="..\src\backends\windows\header\resource.h" />
+		<ClInclude Include="..\src\backends\windows\header\winquake.h" />
+		<ClInclude Include="..\src\client\header\client.h" />
+		<ClInclude Include="..\src\client\header\console.h" />
+		<ClInclude Include="..\src\client\header\keyboard.h" />
+		<ClInclude Include="..\src\client\header\ref.h" />
+		<ClInclude Include="..\src\client\header\screen.h" />
+		<ClInclude Include="..\src\client\header\vid.h" />
+	</ItemGroup>
+	<ItemGroup>
+		<ResourceCompile Include="..\src\backends\windows\icon.rc" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\src\libogg-1.3.2\win32\VS2010\libogg_static.vcxproj">
+			<Project>{15cbfeff-7965-41f5-b4e2-21e8795c9159}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\src\libvorbis-1.3.5\win32\VS2010\libvorbisfile\libvorbisfile_static.vcxproj">
+			<Project>{cebde98b-a6aa-46e6-bc79-faaf823db9ec}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\src\libvorbis-1.3.5\win32\VS2010\libvorbis\libvorbis_static.vcxproj">
+			<Project>{3a214e06-b95e-4d61-a291-1f8df2ec10fd}</Project>
+		</ProjectReference>
+		<ProjectReference Include="..\src\zlib-1.2.11\contrib\vstudio\vc14\zlibstat.vcxproj">
+			<Project>{745dec58-ebb3-47a9-a9b8-4c6627c01bf8}</Project>
+			<UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+		</ProjectReference>
+	</ItemGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+	<ImportGroup Label="ExtensionTargets">
+	</ImportGroup>
 </Project>
