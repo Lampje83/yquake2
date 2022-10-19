@@ -1,26 +1,26 @@
+#ifdef __INTELLISENSE__
+#include "Common3D.frag"
+#endif
+
 // it gets attributes and uniforms from fragmentCommon3D
 
 uniform sampler2D tex;
 uniform	sampler2DArray refl;
 uniform sampler2DArray reflDepth;
 
-in VS_OUT {
-	vec2 TexCoord;
-	vec3 WorldCoord;
-	vec3 Normal;
-} fs_in;
+in Vx3D gs_out;
 
 void main()
 {
-	vec4 texel = texture(tex, fs_in.TexCoord);
+	vec4 texel = texture(tex, gs_out.TexCoord);
 
 	texel.rgb /= intensity;
 
 	float newalpha = alpha;
 	if (alpha < 1)
 	{
-		vec3 viewang = normalize(viewPos - fs_in.WorldCoord.xyz);
-		float dp = dot(fs_in.Normal, viewang);
+		vec3 viewang = normalize(viewPos - gs_out.WorldCoord.xyz);
+		float dp = dot(gs_out.Normal, viewang);
 
 		newalpha += (1.0 - alpha) * pow (1 - dp, 3);
 

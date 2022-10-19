@@ -39,33 +39,32 @@ layout (std140) uniform refDat {
 };
 #endif
 
-in TCS_OUT {
-	vec2		TexCoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} tese_in[];
+in Vx3D tesc_out[];
+out Vx3D vs;
 
-out VS_OUT {
-	vec2		TexCoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} tese_out;
+in gl_PerVertex {
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+} gl_in[];
+
+out gl_PerVertex {
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+};
 
 void main (void) {
 	bool	refrActive = false;
 	//gl_Position = gl_in[0].gl_Position[0] * gl_TessCoord.x + gl_in[1].gl_Position * gl_TessCoord.y + gl_in[2].gl_Position * gl_TessCoord.z;
-	tese_out.TexCoord = tese_in[0].TexCoord * gl_TessCoord.x + tese_in[1].TexCoord * gl_TessCoord.y + tese_in[2].TexCoord * gl_TessCoord.z;
-	tese_out.WorldCoord = tese_in[0].WorldCoord * gl_TessCoord.x + tese_in[1].WorldCoord * gl_TessCoord.y + tese_in[2].WorldCoord * gl_TessCoord.z;
-	tese_out.Normal = tese_in[0].Normal * gl_TessCoord.x + tese_in[1].Normal * gl_TessCoord.y + tese_in[2].Normal * gl_TessCoord.z;
-	tese_out.SurfFlags = tese_in[2].SurfFlags;
-	tese_out.refIndex = tese_in[2].refIndex;
+	vs.TexCoord = tesc_out[0].TexCoord * gl_TessCoord.x + tesc_out[1].TexCoord * gl_TessCoord.y + tesc_out[2].TexCoord * gl_TessCoord.z;
+	vs.WorldCoord = tesc_out[0].WorldCoord * gl_TessCoord.x + tesc_out[1].WorldCoord * gl_TessCoord.y + tesc_out[2].WorldCoord * gl_TessCoord.z;
+	vs.Normal = tesc_out[0].Normal * gl_TessCoord.x + tesc_out[1].Normal * gl_TessCoord.y + tesc_out[2].Normal * gl_TessCoord.z;
+	vs.SurfFlags = tesc_out[2].SurfFlags;
+	vs.refIndex = tesc_out[2].refIndex;
 
-	if (tese_in[2].refIndex >= 0) {
-		if ((refData[tese_in[2].refIndex].flags & REFSURF_REFRACT) != 0) {
+	if (tesc_out[2].refIndex >= 0) {
+		if ((refData[tesc_out[2].refIndex].flags & REFSURF_REFRACT) != 0) {
 			refrActive = true;
 		}
 	}
@@ -78,9 +77,9 @@ void main (void) {
 	else if (gl_TessCoord.x == 0.0 && gl_TessCoord.y == 0.0 && gl_TessCoord.z == 1.0) {
 		gl_Position = gl_in[2].gl_Position;
 	}
-	else if (tese_in[2].refIndex >= 0 && (refData[tese_in[2].refIndex].flags & REFSURF_REFRACT) != 0) {
-		vec3 worldCoord = tese_in[0].WorldCoord * gl_TessCoord.x + tese_in[1].WorldCoord * gl_TessCoord.y + tese_in[2].WorldCoord * gl_TessCoord.z;
-		gl_Position = transProj * transView * vec4 (findRefractedPos(viewPos, worldCoord, refData[tese_in[2].refIndex]), 1);
+	else if (tesc_out[2].refIndex >= 0 && (refData[tesc_out[2].refIndex].flags & REFSURF_REFRACT) != 0) {
+		vec3 worldCoord = tesc_out[0].WorldCoord * gl_TessCoord.x + tesc_out[1].WorldCoord * gl_TessCoord.y + tesc_out[2].WorldCoord * gl_TessCoord.z;
+		gl_Position = transProj * transView * vec4 (findRefractedPos(viewPos, worldCoord, refData[tesc_out[2].refIndex]), 1);
 	}
 	else {
 		gl_Position = gl_in[0].gl_Position[0] * gl_TessCoord.x + gl_in[1].gl_Position * gl_TessCoord.y + gl_in[2].gl_Position * gl_TessCoord.z;

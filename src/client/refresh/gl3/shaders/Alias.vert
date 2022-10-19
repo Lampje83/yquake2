@@ -3,14 +3,7 @@
 #include "Common3D.vert"
 #endif
 
-out VS_OUT {
-	vec2		TexCoord;
-	vec4		Color;
-	vec3		WorldCoord;
-	float		refPlaneDist;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} vs;
+out Vx3Dal vs;
 
 void main()
 {

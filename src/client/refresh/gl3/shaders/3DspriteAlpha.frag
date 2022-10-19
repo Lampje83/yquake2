@@ -1,15 +1,16 @@
-// it gets attributes and uniforms from Common3D.frag
+#ifdef __INTELLISENSE__
+#include "glsl.h"
+#include "Common.glsl"
+#endif
 
-in VS_OUT {
-	vec2 TexCoord;
-	vec3 WorldCoord;
-	vec3 Normal;
-} fs_in;
+// it gets attributes and uniforms from Common3D.frag
+in Vx3D gs_out;
+
 uniform sampler2D tex;
 
 void main()
 {
-	vec4 texel = texture(tex, fs_in.TexCoord);
+	vec4 texel = texture(tex, gs_out.TexCoord);
 
 	if(texel.a <= 0.666)
 		discard;

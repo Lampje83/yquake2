@@ -836,27 +836,28 @@ static void initUBOs(void)
 
 }
 
+#define ERROR_ACTION // return false
 static qboolean createShaders ( void ) {
-	if ( !initShader2D ( &gl3state.si2D,			"shaders/2d.vert",		"shaders/2d.frag",										"textured 2D rendering" ) ) { return false; }
-	if ( !initShader2D ( &gl3state.si2Darray,		"shaders/2d.vert",		"shaders/2darray.frag",									"array-textured 2D rendering" ) ) { return false; }
-	if ( !initShader2D ( &gl3state.si2Dcolor,		"shaders/2Dcolor.vert", "shaders/2Dcolor.frag",									"color-only 2D rendering" ) ) { return false;	}
-	if ( !initShader3D ( &gl3state.si3Dlm,			"shaders/3Dlm.vert",	"shaders/3Dlm.frag",			"shaders/3Dlm.geom",	"textured 3D rendering with lightmap" ) ) { return false; }
-	if ( !initShader3D ( &gl3state.si3Dtrans,		"shaders/3Dcolor.vert",	"shaders/3D.frag",				"shaders/3D.geom",		"rendering translucent 3D things" ) ) { return false; }
-	if ( !initShader3D ( &gl3state.si3DcolorOnly,	"shaders/3D.vert",		"shaders/3Dcolor.frag",			"shaders/3D.geom",		"flat-colored 3D rendering" ) ) { return false;	}
-	if ( !initShader3D ( &gl3state.si3Dturb,		"shaders/3Dcolor.vert",	"shaders/3Dwater.frag",			"shaders/3D.geom",		"water rendering" ) ) { return false; }
-	if ( !initShader3D ( &gl3state.si3Dsky,			"shaders/3D.vert",		"shaders/3Dsky.frag",			"shaders/3D.geom",		"sky rendering" ) ) { return false;	}
-	if ( !initShader3D ( &gl3state.si3Dskycube,		"shaders/3D.vert",		"shaders/3Dskycube.frag",		"shaders/3D.geom",		"sky cubemap rendering" ) ) { return false;	}
-	if ( !initShader3D ( &gl3state.si3Dsprite,		"shaders/3D.vert",		"shaders/3Dsprite.frag",		"shaders/3D.geom",		"sprite rendering" ) ) { return false; }
-	if ( !initShader3D ( &gl3state.si3DspriteAlpha, "shaders/3D.vert",		"shaders/3DspriteAlpha.frag",	"shaders/3D.geom",		"alpha-tested sprite rendering" ) ) { return false;	}
-	if ( !initShader3D ( &gl3state.si3Dalias,		"shaders/Alias.vert",	"shaders/Alias.frag",			"shaders/Alias.geom",	"rendering textured models" ) ) { return false;	}
-	if ( !initShader3D ( &gl3state.si3DaliasColor,	"shaders/Alias.vert",	"shaders/AliasColor.frag",		"shaders/Alias.geom",	"flat-colored models" ) ) { return false;	}
+	if ( !initShader2D ( &gl3state.si2D,			"shaders/2d.vert",		"shaders/2d.frag",										"textured 2D rendering" ) ) { ERROR_ACTION; }
+	if ( !initShader2D ( &gl3state.si2Darray,		"shaders/2d.vert",		"shaders/2darray.frag",									"array-textured 2D rendering" ) ) { ERROR_ACTION; }
+	if ( !initShader2D ( &gl3state.si2Dcolor,		"shaders/2Dcolor.vert", "shaders/2Dcolor.frag",									"color-only 2D rendering" ) ) { ERROR_ACTION;	}
+	if ( !initShader3D ( &gl3state.si3Dlm,			"shaders/3Dlm.vert",	"shaders/3Dlm.frag",			"shaders/3Dlm.geom",	"textured 3D rendering with lightmap" ) ) { ERROR_ACTION; }
+	if ( !initShader3D ( &gl3state.si3Dtrans,		"shaders/3Dcolor.vert",	"shaders/3D.frag",				"shaders/3D.geom",		"rendering translucent 3D things" ) ) { ERROR_ACTION; }
+	if ( !initShader3D ( &gl3state.si3DcolorOnly,	"shaders/3D.vert",		"shaders/3Dcolor.frag",			"shaders/3D.geom",		"flat-colored 3D rendering" ) ) { ERROR_ACTION;	}
+	if ( !initShader3D ( &gl3state.si3Dturb,		"shaders/3Dcolor.vert",	"shaders/3Dwater.frag",			"shaders/3D.geom",		"water rendering" ) ) { ERROR_ACTION; }
+	if ( !initShader3D ( &gl3state.si3Dsky,			"shaders/3D.vert",		"shaders/3Dsky.frag",			"shaders/3D.geom",		"sky rendering" ) ) { ERROR_ACTION;	}
+	if ( !initShader3D ( &gl3state.si3Dskycube,		"shaders/3D.vert",		"shaders/3Dskycube.frag",		"shaders/3D.geom",		"sky cubemap rendering" ) ) { ERROR_ACTION;	}
+	if ( !initShader3D ( &gl3state.si3Dsprite,		"shaders/3D.vert",		"shaders/3Dsprite.frag",		"shaders/3D.geom",		"sprite rendering" ) ) { ERROR_ACTION; }
+	if ( !initShader3D ( &gl3state.si3DspriteAlpha, "shaders/3D.vert",		"shaders/3DspriteAlpha.frag",	"shaders/3D.geom",		"alpha-tested sprite rendering" ) ) { ERROR_ACTION;	}
+	if ( !initShader3D ( &gl3state.si3Dalias,		"shaders/Alias.vert",	"shaders/Alias.frag",			"shaders/Alias.geom",	"rendering textured models" ) ) { ERROR_ACTION;	}
+	if ( !initShader3D ( &gl3state.si3DaliasColor,	"shaders/Alias.vert",	"shaders/AliasColor.frag",		"shaders/Alias.geom",	"flat-colored models" ) ) { ERROR_ACTION; }
 	const char* particleFrag = "shaders/Particles.frag";
 	if ( gl3_particle_square->value != 0.0f ) {
 		particleFrag = "shaders/ParticlesSquare.frag";
 	}
-	if ( !initShader3D ( &gl3state.siParticle, "shaders/Particles.vert", particleFrag, "shaders/Particles.geom", "rendering particles" ) ) { return false; }
+	if ( !initShader3D ( &gl3state.siParticle, "shaders/Particles.vert", particleFrag, "shaders/Particles.geom", "rendering particles" ) ) { ERROR_ACTION; }
 
-	if (!initShaderCompute (&gl3state.siBumpmap, "shaders/bumpmap.comp", "generating bumpmaps")) { return false; }
+	if (!initShaderCompute (&gl3state.siBumpmap, "shaders/bumpmap.comp", "generating bumpmaps")) { ERROR_ACTION; }
 
 	gl3state.currentShaderProgram = 0;
 

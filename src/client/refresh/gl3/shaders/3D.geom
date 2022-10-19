@@ -5,28 +5,15 @@
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 3) out;
 
-in VS_OUT {
-	vec2		TexCoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} gs_in[];
-
-out VS_OUT {
-	vec2		TexCoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} gs_out;
+in Vx3D vs[];
+out Vx3D gs_out;
 
 void writeVertexData (int index) {
-	gs_out.TexCoord = gs_in[index].TexCoord;
-	gs_out.WorldCoord = gs_in[index].WorldCoord;
-	gs_out.Normal = gs_in[index].Normal;
-	gs_out.refIndex = gs_in[index].refIndex;
-	gs_out.SurfFlags = gs_in[index].SurfFlags;
+	gs_out.TexCoord = vs[index].TexCoord;
+	gs_out.WorldCoord = vs[index].WorldCoord;
+	gs_out.Normal = vs[index].Normal;
+	gs_out.refIndex = vs[index].refIndex;
+	gs_out.SurfFlags = vs[index].SurfFlags;
 	gl_ClipDistance[0] = gl_in[index].gl_ClipDistance[0];
 	gl_Position = gl_in[index].gl_Position;
 }
@@ -43,7 +30,7 @@ vec4 transformPlane (vec4 plane, mat4 mat)
 
 void main() {
 	int i, j, k;
-	bool reflectionActive = gs_in[i].refIndex >= 0;
+	bool reflectionActive = vs[i].refIndex >= 0;
 
 	// perform backface culling, improves speed
 	// if (cross(gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz, gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz).z < 0)
@@ -58,9 +45,9 @@ void main() {
 		k = 0;
 		for (i = 0; i < gl_in.length (); i++) {
 /*
-			refPlaneDist[i] = dot (gs_in[i].WorldCoord.xyz, refData[gs_in[i].refIndex].plane.xyz) - refData[gs_in[i].refIndex].plane.w;
-			if (dot (viewPos, refData[gs_in[i].refIndex].plane.xyz) - refData[gs_in[i].refIndex].plane.w < 0)
-			//if ((refData[gs_in[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
+			refPlaneDist[i] = dot (vs[i].WorldCoord.xyz, refData[vs[i].refIndex].plane.xyz) - refData[vs[i].refIndex].plane.w;
+			if (dot (viewPos, refData[vs[i].refIndex].plane.xyz) - refData[vs[i].refIndex].plane.w < 0)
+			//if ((refData[vs[i].refIndex].flags & REFSURF_PLANEBACK) != 0)
 				refPlaneDist[i] = -refPlaneDist[i];
 */
 			// is point on plane?
@@ -72,11 +59,11 @@ void main() {
 			// discard
 			return;
 
-		gl_Layer = 1 + gs_in[0].refIndex;
+		gl_Layer = 1 + vs[0].refIndex;
 	}
 	else
 	{
 		gl_Layer = 0;
 	}
-	outputPrimitive ((reflectionActive) && ((refData[gs_in[0].refIndex].flags & REFSURF_REFRACT) == 0), gl_in.length ());
+	outputPrimitive ((reflectionActive) && ((refData[vs[0].refIndex].flags & REFSURF_REFRACT) == 0), gl_in.length ());
 }

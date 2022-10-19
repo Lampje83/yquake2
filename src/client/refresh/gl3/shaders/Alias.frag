@@ -1,17 +1,17 @@
+#ifdef __INTELLISENSE__
+#include "glsl.h"
+#include "Common3D.frag"
+#endif
+
 // it gets attributes and uniforms from fragmentCommon3D
 
 uniform sampler2D tex;
 
-in VS_OUT {
-	vec2		TexCoord;
-	vec4		Color;
-	vec3		WorldCoord;
-	// flat int	refIndex;
-} fs_in;
+in Vx3Dal gs_out;
 
 void main()
 {
-	vec4 texel = texture(tex, fs_in.TexCoord);
+	vec4 texel = texture(tex, gs_out.TexCoord);
 /*
 	float clipPos = dot (passWorldCoord, fluidPlane.xyz) + fluidPlane.w;
 	if (clipPos < 0 && (length(fluidPlane.xyz) > 0))
@@ -19,7 +19,7 @@ void main()
 */
 	// apply gamma correction and intensity
 	texel.a *= alpha; // is alpha even used here?
-	texel *= min(vec4(3.0), fs_in.Color);
+	texel *= min(vec4(3.0), gs_out.Color);
 
 	outColor = texel;
 }

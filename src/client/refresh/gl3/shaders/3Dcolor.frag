@@ -1,3 +1,7 @@
+#ifdef __INTELLISENSE__
+#include "Common3D.frag"
+#endif
+
 // it gets attributes and uniforms from Common3D.frag
 
 void main()

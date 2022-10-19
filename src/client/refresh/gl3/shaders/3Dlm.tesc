@@ -13,40 +13,31 @@ layout (std140) uniform refDat {
 };
 #endif
 
-struct Vertex {
-	vec2		TexCoord;
-	vec2		LMcoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	LightFlags;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-};
+in Vx3Dlm vs[];
+out Vx3Dlm tcs_out[];
 
-in Vertex VS_OUT[];
-/*
-out TCS_OUT {
-	vec2		TexCoord;
-	vec2		LMcoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	LightFlags;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} tesc_out[];
-*/
-out Vertex TCS_OUT[];
+in gl_PerVertex {
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+} gl_in[];
+
+out gl_PerVertex {
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+} gl_out[];
 
 void main () {
 	vec2 scrpos[3];
 
-	TCS_OUT[gl_InvocationID].TexCoord = VS_OUT[gl_InvocationID].TexCoord;
-	TCS_OUT[gl_InvocationID].LMcoord = VS_OUT[gl_InvocationID].LMcoord;
-	TCS_OUT[gl_InvocationID].WorldCoord = VS_OUT[gl_InvocationID].WorldCoord;
-	TCS_OUT[gl_InvocationID].Normal = VS_OUT[gl_InvocationID].Normal;
-	TCS_OUT[gl_InvocationID].LightFlags = VS_OUT[gl_InvocationID].LightFlags;
-	TCS_OUT[gl_InvocationID].SurfFlags = VS_OUT[gl_InvocationID].SurfFlags;
-	TCS_OUT[gl_InvocationID].refIndex = VS_OUT[gl_InvocationID].refIndex;
+	tcs_out[gl_InvocationID].TexCoord = vs[gl_InvocationID].TexCoord;
+	tcs_out[gl_InvocationID].LMcoord = vs[gl_InvocationID].LMcoord;
+	tcs_out[gl_InvocationID].WorldCoord = vs[gl_InvocationID].WorldCoord;
+	tcs_out[gl_InvocationID].Normal = vs[gl_InvocationID].Normal;
+	tcs_out[gl_InvocationID].LightFlags = vs[gl_InvocationID].LightFlags;
+	tcs_out[gl_InvocationID].SurfFlags = vs[gl_InvocationID].SurfFlags;
+	tcs_out[gl_InvocationID].refIndex = vs[gl_InvocationID].refIndex;
 
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 	gl_out[gl_InvocationID].gl_ClipDistance[0] = gl_in[gl_InvocationID].gl_ClipDistance[0];
@@ -80,12 +71,12 @@ void main () {
 				}
 			}
 #endif
-			if (VS_OUT[0].refIndex >= 0 && ((refData[VS_OUT[0].refIndex].flags & REFSURF_REFRACT) != 0) && refData[VS_OUT[0].refIndex].refrindex != 1.0) {
+			if (vs[0].refIndex >= 0 && ((refData[vs[0].refIndex].flags & REFSURF_REFRACT) != 0) && refData[vs[0].refIndex].refrindex != 1.0) {
 				vec3 lengths;
 #if 0
-				scrpos[0] = tesc_in[0].WorldCoord.xyz;
-				scrpos[1] = tesc_in[1].WorldCoord.xyz;
-				scrpos[2] = tesc_in[2].WorldCoord.xyz;
+				scrpos[0] = vs[0].WorldCoord.xyz;
+				scrpos[1] = vs[1].WorldCoord.xyz;
+				scrpos[2] = vs[2].WorldCoord.xyz;
 #else
 				scrpos[0] = clamp (gl_in[0].gl_Position.xy / gl_in[0].gl_Position.w, -1, 1);
 				scrpos[1] = clamp (gl_in[1].gl_Position.xy / gl_in[1].gl_Position.w, -1, 1);

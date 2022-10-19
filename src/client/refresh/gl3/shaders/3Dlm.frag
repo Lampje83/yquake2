@@ -21,38 +21,28 @@ layout (std140) uniform uniLights
 };
 
 uniform sampler2D tex;
-
 uniform sampler2DArray lightmap;
-
 uniform vec4 lmScales[4];
 
-in VS_OUT {
-	vec2		TexCoord;
-	vec2		LMcoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	LightFlags;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} fs_in;
+in Vx3Dlm gs_out;
 
 void main()
 {
-	vec4 texel = texture(tex, fs_in.TexCoord);
+	vec4 texel = texture(tex, gs_out.TexCoord);
 	vec4 lmTex;
 
 	// apply lightmap
 	if (flags != 3u)
 	{
-		lmTex  = texture(lightmap, vec3(fs_in.LMcoord, 0 + lightmapindex)) * lmScales[0];
-		lmTex += texture(lightmap, vec3(fs_in.LMcoord, 1 + lightmapindex)) * lmScales[1];
-		lmTex += texture(lightmap, vec3(fs_in.LMcoord, 2 + lightmapindex)) * lmScales[2];
-		lmTex += texture(lightmap, vec3(fs_in.LMcoord, 3 + lightmapindex)) * lmScales[3];
+		lmTex  = texture(lightmap, vec3(gs_out.LMcoord, 0 + lightmapindex)) * lmScales[0];
+		lmTex += texture(lightmap, vec3(gs_out.LMcoord, 1 + lightmapindex)) * lmScales[1];
+		lmTex += texture(lightmap, vec3(gs_out.LMcoord, 2 + lightmapindex)) * lmScales[2];
+		lmTex += texture(lightmap, vec3(gs_out.LMcoord, 3 + lightmapindex)) * lmScales[3];
 	}
 	else
 	{
 		ivec2 lmSize = textureSize (lightmap, 0).xy;
-		ivec2 LMcoord = ivec2(fs_in.LMcoord * lmSize);
+		ivec2 LMcoord = ivec2(gs_out.LMcoord * lmSize);
 		
 		lmTex  = texelFetch(lightmap, ivec3(LMcoord, 0 + lightmapindex), 0) * lmScales[0];
 		lmTex += texelFetch(lightmap, ivec3(LMcoord, 1 + lightmapindex), 0) * lmScales[1];
@@ -60,7 +50,7 @@ void main()
 		lmTex += texelFetch(lightmap, ivec3(LMcoord, 3 + lightmapindex), 0) * lmScales[3];
 	}
 
-	if(fs_in.LightFlags != 0u)
+	if(gs_out.LightFlags != 0u)
 	{
 		// TODO: or is hardcoding 32 better?
 		for(uint i=0u; i<numDynLights; ++i)
@@ -70,16 +60,16 @@ void main()
 			// and, if it is, sets intensity according to distance between light and pixel on surface
 
 			// dyn light number i does not affect this plane, just skip it
-			if((fs_in.LightFlags & (1u << i)) == 0u)  continue;
+			if((gs_out.LightFlags & (1u << i)) == 0u)  continue;
 
 			float intens = dynLights[i].lightColor.a;
 
-			vec3 lightToPos = dynLights[i].lightOrigin - fs_in.WorldCoord;
+			vec3 lightToPos = dynLights[i].lightOrigin - gs_out.WorldCoord;
 			float distLightToPos = length(lightToPos);
 			float fact = max(0, intens - distLightToPos - 52);
 
 			// also factor in angle between light and point on surface
-			fact *= max (0, dot (fs_in.Normal, lightToPos / distLightToPos));
+			fact *= max (0, dot (gs_out.Normal, lightToPos / distLightToPos));
 
 			lmTex.rgb += dynLights[i].lightColor.rgb * fact * (1.0/256.0);
 		}

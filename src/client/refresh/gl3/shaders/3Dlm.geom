@@ -6,41 +6,24 @@
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 3) out;
 
-in VS_OUT {
-	vec2		TexCoord;
-	vec2		LMcoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	LightFlags;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} gs_in[];
-
-out VS_OUT {
-	vec2		TexCoord;
-	vec2		LMcoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	LightFlags;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} gs_out;
+in Vx3Dlm vs[];
+out Vx3Dlm gs_out;
 
 void writeVertexData (int index) {
-	gs_out.LMcoord = gs_in[index].LMcoord;
-	gs_out.TexCoord = gs_in[index].TexCoord;
-	gs_out.WorldCoord = gs_in[index].WorldCoord;
-	gs_out.Normal = gs_in[index].Normal;
-	gs_out.LightFlags = gs_in[index].LightFlags;
-	gs_out.SurfFlags = gs_in[index].SurfFlags;
-	gs_out.refIndex = gs_in[index].refIndex;
+	gs_out.LMcoord = vs[index].LMcoord;
+	gs_out.TexCoord = vs[index].TexCoord;
+	gs_out.WorldCoord = vs[index].WorldCoord;
+	gs_out.Normal = vs[index].Normal;
+	gs_out.LightFlags = vs[index].LightFlags;
+	gs_out.SurfFlags = vs[index].SurfFlags;
+	gs_out.refIndex = vs[index].refIndex;
 	gl_ClipDistance[0] = gl_in[index].gl_ClipDistance[0];
 	gl_Position = gl_in[index].gl_Position;
 }
 
 void main() {
 	int i, j, k;
-	bool reflectionActive = gs_in[0].refIndex >= 0;
+	bool reflectionActive = vs[0].refIndex >= 0;
 
 	if (reflectionActive) {
 		// perform frustum culling
@@ -51,8 +34,8 @@ void main() {
 				vec4 pos = gl_in[i].gl_Position;
 				if (j < 4) {
 					// test for view culling
-					//if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[gs_in[i].refIndex].cullDistances[j] * pos.w) && (gl_in[i].gl_ClipDistance[0] > 0)) k++;
-					if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[gs_in[i].refIndex].cullDistances[j] * pos.w)) k++;
+					//if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[vs[i].refIndex].cullDistances[j] * pos.w) && (gl_in[i].gl_ClipDistance[0] > 0)) k++;
+					if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[vs[i].refIndex].cullDistances[j] * pos.w)) k++;
 				} else {
 					if (gl_in[i].gl_ClipDistance[0] < 0) k++;
 				}
@@ -64,9 +47,9 @@ void main() {
 			}
 		}
 #endif
-		gl_Layer = 1 + gs_in[0].refIndex;
+		gl_Layer = 1 + vs[0].refIndex;
 	} else {
 		gl_Layer = 0;
 	}
-	outputPrimitive ((reflectionActive) && ((refData[gs_in[0].refIndex].flags & REFSURF_REFRACT) == 0), gl_in.length ());
+	outputPrimitive ((reflectionActive) && ((refData[vs[0].refIndex].flags & REFSURF_REFRACT) == 0), gl_in.length ());
 }

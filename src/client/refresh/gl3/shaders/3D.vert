@@ -1,16 +1,9 @@
 // it gets attributes and uniforms from Common3D.vert
 #ifdef __INTELLISENSE__
-#include "glsl.h"
 #include "Common3D.vert"
 #endif
 
-out VS_OUT {
-	vec2		TexCoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} vs;
+out Vx3D vs;
 
 void main()
 {

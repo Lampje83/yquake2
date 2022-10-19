@@ -8,13 +8,7 @@ layout (std140) uniform refDat {
 };
 #endif
 
-in VS_OUT {
-	vec2 TexCoord;
-	vec3 WorldCoord;
-	vec3 Normal;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} fs_in;
+in Vx3D gs_out;
 
 uniform samplerCube tex;
 
@@ -34,11 +28,11 @@ mat4 rotationMatrix (vec3 axis, float angle)
 void main()
 {
 	vec3 vp = viewPos;
-	if (fs_in.refIndex >= 0 && (gl_Layer & 1) != 0) {
-		float dist = distToPlane (vp, refData[fs_in.refIndex].plane);
-		vp -= refData[fs_in.refIndex].plane.xyz * dist * 2;
+	if (gs_out.refIndex >= 0 && (gl_Layer & 1) != 0) {
+		float dist = distToPlane (vp, refData[gs_out.refIndex].plane);
+		vp -= refData[gs_out.refIndex].plane.xyz * dist * 2;
 	}
-	vec3 ray = fs_in.WorldCoord.yzx - vp.yzx;
+	vec3 ray = gs_out.WorldCoord.yzx - vp.yzx;
 	ray.x = -ray.x;
 	if (skyRotate.w != 0) {
 		vec3 axis = vec3 (-skyRotate.y, skyRotate.z, skyRotate.x);

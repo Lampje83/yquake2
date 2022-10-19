@@ -1,15 +1,10 @@
 // it gets attributes and uniforms from Common3D.frag
 
-in VS_OUT {
-	vec2		TexCoord;
-	vec4		Color;
-	vec3		WorldCoord;
-	// flat int	refIndex;
-} fs_in;
+in Vx3Dal gs_out;
 
 void main()
 {
-	vec4 texel = fs_in.Color;
+	vec4 texel = gs_out.Color;
 
 	// apply gamma correction and intensity
 	// texel.rgb *= intensity; // TODO: color-only rendering probably shouldn't use intensity?

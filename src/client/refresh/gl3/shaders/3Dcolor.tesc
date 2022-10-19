@@ -1,5 +1,4 @@
 #ifdef __INTELLISENSE__
-#include "glsl.h"
 #include "Common.glsl"
 #endif
 
@@ -13,30 +12,29 @@ layout (std140) uniform refDat {
 };
 #endif
 
-in VS_OUT {
-	vec2		TexCoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} tesc_in[];
+in Vx3D vs[];
+out Vx3D tesc_out[];
 
-out TCS_OUT {
-	vec2		TexCoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} tesc_out[];
+in gl_PerVertex {
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+} gl_in[];
+
+out gl_PerVertex {
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+} gl_out[];
 
 void main () {
 	vec2 scrpos[3];
 
-	tesc_out[gl_InvocationID].TexCoord = tesc_in[gl_InvocationID].TexCoord;
-	tesc_out[gl_InvocationID].WorldCoord = tesc_in[gl_InvocationID].WorldCoord;
-	tesc_out[gl_InvocationID].Normal = tesc_in[gl_InvocationID].Normal;
-	tesc_out[gl_InvocationID].SurfFlags = tesc_in[gl_InvocationID].SurfFlags;
-	tesc_out[gl_InvocationID].refIndex = tesc_in[gl_InvocationID].refIndex;
+	tesc_out[gl_InvocationID].TexCoord = vs[gl_InvocationID].TexCoord;
+	tesc_out[gl_InvocationID].WorldCoord = vs[gl_InvocationID].WorldCoord;
+	tesc_out[gl_InvocationID].Normal = vs[gl_InvocationID].Normal;
+	tesc_out[gl_InvocationID].SurfFlags = vs[gl_InvocationID].SurfFlags;
+	tesc_out[gl_InvocationID].refIndex = vs[gl_InvocationID].refIndex;
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 	gl_out[gl_InvocationID].gl_ClipDistance[0] = gl_in[gl_InvocationID].gl_ClipDistance[0];
 
@@ -50,7 +48,7 @@ void main () {
 					if (j < 4) {
 						// test for view culling
 						//if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[gs_in[i].refIndex].cullDistances[j] * pos.w) && (gl_in[i].gl_ClipDistance[0] > 0)) k++;
-						if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[tesc_in[i].refIndex].cullDistances[j] * pos.w)) k++;
+						if ((pos[j & 1] * (1.0 - (j & 2))) > (refData[vs[i].refIndex].cullDistances[j] * pos.w)) k++;
 					}
 					else {
 						if (gl_in[i].gl_ClipDistance[0] < 0) k++;
@@ -69,13 +67,13 @@ void main () {
 				}
 			}
 #endif
-			if (tesc_in[0].refIndex >= 0 && ((refData[tesc_in[0].refIndex].flags & REFSURF_REFRACT) != 0) && refData[tesc_in[0].refIndex].refrindex != 1.0) {
+			if (vs[0].refIndex >= 0 && ((refData[vs[0].refIndex].flags & REFSURF_REFRACT) != 0) && refData[vs[0].refIndex].refrindex != 1.0) {
 				vec3 lengths;
 
 #if 0
-				scrpos[0] = tesc_in[0].WorldCoord.xyz;
-				scrpos[1] = tesc_in[1].WorldCoord.xyz;
-				scrpos[2] = tesc_in[2].WorldCoord.xyz;
+				scrpos[0] = vs[0].WorldCoord.xyz;
+				scrpos[1] = vs[1].WorldCoord.xyz;
+				scrpos[2] = vs[2].WorldCoord.xyz;
 #else
 				scrpos[0] = clamp(gl_in[0].gl_Position.xy / gl_in[0].gl_Position.w, -1, 1);
 				scrpos[1] = clamp(gl_in[1].gl_Position.xy / gl_in[1].gl_Position.w, -1, 1);

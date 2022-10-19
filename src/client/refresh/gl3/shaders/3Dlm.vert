@@ -1,19 +1,10 @@
 // it gets attributes and uniforms from Common3D.vert
 #ifdef __INTELLISENSE__
-#include "Common.glsl"
 #include "Common3D.vert"
 #define VS_OUT struct
 #endif
 
-out VS_OUT {
-	vec2		TexCoord;
-	vec2		LMcoord;
-	vec3		WorldCoord;
-	vec3		Normal;
-	flat uint	LightFlags;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} vs;
+out Vx3Dlm vs;
 
 void main()
 {

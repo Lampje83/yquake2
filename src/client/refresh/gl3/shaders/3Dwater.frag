@@ -1,3 +1,7 @@
+#ifdef __INTELLISENSE__
+#include "glsl.h"
+#include "Common3D.frag"
+#endif
 
 #ifdef __INTELLISENSE__
 // it gets attributes and uniforms from Common3D.frag
@@ -20,13 +24,7 @@ layout (std140) uniform refDat {
 };
 #endif
 
-in VS_OUT {
-	vec2 TexCoord;
-	vec3 WorldCoord;
-	vec3 Normal;
-	flat uint	SurfFlags;
-	flat int	refIndex;
-} fs_in;
+in Vx3D gs_out;
 
 float brightness (vec3 color)
 {
@@ -38,17 +36,17 @@ void main()
 	vec2 texw;
 
 	// Apply water warp
-	texw.s = (fs_in.TexCoord.s + sin( fs_in.TexCoord.t * 4 + time ) * 0.0625) ;
-	texw.t = (fs_in.TexCoord.t + sin( fs_in.TexCoord.s * 4 + time ) * 0.0625) ;
+	texw.s = (gs_out.TexCoord.s + sin( gs_out.TexCoord.t * 4 + time ) * 0.0625) ;
+	texw.t = (gs_out.TexCoord.t + sin( gs_out.TexCoord.s * 4 + time ) * 0.0625) ;
 	vec4 texel = texture(tex, texw);
 
 	texel.rgb /= intensity;
 
-	float newalpha = pow(alpha, 2.0);
+	float newalpha = pow(alpha, 3.0);
 
 	if (alpha < 1)
 	{
-		vec3 viewang = normalize(viewPos - fs_in.WorldCoord.xyz);
+		vec3 viewang = normalize(viewPos - gs_out.WorldCoord.xyz);
 		vec2 delta = 1.0 / textureSize (tex, 0);
 		vec4 plane = refData[refTexture].plane;
 
@@ -76,7 +74,7 @@ void main()
 				;
 		*/
 
-		float dp = abs (dot (normalize(fs_in.Normal + vec3(df, 0.0) * 0.15), viewang));
+		float dp = abs (dot (normalize(gs_out.Normal + vec3(df, 0.0) * 0.15), viewang));
 
 		newalpha += (1.0 - newalpha) * pow (1 - dp, 3.0);
 		if (plane.z < 0) { plane = -plane; }
@@ -89,7 +87,7 @@ void main()
 		if (plane.z > 0) { plane = -plane; }
 
 		float refldepth;
-		if (fs_in.refIndex == -1) {
+		if (gs_out.refIndex == -1) {
 			refldepth = 0.002 / (1.0 - texture (reflDepth, vec3 (projCoord.xy, 1 + refTexture)).r);
 			refldepth -= 0.002 / (1.0 - gl_FragCoord.z);
 		}
@@ -102,7 +100,7 @@ void main()
 		//projCoord.xy += df * (texture (reflDepth, vec3(projCoord.xy, 1 + refTexture)).z - gl_FragCoord.z);
 		//projCoord.zw += df * (texture (reflDepth, vec3(projCoord.xy, 2 + refTexture)).z - gl_FragCoord.z);
 		float refrdepth;
-		if (fs_in.refIndex == -1) {
+		if (gs_out.refIndex == -1) {
 			refrdepth = 0.002 / (1.0 - texture (reflDepth, vec3 (projCoord.zw, 2 + refTexture)).r);
 			refrdepth -= 0.002 / (1.0 - gl_FragCoord.z);
 		}
@@ -119,7 +117,7 @@ void main()
 		if (plane.z < 0) { plane = -plane; }
 		if ((dot(plane.xyz, viewPos) - plane.w) < 0) {
 			// we are under water
-			refrdepth = length(fs_in.WorldCoord - viewPos) / 1000;
+			refrdepth = length(gs_out.WorldCoord - viewPos) / 1000;
 		}
 		texel.rgb *= clamp (1.0 - pow (0.95, refrdepth * 80.0), 0.0, 1.0);
 		// debug

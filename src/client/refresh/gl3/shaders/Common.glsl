@@ -22,6 +22,33 @@ struct refData_s {
 	float	_pad_2;
 };
 
+struct Vx3Dlm {
+	vec2		TexCoord;
+	vec2		LMcoord;
+	vec3		WorldCoord;
+	vec3		Normal;
+	uint	LightFlags;
+	uint	SurfFlags;
+	int		refIndex;
+};
+
+struct Vx3D {
+	vec2	TexCoord;
+	vec3	WorldCoord;
+	vec3	Normal;
+	uint	SurfFlags;
+	int		refIndex;
+};
+
+struct Vx3Dal {
+	vec2	TexCoord;
+	vec4	Color;
+	vec3	WorldCoord;
+	vec3	Normal;
+	uint	SurfFlags;
+	int		refIndex;
+};
+
 float distToPlane (vec3 point, vec4 plane) {
 	return  dot (point, plane.xyz) - plane.w;
 }
